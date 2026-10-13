@@ -6,6 +6,10 @@ DACA recipients, undocumented students, TPS holders, refugees/asylees, and F-1 /
 Students take a 6-step questionnaire, the AI backend scans ~650–700 scholarships, and results come back
 ranked by match score and grouped into 14 categories.
 
+![LevelUp landing page](docs/screenshots/1-landing.png)
+
+![Results dashboard](docs/screenshots/5-results.png)
+
 ## Stack
 
 React 18 · TypeScript · Vite · Tailwind CSS · React Router · lucide-react icons
