@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
-import { Bookmark, CheckCircle2, ExternalLink, Globe2, GraduationCap, MapPin, Sparkles, Users, X } from 'lucide-react'
+import {
+  AlertTriangle, BadgeCheck, Bookmark, CheckCircle2, ExternalLink, Globe2, GraduationCap, MapPin, Sparkles, X,
+} from 'lucide-react'
 import { CATEGORY_MAP, STATUS_SHORT } from '../data/options'
-import { amountLabel } from '../lib/format'
+import { shortDate } from '../lib/format'
 import { useStore } from '../lib/store'
 import type { MatchedScholarship } from '../lib/types'
 import { DeadlinePill, MatchRing } from './ScholarshipCard'
@@ -24,19 +26,26 @@ export default function ScholarshipDrawer({ s, onClose }: { s: MatchedScholarshi
   const isSaved = saved.includes(s.id)
   const isApplied = applied.includes(s.id)
 
+  const statuses =
+    s.eligibleStatuses === 'all'
+      ? null
+      : s.eligibleStatuses.filter((x) => x !== 'not_sure').map((x) => STATUS_SHORT[x]).join(', ')
+
   const facts = [
     {
       icon: Globe2,
-      label: 'Status eligibility',
-      value: s.eligibleStatuses === 'all' ? 'Open to all — no citizenship requirement' : s.eligibleStatuses.map((x) => STATUS_SHORT[x]).join(', '),
+      label: 'Citizenship & status',
+      value: s.citizenshipText,
+      sub: statuses ? `We match this to: ${statuses}` : undefined,
+      warn: !s.statusConfirmed,
     },
-    { icon: MapPin, label: 'Location', value: s.states === 'national' ? 'Nationwide' : s.states.join(', ') },
+    { icon: MapPin, label: 'Location', value: s.locationText },
     {
       icon: GraduationCap,
-      label: 'Grades',
-      value: s.grades.map((g) => (g === 'gap' ? 'Gap year' : `${g}th`)).join(', ') + (s.minGpa ? ` · Min GPA ${s.minGpa.toFixed(2)}` : ''),
+      label: 'Who can apply',
+      value: s.gradeText,
+      sub: s.minGpaText ? `Minimum GPA: ${s.minGpaText}` : 'No minimum GPA listed',
     },
-    { icon: Users, label: 'Awards given', value: s.awardsCount ? `${s.awardsCount} winners` : '—' },
   ]
 
   return (
@@ -62,14 +71,16 @@ export default function ScholarshipDrawer({ s, onClose }: { s: MatchedScholarshi
           <div className="mt-6 grid grid-cols-2 gap-3">
             <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-violet-600 p-4 text-white">
               <p className="text-xs font-medium uppercase tracking-wide text-white/70">Award</p>
-              <p className="mt-1 font-display text-2xl font-bold">{amountLabel(s)}</p>
-              {s.renewable && <p className="text-xs text-white/80">Renewable yearly</p>}
+              <p className="mt-1 font-display text-lg font-bold leading-snug">{s.amountText}</p>
             </div>
             <div className="rounded-2xl bg-slate-50 p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Deadline</p>
               <div className="mt-2">
-                <DeadlinePill deadline={s.deadline} />
+                <DeadlinePill s={s} />
               </div>
+              {s.deadlineDate && !s.deadlineExact && (
+                <p className="mt-1 text-xs text-slate-400">Estimated {shortDate(s.deadlineDate)}</p>
+              )}
             </div>
           </div>
 
@@ -79,14 +90,32 @@ export default function ScholarshipDrawer({ s, onClose }: { s: MatchedScholarshi
             </p>
             <ul className="mt-2 space-y-1">
               {s.reasons.map((r) => (
-                <li key={r} className="flex items-center gap-2 text-sm text-brand-900">
-                  <CheckCircle2 className="h-4 w-4 text-brand-500" /> {r}
+                <li key={r} className="flex items-start gap-2 text-sm text-brand-900">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" /> {r}
                 </li>
               ))}
             </ul>
           </div>
 
-          <p className="mt-6 leading-relaxed text-slate-700">{s.description}</p>
+          {s.warnings.length > 0 && (
+            <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <p className="flex items-center gap-2 text-sm font-semibold text-amber-800">
+                <AlertTriangle className="h-4 w-4" /> Double-check before applying
+              </p>
+              <ul className="mt-2 space-y-1">
+                {s.warnings.map((w) => (
+                  <li key={w} className="text-sm text-amber-900">• {w}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {s.notes && (
+            <>
+              <h3 className="mt-6 font-sans text-sm font-bold uppercase tracking-wide text-slate-500">Eligibility notes</h3>
+              <p className="mt-2 leading-relaxed text-slate-700">{s.notes}</p>
+            </>
+          )}
 
           <div className="mt-6 flex flex-wrap gap-1.5">
             {s.categories.map((c) => (
@@ -99,36 +128,33 @@ export default function ScholarshipDrawer({ s, onClose }: { s: MatchedScholarshi
           <dl className="mt-6 divide-y divide-slate-100 rounded-2xl border border-slate-200">
             {facts.map((f) => (
               <div key={f.label} className="flex gap-3 p-4">
-                <f.icon className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
+                <f.icon className={`mt-0.5 h-5 w-5 shrink-0 ${f.warn ? 'text-amber-500' : 'text-slate-400'}`} />
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{f.label}</dt>
                   <dd className="mt-0.5 text-sm text-slate-800">{f.value}</dd>
+                  {f.sub && <dd className="mt-0.5 text-xs text-slate-500">{f.sub}</dd>}
                 </div>
               </div>
             ))}
           </dl>
 
-          <h3 className="mt-6 font-sans text-sm font-bold uppercase tracking-wide text-slate-500">What you'll need</h3>
-          <ul className="mt-3 space-y-2">
-            {s.requirements.map((r) => (
-              <li key={r} className="flex items-start gap-2 text-sm text-slate-700">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" /> {r}
-              </li>
-            ))}
-          </ul>
+          <p className="mt-4 flex items-center gap-1.5 text-xs text-slate-400">
+            {s.verified && <BadgeCheck className="h-3.5 w-3.5 text-emerald-500" />}
+            {s.verificationText} · Last checked {shortDate(s.lastChecked)}
+          </p>
         </div>
 
         <div className="flex gap-2 border-t border-slate-100 p-4">
-          <button onClick={() => toggleSaved(s.id)} className="btn-secondary" aria-label="Save">
+          <button onClick={() => toggleSaved(s.id)} className="btn-secondary px-4" aria-label="Save">
             <Bookmark className="h-4 w-4" fill={isSaved ? 'currentColor' : 'none'} />
-            {isSaved ? 'Saved' : 'Save'}
+            <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save'}</span>
           </button>
-          <button onClick={() => toggleApplied(s.id)} className="btn-secondary">
+          <button onClick={() => toggleApplied(s.id)} className="btn-secondary px-4">
             <CheckCircle2 className={`h-4 w-4 ${isApplied ? 'text-emerald-600' : ''}`} />
             {isApplied ? 'Applied' : 'Mark applied'}
           </button>
-          <a href={s.url} target="_blank" rel="noreferrer" className="btn-primary flex-1">
-            Apply <ExternalLink className="h-4 w-4" />
+          <a href={s.url} target="_blank" rel="noopener noreferrer" className="btn-primary flex-1">
+            Official site <ExternalLink className="h-4 w-4" />
           </a>
         </div>
       </aside>

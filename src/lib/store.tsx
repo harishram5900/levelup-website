@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { MatchedScholarship, StudentProfile } from './types'
+import type { MatchResponse, StudentProfile } from './types'
 
 export const EMPTY_PROFILE: StudentProfile = {
   firstName: '',
@@ -22,8 +22,9 @@ export const EMPTY_PROFILE: StudentProfile = {
 interface Store {
   profile: StudentProfile | null
   setProfile: (p: StudentProfile | null) => void
-  results: MatchedScholarship[] | null
-  setResults: (r: MatchedScholarship[] | null) => void
+  /** Last match response (results + notices). */
+  match: MatchResponse | null
+  setMatch: (r: MatchResponse | null) => void
   saved: string[]
   toggleSaved: (id: string) => void
   applied: string[]
@@ -56,7 +57,7 @@ function usePersisted<T>(key: string, fallback: T) {
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = usePersisted<StudentProfile | null>('lu.profile', null)
-  const [results, setResults] = usePersisted<MatchedScholarship[] | null>('lu.results', null)
+  const [match, setMatch] = usePersisted<MatchResponse | null>('lu.match', null)
   const [saved, setSaved] = usePersisted<string[]>('lu.saved', [])
   const [applied, setApplied] = usePersisted<string[]>('lu.applied', [])
 
@@ -65,18 +66,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const reset = useCallback(() => {
     setProfile(null)
-    setResults(null)
+    setMatch(null)
     setSaved([])
     setApplied([])
-  }, [setProfile, setResults, setSaved, setApplied])
+  }, [setProfile, setMatch, setSaved, setApplied])
 
   return (
     <Ctx.Provider
       value={{
         profile,
         setProfile,
-        results,
-        setResults,
+        match,
+        setMatch,
         saved,
         toggleSaved: toggle(setSaved),
         applied,

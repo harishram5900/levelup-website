@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Lock, Sparkles } from 'lucide-react'
 import Chip, { OptionCard } from '../components/Chip'
 import {
-  ACTIVITIES, CIRCUMSTANCES, COLLEGE_PLANS, FIELDS, GPA, HERITAGE, INCOME, STATUS_OPTIONS, US_STATES,
+  ACTIVITIES, CIRCUMSTANCES, COLLEGE_PLANS, FIELDS, GENDERS, GPA, HERITAGE, INCOME, STATUS_OPTIONS, US_STATES,
 } from '../data/options'
 import { EMPTY_PROFILE, useStore } from '../lib/store'
 import type { StudentProfile } from '../lib/types'
@@ -124,6 +124,12 @@ const STEPS: Step[] = [
           </div>
         </div>
         <div>
+          <span className="label">Gender <span className="font-normal text-slate-400">(optional — some awards are for women & girls)</span></span>
+          <div className="flex flex-wrap gap-2">
+            {GENDERS.map((g) => <Chip key={g} label={g} selected={p.gender === g} onClick={() => set('gender', p.gender === g ? '' : g)} />)}
+          </div>
+        </div>
+        <div>
           <span className="label">Heritage <span className="font-normal text-slate-400">(optional, pick any)</span></span>
           <div className="flex flex-wrap gap-2">
             {HERITAGE.map((h) => <Chip key={h} label={h} selected={p.heritage.includes(h)} onClick={() => set('heritage', toggleIn(p.heritage, h))} />)}
@@ -150,16 +156,16 @@ const STEPS: Step[] = [
   },
   {
     title: 'Last thing — your preferences',
-    subtitle: 'We’ll tailor results to how much time you want to spend applying.',
+    subtitle: 'We’ll rank results around how much time you want to spend applying.',
     valid: () => true,
     render: (p, set) => (
       <div className="space-y-7">
         <div>
-          <span className="label">Essays?</span>
+          <span className="label">How much effort per application?</span>
           <div className="grid gap-3 sm:grid-cols-3">
-            <OptionCard label="Bring them on" hint="Show everything" selected={p.essayPref === 'any'} onClick={() => set('essayPref', 'any')} />
-            <OptionCard label="Short ones only" hint="Under ~500 words" selected={p.essayPref === 'short'} onClick={() => set('essayPref', 'short')} />
-            <OptionCard label="No essays" hint="Quick applications" selected={p.essayPref === 'none'} onClick={() => set('essayPref', 'none')} />
+            <OptionCard label="Go big" hint="Rank by best fit only" selected={p.essayPref === 'any'} onClick={() => set('essayPref', 'any')} />
+            <OptionCard label="A mix" hint="Bump quick awards up" selected={p.essayPref === 'short'} onClick={() => set('essayPref', 'short')} />
+            <OptionCard label="Quick wins first" hint="Small & easy awards on top" selected={p.essayPref === 'none'} onClick={() => set('essayPref', 'none')} />
           </div>
         </div>
         <div>
@@ -177,6 +183,7 @@ const STEPS: Step[] = [
             className="w-full accent-brand-600"
           />
           <div className="mt-1 flex justify-between text-xs text-slate-400"><span>Any</span><span>$10k+</span></div>
+          <p className="mt-2 text-xs text-slate-500">Awards listed as “Varies” or “Full tuition” are always kept.</p>
         </div>
       </div>
     ),

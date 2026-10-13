@@ -1,31 +1,32 @@
-import { SAMPLE_SCHOLARSHIPS } from '../data/sampleScholarships'
-import { matchScholarships } from './matching'
-import type { MatchedScholarship, StudentProfile } from './types'
+import type { MatchResponse, StatsResponse, StudentProfile } from './types'
 
 /**
- * Backend integration point.
- *
- * Set VITE_API_URL (e.g. in .env.local) and the app will POST the student's
- * questionnaire answers to `${VITE_API_URL}/match` and expect
- * `{ results: MatchedScholarship[] }` back. Without it, the bundled demo data
- * and client-side matcher are used.
+ * Base URL of the LevelUp API (server/). Defaults to same-origin `/api`, which the Vite
+ * dev server proxies to the API and which `npm start` serves directly. Set VITE_API_URL
+ * when the API is hosted elsewhere.
  */
-const API_URL = import.meta.env.VITE_API_URL as string | undefined
+const API_BASE = ((import.meta.env.VITE_API_URL as string | undefined) ?? '/api').replace(/\/$/, '')
 
-export const usingDemoData = !API_URL
-
-export async function findScholarships(profile: StudentProfile): Promise<MatchedScholarship[]> {
-  if (API_URL) {
-    const res = await fetch(`${API_URL.replace(/\/$/, '')}/match`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profile }),
-    })
-    if (!res.ok) throw new Error(`Matching service returned ${res.status}`)
-    const data = (await res.json()) as { results: MatchedScholarship[] }
-    return data.results
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  let res: Response
+  try {
+    res = await fetch(`${API_BASE}${path}`, init)
+  } catch {
+    throw new Error("Can't reach the LevelUp server. Check your connection and try again.")
   }
-  return matchScholarships(profile, SAMPLE_SCHOLARSHIPS)
+  const body = await res.json().catch(() => null)
+  if (!res.ok) throw new Error((body as { error?: string } | null)?.error ?? `Server error (${res.status})`)
+  return body as T
 }
 
-export const TOTAL_INDEXED = SAMPLE_SCHOLARSHIPS.length
+export function findScholarships(profile: StudentProfile) {
+  return request<MatchResponse>('/match', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ profile }),
+  })
+}
+
+export function getStats() {
+  return request<StatsResponse>('/stats')
+}

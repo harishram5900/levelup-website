@@ -2,20 +2,23 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, BadgeCheck, Bot, ClipboardList, LayoutGrid, Lock, ShieldCheck, Sparkles } from 'lucide-react'
 import { CATEGORIES, STATUS_OPTIONS } from '../data/options'
 import { LogoMark } from '../components/Logo'
+import { useStats } from '../lib/useStats'
 
 const steps = [
   { icon: ClipboardList, title: 'Answer a 3-minute quiz', body: 'Tell us your grade, state, status, interests and goals. Skip anything you’re not comfortable sharing.' },
-  { icon: Bot, title: 'Our AI scans 650+ scholarships', body: 'We check every listing’s fine print — citizenship rules, GPA, location, essays — against your answers.' },
+  { icon: Bot, title: 'We scan every scholarship', body: 'We check every listing’s fine print — citizenship rules, grade, GPA, location — against your answers.' },
   { icon: LayoutGrid, title: 'Get a sorted, categorized list', body: 'Only scholarships you can actually win, ranked by match and grouped into clear categories.' },
 ]
 
 const preview = [
-  { name: 'Dreamers Opportunity Scholarship', amt: '$12,500', tag: '🗽 Open to DACA', score: 96 },
-  { name: 'Future Innovators STEM Award', amt: '$5,000', tag: '🔬 STEM', score: 91 },
-  { name: 'First in the Family Grant', amt: '$8,000', tag: '🌱 First-Gen', score: 88 },
+  { name: 'TheDream.US National Scholarship', amt: 'Up to $33k', tag: '🗽 Undocumented, DACA & TPS', score: 96 },
+  { name: 'Microsoft HOLA Scholarship', amt: 'Up to $10k', tag: '🔬 STEM & Computer Science', score: 91 },
+  { name: 'Jack Kent Cooke College Scholarship', amt: 'Up to $55k/yr', tag: '💛 Financial Need & First-Gen', score: 88 },
 ]
 
 export default function Landing() {
+  const stats = useStats()
+  const count = stats?.highSchoolEligible
   return (
     <>
       {/* Hero */}
@@ -53,15 +56,15 @@ export default function Landing() {
           {/* Preview card */}
           <div className="relative mx-auto w-full max-w-md animate-fade-up [animation-delay:150ms]">
             <div className="absolute -right-6 -top-6 hidden animate-float rounded-2xl bg-white p-3 shadow-lift sm:block">
-              <p className="text-xs text-slate-500">Potential total</p>
-              <p className="font-display text-xl font-bold text-emerald-600">$148,250</p>
+              <p className="text-xs text-slate-500">Status rules checked</p>
+              <p className="font-display text-xl font-bold text-emerald-600">Every listing</p>
             </div>
             <div className="card p-6">
               <div className="flex items-center gap-3">
                 <LogoMark className="h-10 w-10" />
                 <div>
                   <p className="text-sm font-semibold text-slate-900">Hi Maya 👋</p>
-                  <p className="text-xs text-slate-500">We found 214 scholarships for you</p>
+                  <p className="text-xs text-slate-500">Here are your top matches</p>
                 </div>
               </div>
               <div className="mt-5 space-y-3">
@@ -79,7 +82,7 @@ export default function Landing() {
               <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
                 <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-brand-500 to-violet-500" />
               </div>
-              <p className="mt-2 text-xs text-slate-500">Scanning 684 of 684 scholarships…</p>
+              <p className="mt-2 text-xs text-slate-500">Example results</p>
             </div>
           </div>
         </div>
@@ -89,7 +92,7 @@ export default function Landing() {
       <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-10 sm:px-6 md:grid-cols-4">
           {[
-            ['650+', 'scholarships scanned'],
+            [count ? String(count) : '—', 'high-school scholarships'],
             ['14', 'clear categories'],
             ['10', 'immigration statuses supported'],
             ['50 + DC', 'states & territories'],

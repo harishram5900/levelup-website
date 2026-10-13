@@ -5,13 +5,13 @@ import Logo from './Logo'
 import { useStore } from '../lib/store'
 
 export default function Navbar() {
-  const { results, saved } = useStore()
+  const { match, saved } = useStore()
   const [open, setOpen] = useState(false)
 
   const links = [
     { to: '/#how', label: 'How it works' },
     { to: '/#who', label: 'Who we help' },
-    ...(results ? [{ to: '/results', label: 'My matches' }] : []),
+    ...(match ? [{ to: '/results', label: 'My matches' }] : []),
   ]
 
   return (
@@ -51,7 +51,7 @@ export default function Navbar() {
             )}
           </Link>
           <Link to="/start" className="btn-primary hidden sm:inline-flex">
-            {results ? 'Retake quiz' : 'Find my scholarships'}
+            {match ? 'Retake quiz' : 'Find my scholarships'}
           </Link>
           <button className="inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-slate-100 md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

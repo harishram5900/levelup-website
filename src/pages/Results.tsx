@@ -1,25 +1,32 @@
 import { useMemo, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { CalendarClock, DollarSign, Info, Layers, Search, SlidersHorizontal, Sparkles, X, Zap } from 'lucide-react'
+import { CalendarClock, DollarSign, Info, Layers, Search, ShieldCheck, SlidersHorizontal, Sparkles, X } from 'lucide-react'
 import ScholarshipCard from '../components/ScholarshipCard'
 import ScholarshipDrawer from '../components/ScholarshipDrawer'
 import { CATEGORIES, STATUS_OPTIONS } from '../data/options'
-import { usingDemoData } from '../lib/api'
-import { daysUntil, moneyFull } from '../lib/format'
+import { daysUntil, deadlineSortKey, moneyFull } from '../lib/format'
 import { useStore } from '../lib/store'
 import type { CategoryId, MatchedScholarship } from '../lib/types'
 
 type Sort = 'match' | 'deadline' | 'amount'
 const PAGE = 24
 
+const isConfirmed = (s: MatchedScholarship) => s.statusConfirmed
+const dueSoon = (s: MatchedScholarship) => {
+  const d = daysUntil(s.deadlineDate)
+  return d !== null && d <= 30
+}
+
 export default function Results() {
-  const { results, profile } = useStore()
+  const { match, profile } = useStore()
+  const results = match?.results ?? null
   const [cat, setCat] = useState<CategoryId | 'all'>('all')
   const [q, setQ] = useState('')
   const [sort, setSort] = useState<Sort>('match')
-  const [noEssay, setNoEssay] = useState(false)
+  const [confirmedOnly, setConfirmedOnly] = useState(false)
+  const [verifiedOnly, setVerifiedOnly] = useState(false)
   const [closingSoon, setClosingSoon] = useState(false)
-  const [renewable, setRenewable] = useState(false)
+  const [localOnly, setLocalOnly] = useState(false)
   const [limit, setLimit] = useState(PAGE)
   const [open, setOpen] = useState<MatchedScholarship | null>(null)
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -35,30 +42,25 @@ export default function Results() {
     const needle = q.trim().toLowerCase()
     const list = results.filter((s) => {
       if (cat !== 'all' && !s.categories.includes(cat)) return false
-      if (noEssay && s.essay !== 'none') return false
-      if (renewable && !s.renewable) return false
-      if (closingSoon) {
-        const d = daysUntil(s.deadline)
-        if (d === null || d > 30) return false
-      }
-      if (needle && !`${s.name} ${s.provider} ${s.description}`.toLowerCase().includes(needle)) return false
+      if (confirmedOnly && !isConfirmed(s)) return false
+      if (verifiedOnly && !s.verified) return false
+      if (closingSoon && !dueSoon(s)) return false
+      if (localOnly && s.states === 'national') return false
+      if (needle && !`${s.name} ${s.provider} ${s.notes}`.toLowerCase().includes(needle)) return false
       return true
     })
-    if (sort === 'amount') list.sort((a, b) => (b.amountMax ?? b.amount) - (a.amountMax ?? a.amount))
-    if (sort === 'deadline') list.sort((a, b) => (a.deadline ?? '9999').localeCompare(b.deadline ?? '9999'))
+    if (sort === 'amount') list.sort((a, b) => (b.amountMax ?? -1) - (a.amountMax ?? -1))
+    if (sort === 'deadline') list.sort((a, b) => deadlineSortKey(a).localeCompare(deadlineSortKey(b)))
     return list
-  }, [results, cat, q, sort, noEssay, closingSoon, renewable])
+  }, [results, cat, q, sort, confirmedOnly, verifiedOnly, closingSoon, localOnly])
 
   if (!results || !profile) return <Navigate to="/start" replace />
 
-  const total = results.reduce((sum, s) => sum + (s.amountMax ?? s.amount), 0)
-  const soonCount = results.filter((s) => {
-    const d = daysUntil(s.deadline)
-    return d !== null && d <= 30
-  }).length
-  const noEssayCount = results.filter((s) => s.essay === 'none').length
+  const total = results.reduce((sum, s) => sum + (s.amountMax ?? 0), 0)
+  const soonCount = results.filter(dueSoon).length
+  const confirmedCount = results.filter(isConfirmed).length
   const statusLabel = STATUS_OPTIONS.find((s) => s.id === profile.status)?.label
-  const activeFilters = [noEssay, closingSoon, renewable].filter(Boolean).length
+  const activeFilters = [confirmedOnly, verifiedOnly, closingSoon, localOnly].filter(Boolean).length
 
   const resetView = () => setLimit(PAGE)
   const chooseCat = (c: CategoryId | 'all') => {
@@ -68,9 +70,9 @@ export default function Results() {
 
   const stats = [
     { icon: Layers, label: 'Scholarships matched', value: results.length.toLocaleString(), tone: 'text-brand-600 bg-brand-50' },
-    { icon: DollarSign, label: 'Total potential', value: moneyFull(total), tone: 'text-emerald-600 bg-emerald-50' },
-    { icon: CalendarClock, label: 'Due in 30 days', value: soonCount, tone: 'text-rose-600 bg-rose-50' },
-    { icon: Zap, label: 'No essay required', value: noEssayCount, tone: 'text-fuchsia-600 bg-fuchsia-50' },
+    { icon: DollarSign, label: 'Listed award value', value: `${moneyFull(total)}+`, tone: 'text-emerald-600 bg-emerald-50' },
+    { icon: ShieldCheck, label: 'Status rules confirmed', value: confirmedCount, tone: 'text-teal-600 bg-teal-50' },
+    { icon: CalendarClock, label: 'Due in ~30 days', value: soonCount, tone: 'text-rose-600 bg-rose-50' },
   ]
 
   const CategoryList = (
@@ -108,16 +110,21 @@ export default function Results() {
             <span className="text-brand-600">{results.length}</span> scholarships
           </h1>
           <p className="mt-2 text-slate-600">
-            Filtered for {statusLabel ?? 'your status'} · grade {profile.grade === 'gap' ? 'gap year' : profile.grade} · {profile.state}
+            Filtered for {statusLabel ?? 'your status'} · {profile.grade === 'gap' ? 'gap year' : `grade ${profile.grade}`} · {profile.state}
+            {match && ` · ${match.scanned} high-school scholarships scanned`}
           </p>
         </div>
         <Link to="/start" className="btn-secondary self-start md:self-auto">Edit answers</Link>
       </div>
 
-      {usingDemoData && (
-        <div className="mt-5 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          <Info className="mt-0.5 h-4 w-4 shrink-0" />
-          <p><strong>Demo mode:</strong> showing generated sample scholarships. Connect the backend (VITE_API_URL) or load your spreadsheet to see real listings.</p>
+      {match && match.notices.length > 0 && (
+        <div className="mt-5 space-y-2">
+          {match.notices.map((n) => (
+            <div key={n} className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <Info className="mt-0.5 h-4 w-4 shrink-0" />
+              <p>{n}</p>
+            </div>
+          ))}
         </div>
       )}
 
@@ -191,9 +198,10 @@ export default function Results() {
           {filtersOpen && (
             <div className="mt-3 flex flex-wrap gap-2 animate-fade-up">
               {[
-                { on: noEssay, set: setNoEssay, label: '⚡ No essay' },
-                { on: closingSoon, set: setClosingSoon, label: '⏰ Due within 30 days' },
-                { on: renewable, set: setRenewable, label: '🔁 Renewable' },
+                { on: confirmedOnly, set: setConfirmedOnly, label: '🛡️ Status rules confirmed' },
+                { on: verifiedOnly, set: setVerifiedOnly, label: '✅ Verified 2026' },
+                { on: closingSoon, set: setClosingSoon, label: '⏰ Due in ~30 days' },
+                { on: localOnly, set: setLocalOnly, label: '📍 State & local only' },
               ].map((f) => (
                 <button
                   key={f.label}
@@ -209,9 +217,10 @@ export default function Results() {
               {activeFilters > 0 && (
                 <button
                   onClick={() => {
-                    setNoEssay(false)
+                    setConfirmedOnly(false)
+                    setVerifiedOnly(false)
                     setClosingSoon(false)
-                    setRenewable(false)
+                    setLocalOnly(false)
                   }}
                   className="inline-flex items-center gap-1 px-2 text-sm text-slate-500 hover:text-slate-800"
                 >
@@ -232,7 +241,7 @@ export default function Results() {
               <p className="mt-1 text-sm text-slate-500">Try clearing a filter or picking another category.</p>
             </div>
           ) : (
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {filtered.slice(0, limit).map((s) => (
                 <ScholarshipCard key={s.id} s={s} onOpen={() => setOpen(s)} />
               ))}

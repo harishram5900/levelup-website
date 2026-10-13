@@ -3,17 +3,18 @@ import { Link } from 'react-router-dom'
 import { Bookmark } from 'lucide-react'
 import ScholarshipCard from '../components/ScholarshipCard'
 import ScholarshipDrawer from '../components/ScholarshipDrawer'
-import { moneyFull } from '../lib/format'
+import { deadlineSortKey, moneyFull } from '../lib/format'
 import { useStore } from '../lib/store'
 import type { MatchedScholarship } from '../lib/types'
 
 export default function Saved() {
-  const { results, saved, applied } = useStore()
+  const { match, saved, applied } = useStore()
+  const results = match?.results ?? null
   const [open, setOpen] = useState<MatchedScholarship | null>(null)
   const list = (results ?? [])
     .filter((s) => saved.includes(s.id))
-    .sort((a, b) => (a.deadline ?? '9999').localeCompare(b.deadline ?? '9999'))
-  const total = list.reduce((sum, s) => sum + (s.amountMax ?? s.amount), 0)
+    .sort((a, b) => deadlineSortKey(a).localeCompare(deadlineSortKey(b)))
+  const total = list.reduce((sum, s) => sum + (s.amountMax ?? 0), 0)
   const appliedCount = list.filter((s) => applied.includes(s.id)).length
 
   return (
@@ -36,10 +37,10 @@ export default function Saved() {
         <>
           <div className="mt-6 grid max-w-xl grid-cols-3 gap-3">
             <div className="card p-4"><p className="font-display text-2xl font-bold">{list.length}</p><p className="text-xs text-slate-500">Saved</p></div>
-            <div className="card p-4"><p className="font-display text-2xl font-bold text-emerald-600">{moneyFull(total)}</p><p className="text-xs text-slate-500">Potential</p></div>
+            <div className="card p-4"><p className="font-display text-2xl font-bold text-emerald-600">{moneyFull(total)}+</p><p className="text-xs text-slate-500">Listed value</p></div>
             <div className="card p-4"><p className="font-display text-2xl font-bold">{appliedCount}/{list.length}</p><p className="text-xs text-slate-500">Applied</p></div>
           </div>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {list.map((s) => <ScholarshipCard key={s.id} s={s} onOpen={() => setOpen(s)} />)}
           </div>
         </>

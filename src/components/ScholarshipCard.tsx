@@ -1,13 +1,13 @@
-import { Bookmark, CalendarDays, CheckCircle2, FileText, RefreshCw } from 'lucide-react'
+import { AlertTriangle, BadgeCheck, Bookmark, CalendarDays, CheckCircle2, MapPin } from 'lucide-react'
 import { CATEGORY_MAP } from '../data/options'
-import { amountLabel, daysUntil, deadlineLabel } from '../lib/format'
+import { daysUntil, shortDate } from '../lib/format'
 import { useStore } from '../lib/store'
 import type { MatchedScholarship } from '../lib/types'
 
 export function MatchRing({ score }: { score: number }) {
   const r = 18
   const c = 2 * Math.PI * r
-  const color = score >= 85 ? '#10b981' : score >= 70 ? '#6366f1' : '#f59e0b'
+  const color = score >= 80 ? '#10b981' : score >= 60 ? '#6366f1' : '#f59e0b'
   return (
     <div className="relative h-12 w-12 shrink-0" title={`${score}% match`}>
       <svg viewBox="0 0 44 44" className="h-12 w-12 -rotate-90">
@@ -19,18 +19,19 @@ export function MatchRing({ score }: { score: number }) {
   )
 }
 
-export function DeadlinePill({ deadline }: { deadline?: string }) {
-  const d = daysUntil(deadline)
+/** Shows the source's deadline wording, plus a countdown when a date is known or estimated. */
+export function DeadlinePill({ s }: { s: Pick<MatchedScholarship, 'deadlineText' | 'deadlineDate' | 'deadlineExact'> }) {
+  const d = daysUntil(s.deadlineDate)
   const urgent = d !== null && d <= 14
   const soon = d !== null && d <= 45
+  const label = s.deadlineExact && s.deadlineDate ? shortDate(s.deadlineDate) : s.deadlineText
   return (
-    <span
-      className={`inline-flex items-center gap-1 text-xs font-medium ${
-        urgent ? 'text-rose-600' : soon ? 'text-amber-600' : 'text-slate-500'
-      }`}
-    >
-      <CalendarDays className="h-3.5 w-3.5" />
-      {deadline ? `${deadlineLabel(deadline)}${d !== null && d <= 45 ? ` · ${d === 0 ? 'today' : `${d}d left`}` : ''}` : 'Rolling deadline'}
+    <span className={`inline-flex items-center gap-1 text-xs font-medium ${urgent ? 'text-rose-600' : soon ? 'text-amber-600' : 'text-slate-500'}`}>
+      <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+      <span className="line-clamp-1">
+        {label}
+        {d !== null && d <= 45 && ` · ${s.deadlineExact ? '' : '~'}${d === 0 ? 'today' : `${d}d left`}`}
+      </span>
     </span>
   )
 }
@@ -59,11 +60,11 @@ export default function ScholarshipCard({ s, onOpen }: { s: MatchedScholarship; 
         </button>
       </div>
 
-      <div className="mt-4 flex items-baseline gap-2">
-        <span className="font-display text-2xl font-bold text-slate-900">{amountLabel(s)}</span>
-        {s.renewable && (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600">
-            <RefreshCw className="h-3 w-3" /> Renewable
+      <div className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span className="font-display text-xl font-bold leading-tight text-slate-900">{s.amountText}</span>
+        {s.verified && (
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600" title={s.verificationText}>
+            <BadgeCheck className="h-3.5 w-3.5" /> Verified 2026
           </span>
         )}
       </div>
@@ -77,21 +78,28 @@ export default function ScholarshipCard({ s, onOpen }: { s: MatchedScholarship; 
       </div>
 
       <p className="mt-3 line-clamp-2 text-sm text-slate-600">{s.reasons[0]}</p>
+      {s.warnings[0] && (
+        <p className="mt-2 flex items-start gap-1.5 text-xs text-amber-700">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span className="line-clamp-2">{s.warnings[0]}</span>
+        </p>
+      )}
 
-      <div className="mt-auto flex items-center justify-between gap-2 border-t border-slate-100 pt-4 mt-4">
-        <div className="flex flex-col gap-1">
-          <DeadlinePill deadline={s.deadline} />
+      <div className="flex-1" />
+      <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <DeadlinePill s={s} />
           <span className="inline-flex items-center gap-1 text-xs text-slate-500">
-            <FileText className="h-3.5 w-3.5" />
-            {s.essay === 'none' ? 'No essay' : s.essay === 'short' ? 'Short essay' : 'Full essay'}
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{s.locationText}</span>
           </span>
         </div>
         {isApplied ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
             <CheckCircle2 className="h-4 w-4" /> Applied
           </span>
         ) : (
-          <button onClick={onOpen} className="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-700">
+          <button onClick={onOpen} className="shrink-0 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-700">
             View details
           </button>
         )}

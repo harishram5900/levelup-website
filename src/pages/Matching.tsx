@@ -3,8 +3,9 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { Check, Loader2 } from 'lucide-react'
 import { LogoMark } from '../components/Logo'
 import { STATUS_OPTIONS } from '../data/options'
-import { findScholarships, TOTAL_INDEXED } from '../lib/api'
+import { findScholarships } from '../lib/api'
 import { useStore } from '../lib/store'
+import { useStats } from '../lib/useStats'
 
 const DURATION = 4200
 
@@ -17,9 +18,11 @@ const PHASES = [
 ]
 
 export default function Matching() {
-  const { profile, setResults } = useStore()
+  const { profile, setMatch } = useStore()
+  const stats = useStats()
+  const total = stats?.highSchoolEligible ?? 0
   const navigate = useNavigate()
-  const [scanned, setScanned] = useState(0)
+  const [progress, setProgress] = useState(0)
   const [phase, setPhase] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const started = useRef(false)
@@ -31,7 +34,7 @@ export default function Matching() {
     let raf = 0
     const tick = (t: number) => {
       const k = Math.min(1, (t - t0) / DURATION)
-      setScanned(Math.round(TOTAL_INDEXED * (1 - Math.pow(1 - k, 2))))
+      setProgress(1 - Math.pow(1 - k, 2))
       setPhase(Math.min(PHASES.length - 1, Math.floor(k * PHASES.length)))
       if (k < 1) raf = requestAnimationFrame(tick)
     }
@@ -43,12 +46,12 @@ export default function Matching() {
     if (!profile || started.current) return
     started.current = true
     Promise.all([findScholarships(profile), new Promise((r) => setTimeout(r, DURATION + 300))])
-      .then(([results]) => {
-        setResults(results)
+      .then(([response]) => {
+        setMatch(response)
         navigate('/results', { replace: true })
       })
       .catch((e: Error) => setError(e.message))
-  }, [profile, setResults, navigate])
+  }, [profile, setMatch, navigate])
 
   if (!profile) return <Navigate to="/start" replace />
   const statusLabel = STATUS_OPTIONS.find((s) => s.id === profile.status)?.label
@@ -68,10 +71,12 @@ export default function Matching() {
           Our AI is reviewing every listing{statusLabel ? ` for ${statusLabel} eligibility` : ''}.
         </p>
 
-        <p className="mt-6 font-display text-5xl font-extrabold tabular-nums text-brand-700">{scanned}</p>
-        <p className="text-sm text-slate-500">of {TOTAL_INDEXED} scholarships scanned</p>
+        <p className="mt-6 font-display text-5xl font-extrabold tabular-nums text-brand-700">
+          {total ? Math.round(total * progress) : `${Math.round(progress * 100)}%`}
+        </p>
+        <p className="text-sm text-slate-500">{total ? `of ${total} scholarships scanned` : 'scanned'}</p>
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full rounded-full bg-gradient-to-r from-brand-500 to-violet-500 transition-[width] duration-150" style={{ width: `${(scanned / TOTAL_INDEXED) * 100}%` }} />
+          <div className="h-full rounded-full bg-gradient-to-r from-brand-500 to-violet-500 transition-[width] duration-150" style={{ width: `${progress * 100}%` }} />
         </div>
 
         <ul className="mt-6 space-y-2.5 text-left">
@@ -91,7 +96,7 @@ export default function Matching() {
 
         {error && (
           <div className="mt-6 rounded-xl bg-rose-50 p-3 text-sm text-rose-700">
-            Something went wrong: {error}.{' '}
+            {error}{' '}
             <button className="font-semibold underline" onClick={() => navigate('/start')}>Try again</button>
           </div>
         )}

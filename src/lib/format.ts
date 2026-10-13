@@ -1,22 +1,17 @@
-import type { Scholarship } from './types'
-
-export const money = (n: number) =>
-  n >= 1000 ? `$${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k` : `$${n.toLocaleString()}`
-
 export const moneyFull = (n: number) => `$${n.toLocaleString()}`
 
-export function amountLabel(s: Scholarship) {
-  return s.amountMax ? `${money(s.amount)} – ${money(s.amountMax)}` : money(s.amount)
-}
-
-export function daysUntil(iso?: string) {
+export function daysUntil(iso: string | null) {
   if (!iso) return null
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   return Math.round((new Date(iso + 'T00:00:00').getTime() - today.getTime()) / 86400000)
 }
 
-export function deadlineLabel(iso?: string) {
-  if (!iso) return 'Rolling'
+export function shortDate(iso: string) {
   return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+/** Sort key: soonest real or estimated deadline first, rolling next, unknown last. */
+export function deadlineSortKey(s: { deadlineDate: string | null; rolling: boolean }) {
+  return s.deadlineDate ?? (s.rolling ? '9998' : '9999')
 }
