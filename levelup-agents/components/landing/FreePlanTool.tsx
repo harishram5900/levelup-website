@@ -1,8 +1,9 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { Copy, RefreshCw, Wand2 } from "lucide-react";
+import { Copy, Loader2, RefreshCw, Sparkles, Wand2 } from "lucide-react";
 import { useState } from "react";
-import { generatePlan, type PlanItem, type Tone } from "@/lib/generate";
+import type { PlanItem, Tone } from "@/lib/generate";
+import { fetchPlan } from "@/lib/planClient";
 import { ease } from "@/lib/motion";
 import { PLATFORMS, PlatformIcon, type Platform } from "@/components/ui/PlatformIcon";
 import { cn } from "@/lib/utils";
@@ -18,8 +19,14 @@ export function FreePlanTool() {
   const [seed, setSeed] = useState(0);
   const [plan, setPlan] = useState<PlanItem[] | null>(null);
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [source, setSource] = useState<"ai" | "template">("template");
 
-  const run = (s = seed) => setPlan(generatePlan({ brand, niche, tone, platforms: plats, seed: s }));
+  const run = async (s = seed) => {
+    setLoading(true);
+    const r = await fetchPlan({ brand, niche, tone, platforms: plats, seed: s });
+    setPlan(r.plan); setSource(r.source); setLoading(false);
+  };
   const toggle = (p: Platform) => setPlats((cur) => (cur.includes(p) ? cur.filter((x) => x !== p) : [...cur, p]));
   const copy = async () => {
     if (!plan) return;
@@ -43,21 +50,25 @@ export function FreePlanTool() {
             <button type="button" key={p.id} aria-pressed={plats.includes(p.id)} onClick={() => toggle(p.id)} className={cn("flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors", plats.includes(p.id) ? "border border-violet/50 bg-violet/10" : "hairline text-muted hover:text-fg")}><PlatformIcon name={p.id} size={16} />{p.name.split(" ")[0]}</button>
           ))}</div>
         </fieldset>
-        <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 font-semibold text-white transition-transform hover:-translate-y-0.5"><Wand2 size={18} aria-hidden /> Make my week of posts</button>
-        <p className="text-xs text-muted">Free, no sign-up. Built from proven short-video formats. The full AI agents will tailor this to real trends.</p>
+        <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 font-semibold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-70">{loading ? <><Loader2 size={18} className="animate-spin" aria-hidden /> Writing your plan…</> : <><Wand2 size={18} aria-hidden /> Make my week of posts</>}</button>
+        <p className="text-xs text-muted">Free, no sign-up. Our Script agent writes a plan for your business in a few seconds.</p>
       </form>
 
       <div className="glass min-h-[420px] rounded-[24px] p-5 sm:p-6" aria-live="polite">
-        {!plan ? (
+        {loading && !plan ? (
+          <div className="grid h-full min-h-[380px] place-items-center text-center">
+            <div><Loader2 className="mx-auto mb-4 animate-spin text-violet" size={32} aria-hidden /><p className="font-display text-2xl font-bold">Writing your week…</p><p className="mt-2 text-muted">This usually takes a few seconds.</p></div>
+          </div>
+        ) : !plan ? (
           <div className="grid h-full min-h-[380px] place-items-center text-center">
             <div><Wand2 className="mx-auto mb-4 text-violet" size={32} aria-hidden /><p className="font-display text-2xl font-bold">Your week of posts appears here</p><p className="mt-2 text-muted">Fill in your business and press the button.</p></div>
           </div>
         ) : (
           <>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <p className="font-display text-xl font-bold">7 posts for {brand || "your business"}</p>
+              <div><p className="font-display text-xl font-bold">7 posts for {brand || "your business"}</p><p className="mt-1 flex items-center gap-1.5 text-xs text-muted">{source === "ai" ? <><Sparkles size={12} className="text-violet" aria-hidden /> Written by our AI Script agent</> : "Built from proven short-video formats"}</p></div>
               <div className="flex gap-2">
-                <button type="button" onClick={() => { const s = seed + 1; setSeed(s); run(s); }} className="inline-flex items-center gap-1.5 rounded-full hairline px-3.5 py-2 text-sm hover:bg-fg/5"><RefreshCw size={14} aria-hidden /> New ideas</button>
+                <button type="button" disabled={loading} onClick={() => { const s = seed + 1; setSeed(s); run(s); }} className="inline-flex disabled:opacity-60 items-center gap-1.5 rounded-full hairline px-3.5 py-2 text-sm hover:bg-fg/5"><RefreshCw size={14} className={loading ? "animate-spin" : ""} aria-hidden /> New ideas</button>
                 <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 rounded-full hairline px-3.5 py-2 text-sm hover:bg-fg/5"><Copy size={14} aria-hidden /> {copied ? "Copied" : "Copy all"}</button>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 A website and demo web app for **LevelUp**, a team of six AI agents (Research, Script, Edit, Review, Publish, Optimize) that runs a small business's short-video marketing end to end.
 
-It also ships one feature that **works today with no backend**: a free content-plan generator. Visitors describe their business and get a week of post ideas with hooks, shot lists and captions. It's the hook that brings people to the site and onto the waitlist before the agents launch.
+It also ships one feature that **works today**: a free content-plan generator. Visitors describe their business and get a week of post ideas with hooks, shot lists and captions. With an Anthropic API key set, the plan is written by Claude for that specific business. Without one, it falls back to built-in templates, so the tool never breaks.
 
 ## Run it locally
 
@@ -31,6 +31,8 @@ Requires Node 18.18+ (tested on Node 22).
 4. Framework preset: **Next.js** (auto-detected). No environment variables are needed yet.
 5. Deploy.
 
+To turn on the AI Script agent, add an environment variable in **Project Settings → Environment Variables**: `ANTHROPIC_API_KEY` = your key from console.anthropic.com, then redeploy. Without it, the site uses templates.
+
 Note: on Vercel the filesystem is read-only, so the stub waitlist endpoint can't write to `data/waitlist.json` there. It falls back to memory and emails are lost on redeploy. Connect a real store before launch (see below).
 
 ## What's in it
@@ -45,6 +47,7 @@ Note: on Vercel the filesystem is read-only, so the stub waitlist endpoint can't
 | `/app/nurture` | Locked "Coming soon" preview with a notify button |
 | `/app/settings` | Theme, connected platforms (mock), approval setting |
 | `/api/waitlist` | Stub endpoint that validates and stores emails |
+| `/api/plan` | AI content-plan endpoint (Claude Opus 5.5, structured JSON output, refusal fallback). Rate-limited to 8 plans per IP per 10 minutes. Falls back to templates without a key |
 
 ## Project structure
 
@@ -70,7 +73,7 @@ Design tokens are CSS variables in `app/globals.css` (dark by default, light mod
 - **Content calendar posts:** `lib/mock/calendar.ts`. Changes aren't saved.
 - **Platform connections** in Settings and the wizard (TikTok, Instagram, YouTube, Facebook). Nothing connects to a real account.
 - **The agents themselves.** Nothing is researched, edited or posted yet.
-- **The free plan generator** (`lib/generate.ts`) is real but template-based, not AI. Swap `generatePlan` for an API call with the same input/output shape when the agents are ready.
+- **The free plan generator** is real. `app/api/plan/route.ts` calls Claude when `ANTHROPIC_API_KEY` is set; otherwise `lib/generate.ts` builds the plan from templates. The UI labels which one wrote it. Every plan costs a small amount of API usage, so the route has a per-IP limit (in memory, per server instance; use a shared store such as Upstash or Vercel KV for a hard limit at scale).
 - **The waitlist** (`app/api/waitlist/route.ts`) writes to `data/waitlist.json` locally (git-ignored).
 - **Nurture Flow** is a "Coming soon" preview. The notify button only changes local state.
 - **The account avatar ("SC")** in the app top bar.

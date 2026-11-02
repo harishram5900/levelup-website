@@ -1,9 +1,10 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Copy } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Copy, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { PLATFORMS, PlatformIcon, type Platform } from "@/components/ui/PlatformIcon";
-import { generatePlan, type PlanItem, type Tone } from "@/lib/generate";
+import type { PlanItem, Tone } from "@/lib/generate";
+import { fetchPlan } from "@/lib/planClient";
 import { ease } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -24,11 +25,16 @@ export function BrandWizard() {
   const [plats, setPlats] = useState<Platform[]>(["tiktok", "instagram"]);
   const [plan, setPlan] = useState<PlanItem[]>([]);
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [source, setSource] = useState<"ai" | "template">("template");
 
   const canNext = [brand.trim().length > 0, niche.trim().length > 0, true, plats.length > 0, true][step];
   const go = (d: number) => {
     const next = step + d;
-    if (next === 4) setPlan(generatePlan({ brand, niche, tone, platforms: plats }));
+    if (next === 4) {
+      setLoading(true); setPlan([]);
+      fetchPlan({ brand, niche, tone, platforms: plats }).then((r) => { setPlan(r.plan); setSource(r.source); setLoading(false); });
+    }
     setDir(d); setStep(next);
   };
   const copy = async () => {
@@ -64,8 +70,9 @@ export function BrandWizard() {
                   <PlatformIcon name={p.id} size={22} /><span className="flex-1 font-semibold">{p.name}</span>{on && <Check size={16} className="text-violet" aria-hidden />}
                 </button>); })}</div></fieldset>)}
             {step === 4 && (<div>
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><div><p className="font-display text-2xl font-bold">Your first week for {brand}</p><p className="text-sm text-muted">A starter plan from proven formats. Agents will tune it to live trends.</p></div>
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><div><p className="font-display text-2xl font-bold">Your first week for {brand}</p><p className="flex items-center gap-1.5 text-sm text-muted">{loading ? "Our Script agent is writing it…" : source === "ai" ? <><Sparkles size={13} className="text-violet" aria-hidden /> Written by our AI Script agent</> : "A starter plan from proven short-video formats."}</p></div>
                 <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 rounded-full hairline px-4 py-2 text-sm hover:bg-fg/5"><Copy size={14} aria-hidden /> {copied ? "Copied" : "Copy plan"}</button></div>
+              {loading && <div className="grid min-h-[240px] place-items-center"><Loader2 className="animate-spin text-violet" size={30} aria-label="Writing your plan" /></div>}
               <ol className="space-y-2">{plan.map((p, i) => (
                 <motion.li key={p.day} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06, ease }} className="flex gap-4 rounded-2xl bg-fg/[0.04] p-4">
                   <span className="w-10 shrink-0 text-sm font-semibold text-muted">{p.day}</span>
