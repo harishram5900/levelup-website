@@ -4,6 +4,7 @@ import { PlatformMarquee } from "@/components/landing/PlatformMarquee";
 import { Pipeline } from "@/components/landing/Pipeline";
 import { AgentGrid } from "@/components/landing/AgentGrid";
 import { TryIdea } from "@/components/landing/TryIdea";
+import { CharacterShowcase } from "@/components/landing/CharacterShowcase";
 import { Compare } from "@/components/landing/Compare";
 import { Pricing } from "@/components/landing/Pricing";
 import { Faq } from "@/components/landing/Faq";
@@ -25,8 +26,13 @@ export default function Home() {
         <PlatformMarquee />
 
         <Section id="how">
-          <Reveal><SectionHeading kicker="How it works" title={<>Six agents. <span className="text-gradient">One startup.</span></>} sub="Each agent handles one step of building a startup, in the order you need them. You always know what to do next." /></Reveal>
+          <Reveal><SectionHeading kicker="How it works" title={<>12 agents. <span className="text-gradient">One startup.</span></>} sub="Each agent handles one step of building a startup, in the order you need them, grouped into 4 worlds. You always know what to do next." /></Reveal>
           <Pipeline />
+        </Section>
+
+        <Section id="characters" className="pt-0">
+          <Reveal><SectionHeading kicker="Pick your co-founder" title={<>Five co-founders. <span className="text-gradient">Pick yours.</span></>} sub="Each one has a different personality and guides you through every step, from your first idea to your pitch." /></Reveal>
+          <CharacterShowcase />
         </Section>
 
         <Section id="agents" className="pt-0">

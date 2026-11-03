@@ -16,6 +16,8 @@ export function Footer() {
           <a href="#faq" className="text-muted hover:text-fg">FAQ</a>
           <Link href="/app/opportunities" className="text-muted hover:text-fg">Opportunities</Link>
           <a href="#waitlist" className="text-muted hover:text-fg">Join waitlist</a>
+          <Link href="/privacy" className="text-muted hover:text-fg">Privacy</Link>
+          <Link href="/terms" className="text-muted hover:text-fg">Terms</Link>
         </nav>
       </div>
       <p className="mx-auto mt-10 max-w-site text-xs text-muted">© {new Date().getFullYear()} LevelUp. Competition and program names belong to their organizers; LevelUp is not affiliated with them.</p>

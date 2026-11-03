@@ -2,7 +2,7 @@ import { Check, Minus } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 
 const ROWS = [
-  ["Getting started", "Search YouTube and blogs, then guess what to do first", "Six steps in order, with a clear next step every day"],
+  ["Getting started", "Search YouTube and blogs, then guess what to do first", "12 agents in 4 worlds, with a clear next step every day"],
   ["Feedback on your idea", "Friends and family say it's great", "Honest risks, plus tests you can run this week"],
   ["Pitch and applications", "Start from a blank page the night before", "One-liner, pitch and a 10-slide deck you can present or download"],
   ["Cost", "Mentors and courses most students can't afford", "Free for student founders"],

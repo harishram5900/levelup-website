@@ -5,3 +5,5 @@ out
 next-env.d.ts
 data/waitlist.json
 .env*.local
+.env
+.env.production

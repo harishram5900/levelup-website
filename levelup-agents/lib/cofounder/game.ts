@@ -1,4 +1,4 @@
-import { Banknote, Flame, Hammer, Layers, Lightbulb, Megaphone, Presentation, Rocket, Target, Users, type LucideIcon } from "lucide-react";
+import { Banknote, Flame, Gem, Hammer, Handshake, Layers, Lightbulb, Megaphone, Palette, Presentation, Radar, Rocket, Target, TrendingUp, Users, Video, type LucideIcon } from "lucide-react";
 import { AGENTS } from "../agents";
 import type { Workspace } from "./profile";
 
@@ -11,7 +11,8 @@ export const LEVELS = [
   { at: 450, title: "Hustler" },
   { at: 700, title: "Launcher" },
   { at: 1000, title: "Founder" },
-  { at: 1400, title: "Legend" },
+  { at: 1400, title: "Mogul" },
+  { at: 1900, title: "Legend" },
 ];
 
 export type Badge = { id: string; name: string; how: string; icon: LucideIcon; earned: (w: Workspace, streak: number) => boolean };
@@ -19,6 +20,12 @@ export type Badge = { id: string; name: string; how: string; icon: LucideIcon; e
 export const BADGES: Badge[] = [
   { id: "first-step", name: "First Step", how: "Finish the Idea agent", icon: Lightbulb, earned: (w) => !!w.results.idea },
   { id: "talk-to-users", name: "People Person", how: "Finish the Customer agent", icon: Users, earned: (w) => !!w.results.customer },
+  { id: "scout", name: "Scout", how: "Finish the Scout agent", icon: Radar, earned: (w) => !!w.results.competitor },
+  { id: "offer-master", name: "Offer Master", how: "Finish the Offer agent", icon: Gem, earned: (w) => !!w.results.offer },
+  { id: "brand-icon", name: "Brand Icon", how: "Finish the Brand agent", icon: Palette, earned: (w) => !!w.results.brand },
+  { id: "closer", name: "Closer", how: "Finish the Sales agent", icon: Handshake, earned: (w) => !!w.results.sales },
+  { id: "creator", name: "Creator", how: "Finish the Content agent", icon: Video, earned: (w) => !!w.results.content },
+  { id: "investor-ready", name: "Investor Ready", how: "Finish the Investor agent", icon: TrendingUp, earned: (w) => !!w.results.investor },
   { id: "shipper", name: "Shipper", how: "Finish the Build agent", icon: Hammer, earned: (w) => !!w.results.build },
   { id: "storyteller", name: "Storyteller", how: "Finish the Pitch agent", icon: Presentation, earned: (w) => !!w.results.pitch },
   { id: "money-brain", name: "Money Brain", how: "Finish the Money agent", icon: Banknote, earned: (w) => !!w.results.money },
@@ -26,7 +33,7 @@ export const BADGES: Badge[] = [
   { id: "deck-master", name: "Deck Master", how: "Build your pitch deck", icon: Layers, earned: (w) => !!w.deck },
   { id: "goal-getter", name: "Goal Getter", how: "Complete 3 weekly goals", icon: Target, earned: (w) => w.goals.filter((g) => g.done).length >= 3 },
   { id: "on-fire", name: "On Fire", how: "Show up 3 days in a row", icon: Flame, earned: (_w, s) => s >= 3 },
-  { id: "all-in", name: "All In", how: "Finish all six agents", icon: Rocket, earned: (w) => AGENTS.every((a) => w.results[a.id]) },
+  { id: "all-in", name: "All In", how: "Finish all 12 agents", icon: Rocket, earned: (w) => AGENTS.every((a) => w.results[a.id]) },
 ];
 
 const dayNum = (d: string) => Math.round(new Date(`${d}T12:00:00`).getTime() / 86_400_000);

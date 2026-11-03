@@ -108,3 +108,28 @@
 
 @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgb(var(--amber) / .55); } 100% { box-shadow: 0 0 0 18px rgb(var(--amber) / 0); } }
 .pulse-ring { animation: pulse-ring 1.6s ease-out infinite; }
+
+/* ---------- Button system: each kind of action has its own look ---------- */
+@layer components {
+  .btn { @apply relative inline-flex select-none items-center justify-center gap-2 font-semibold transition-all duration-150 disabled:pointer-events-none disabled:opacity-50; }
+  /* Game "play" button: chunky 3D press for the main action on a page */
+  .btn-play { @apply btn rounded-2xl px-6 py-3.5; background: rgb(var(--amber)); color: #1a1100; box-shadow: 0 6px 0 0 rgba(0,0,0,.3), 0 14px 30px -10px rgb(var(--amber) / .6); }
+  .btn-play:hover { filter: brightness(1.06); transform: translateY(-1px); box-shadow: 0 7px 0 0 rgba(0,0,0,.35), 0 18px 34px -10px rgb(var(--amber) / .7); }
+  .btn-play:active { transform: translateY(5px); box-shadow: 0 1px 0 0 rgba(0,0,0,.35); }
+  /* Glow button: gradient with a moving shine, for premium actions (present, sign up) */
+  .btn-glow { @apply btn overflow-hidden rounded-full px-5 py-2.5 text-white; background-image: linear-gradient(110deg, rgb(var(--violet)), rgb(var(--cyan))); box-shadow: 0 10px 30px -10px rgb(var(--violet) / .8), inset 0 1px 0 rgba(255,255,255,.25); }
+  .btn-glow::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); transform: translateX(-120%); transition: transform .7s ease; }
+  .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -10px rgb(var(--cyan) / .8), inset 0 1px 0 rgba(255,255,255,.25); }
+  .btn-glow:hover::after { transform: translateX(120%); }
+  /* Glass button: quiet secondary action */
+  .btn-glass { @apply btn rounded-xl px-4 py-2.5 text-fg; background: rgb(var(--fg) / .04); border: 1px solid rgb(var(--line) / .14); backdrop-filter: blur(10px); }
+  .btn-glass:hover { background: rgb(var(--fg) / .08); border-color: rgb(var(--violet) / .5); }
+  /* Soft tinted button: helpful tertiary action */
+  .btn-soft { @apply btn rounded-xl px-4 py-2.5; background: rgb(var(--violet) / .12); color: rgb(var(--violet)); }
+  .btn-soft:hover { background: rgb(var(--violet) / .2); }
+  .btn-outline-cta { @apply btn rounded-full border-2 px-5 py-2.5; border-color: rgb(var(--amber)); color: rgb(var(--amber)); }
+  .btn-outline-cta:hover { background: rgb(var(--amber) / .1); }
+  .btn-danger { @apply btn rounded-xl bg-red-600 px-4 py-2.5 text-white hover:bg-red-500; }
+  .btn-icon { @apply btn h-9 w-9 rounded-xl; background: rgb(var(--fg) / .05); border: 1px solid rgb(var(--line) / .12); }
+  .btn-icon:hover { background: rgb(var(--violet) / .15); color: rgb(var(--violet)); }
+}

@@ -45,8 +45,8 @@ export function Hero() {
         <div className="text-center lg:text-left">
           <motion.a href="#try" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
             className="mb-6 inline-flex items-center gap-2 rounded-full hairline bg-bg-2/60 px-3 py-1.5 text-xs text-muted transition-colors hover:text-fg">
-            <span className="rounded-full bg-cta px-2 py-0.5 text-[10px] font-bold uppercase">New</span>
-            Free for student founders <ArrowRight size={12} aria-hidden />
+            <span className="rounded-full bg-cta px-2 py-0.5 text-[10px] font-bold uppercase">50K+</span>
+            users across LevelUp products <ArrowRight size={12} aria-hidden />
           </motion.a>
           <h1 className="text-[clamp(64px,9vw,118px)] leading-[0.88]">
             <motion.span className="block" {...reveal(0.1)}>Build</motion.span>
@@ -54,19 +54,19 @@ export function Hero() {
             <motion.span className="block" {...reveal(0.26)}>startup</motion.span>
           </h1>
           <motion.p initial={{ y: 10 }} animate={{ y: 0 }} transition={{ duration: 0.7, ease, delay: 0.2 }} className="mx-auto mt-6 max-w-sm text-[15px] leading-relaxed text-muted lg:mx-0">
-            Got an idea but no co-founder, mentor or money? Six AI agents help you validate it, find customers, build it, pitch it, price it and launch it.
+            Got an idea but no co-founder, mentor or money? Pick an AI co-founder, then 12 agents help you validate, build, brand, pitch, sell and raise, with playbooks from founders like Alex Hormozi and Paul Graham.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease, delay: 0.5 }} className="mt-7 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
             <Magnetic>
-              <a href="/app" className="inline-flex items-center gap-2 rounded-xl bg-cta px-6 py-3.5 font-semibold shadow-[0_12px_40px_-12px_rgb(var(--amber)/0.9)] transition-colors">
-                Start building free <ArrowRight size={18} aria-hidden />
+              <a href="/signup" className="btn-play">
+                Sign up free <ArrowRight size={18} aria-hidden />
               </a>
             </Magnetic>
-            <a href="#try" className="inline-flex items-center gap-2 rounded-xl hairline bg-bg-2/40 px-5 py-3.5 font-semibold transition-colors hover:bg-fg/5">
+            <a href="#try" className="btn-glass rounded-2xl px-5 py-3.5">
               <Play size={16} aria-hidden /> Check my idea
             </a>
           </motion.div>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-5 text-sm text-muted">Built by student founders · No card needed</motion.p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-5 text-sm text-muted">Built by student founders · No card needed · <a href="/app" className="underline underline-offset-2 hover:text-fg">Try as guest</a></motion.p>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease, delay: 0.3 }}>

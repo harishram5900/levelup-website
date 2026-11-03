@@ -4,7 +4,9 @@
  * Sections that read these only render when a value is set, so nothing made up ever ships.
  */
 export const TRACTION: { label: string; value: number | null; suffix?: string }[] = [
-  { label: "Student founders using LevelUp", value: null }, // TODO: real user count
+  // Founder-provided: total users across LevelUp products (including the earlier LevelUp platform).
+  // Keep this wording: it is NOT the user count of the co-founder app alone.
+  { label: "Users across LevelUp products", value: 50000, suffix: "+" },
   { label: "Agent plans created", value: null }, // TODO: real number after launch
   { label: "Competitions entered", value: null }, // TODO: from user surveys
 ];

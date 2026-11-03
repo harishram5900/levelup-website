@@ -7,7 +7,7 @@ import { Providers } from "./providers";
 export const metadata: Metadata = {
   title: "LevelUp: your AI co-founder",
   description:
-    "Six AI agents that help young entrepreneurs validate an idea, find customers, build, pitch, price and launch their startup.",
+    "An AI co-founder for young entrepreneurs: 12 agents, a pitch deck designer, playbooks from top founders, and 60 competitions, programs and investors.",
 };
 
 export const viewport: Viewport = {
