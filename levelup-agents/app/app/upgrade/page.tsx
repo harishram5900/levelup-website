@@ -1,9 +1,12 @@
 "use client";
-import { Check, Crown, Loader2, X } from "lucide-react";
-import { useState } from "react";
+import { Check, CreditCard, Crown, Loader2, X } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { openBillingPortal, startCheckout } from "@/lib/cofounder/billing";
 import { Buddy, characterById } from "@/components/cofounder/Pip";
 import { ProBadge } from "@/components/cofounder/ProGate";
-import { PRO_FEATURES, usePlan } from "@/lib/cofounder/plan";
+import { paymentsEnabled, PRO_FEATURES, refreshPlan, usePlan } from "@/lib/cofounder/plan";
 import { useWorkspace } from "@/lib/cofounder/profile";
 import { useAuth } from "@/lib/supabase";
 
@@ -18,9 +21,51 @@ const ROWS: [string, boolean, boolean][] = [
   ["Investor & VC list", false, true],
 ];
 
-export default function Upgrade() {
+export default function UpgradePage() {
+  return <Suspense fallback={null}><Upgrade /></Suspense>;
+}
+
+/** Pay with Stripe (when NEXT_PUBLIC_PAYMENTS=on), or join the Pro waitlist. */
+function Checkout({ pro, signedIn }: { pro: boolean; signedIn: boolean }) {
+  const params = useSearchParams();
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [waiting, setWaiting] = useState(params.get("success") === "1" && !pro);
+
+  // Right after paying, Stripe's webhook flips the plan within a few seconds. Poll until it lands.
+  useEffect(() => {
+    if (!waiting) return;
+    let n = 0;
+    const t = setInterval(async () => { n++; if ((await refreshPlan()) || n > 15) { clearInterval(t); setWaiting(false); } }, 2000);
+    return () => clearInterval(t);
+  }, [waiting]);
+
+  const go = async (fn: () => Promise<void>) => { setBusy(true); setErr(""); try { await fn(); } catch (e) { setErr((e as Error).message); setBusy(false); } };
+
+  if (pro) return (
+    <div className="glass flex flex-col gap-3 rounded-[24px] p-5 sm:flex-row sm:items-center">
+      <p className="flex-1 font-semibold">{params.get("success") === "1" ? "Payment complete. Welcome to Pro! 🎉" : "You're on LevelUp Pro."}</p>
+      <button type="button" onClick={() => go(openBillingPortal)} disabled={busy} className="btn-glass"><CreditCard size={16} aria-hidden /> Manage billing</button>
+    </div>
+  );
+  if (waiting) return <div className="glass flex items-center gap-3 rounded-[24px] p-5"><Loader2 size={18} className="animate-spin" aria-hidden /> Confirming your payment… this takes a few seconds.</div>;
+  return (
+    <div className="glass flex flex-col gap-3 rounded-[24px] p-5 sm:flex-row sm:items-center">
+      <div className="flex-1">
+        <p className="font-semibold">{params.get("canceled") ? "No worries, you weren't charged." : "Upgrade in under a minute"}</p>
+        <p className="text-sm text-muted">Secure checkout by Stripe. Cancel anytime in Settings. Under 18? A parent or guardian should pay.</p>
+        {err && <p className="mt-1 text-sm text-red-500" role="alert">{err}</p>}
+      </div>
+      {signedIn
+        ? <button type="button" onClick={() => go(startCheckout)} disabled={busy} className="btn-play px-6">{busy ? <Loader2 size={16} className="animate-spin" aria-hidden /> : <Crown size={16} aria-hidden />} Upgrade to Pro · $9/mo</button>
+        : <Link href="/signup" className="btn-play px-6">Sign up to upgrade</Link>}
+    </div>
+  );
+}
+
+function Upgrade() {
   const { ws } = useWorkspace();
-  const { pro } = usePlan();
+  const { pro, signedIn } = usePlan();
   const { user } = useAuth();
   const [email, setEmail] = useState(user?.email ?? "");
   const [state, setState] = useState<"idle" | "busy" | "done" | "err">("idle");
@@ -47,7 +92,9 @@ export default function Upgrade() {
         </div>
       </div>
 
-      {!pro && (
+      {paymentsEnabled && <Checkout pro={pro} signedIn={signedIn} />}
+
+      {!paymentsEnabled && !pro && (
         <form onSubmit={join} className="glass flex flex-col gap-3 rounded-[24px] p-5 sm:flex-row sm:items-center">
           <div className="flex-1">
             <p className="font-semibold">Payments open soon</p>

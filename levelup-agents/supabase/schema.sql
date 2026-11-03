@@ -31,6 +31,9 @@ alter table public.waitlist enable row level security;
 -- Plan: "free" or "pro". Users can never change this themselves (see column grants below).
 -- To give someone Pro (e.g. yourself, a tester or a paying user): Table Editor → profiles → set plan to pro.
 alter table public.profiles add column if not exists plan text not null default 'free' check (plan in ('free', 'pro'));
+-- Filled in by the Stripe webhook (server only). Users can't edit these.
+alter table public.profiles add column if not exists stripe_customer_id text unique;
+alter table public.profiles add column if not exists stripe_subscription_id text;
 
 -- Profiles: you can read and update only your own. Rows are created by the trigger below.
 drop policy if exists "own profile read" on public.profiles;

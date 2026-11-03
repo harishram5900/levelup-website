@@ -36,6 +36,8 @@ Also included:
 
 Pro (`lib/cofounder/plan.ts`): pitch deck designer, Offer, Sales and Investor agents, and the investor list in Opportunities. Everything else is free. The plan is stored in `profiles.plan` in Supabase; users can't edit it (column-level grants). Until payments are added, give someone Pro in Supabase → Table Editor → profiles → `plan = pro`. The upgrade page (`/app/upgrade`) collects a Pro waitlist.
 
+Payments: Stripe Checkout (`/api/stripe/checkout`), billing portal (`/api/stripe/portal`) and a signed webhook (`/api/stripe/webhook`) that is the only thing that sets `plan = pro` / back to `free`. Env vars: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_PRO`, `NEXT_PUBLIC_PAYMENTS=on`, `NEXT_PUBLIC_SITE_URL`. Webhook events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`.
+
 Note: Pro checks happen in the browser, so a technical user could get around them. When you add payments (e.g. Stripe), also check the plan on the server for anything valuable.
 
 ## Accounts and data (Supabase)

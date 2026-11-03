@@ -47,3 +47,18 @@ export function usePlan() {
   }, [ready, user?.id]);
   return { pro: s.plan === "pro", ready: s.ready && ready, signedIn: !!user };
 }
+
+/** Re-read the plan from the database (e.g. right after paying). Returns true if the user is now Pro. */
+export async function refreshPlan(): Promise<boolean> {
+  const sb = supabase();
+  if (!sb) return false;
+  const { data: u } = await sb.auth.getUser();
+  if (!u.user) return false;
+  const { data } = await sb.from("profiles").select("plan").eq("id", u.user.id).maybeSingle();
+  const plan: Plan = data?.plan === "pro" ? "pro" : "free";
+  set({ plan, ready: true, uid: u.user.id });
+  return plan === "pro";
+}
+
+/** True when Stripe is set up (Vercel env NEXT_PUBLIC_PAYMENTS=on). */
+export const paymentsEnabled = process.env.NEXT_PUBLIC_PAYMENTS === "on";

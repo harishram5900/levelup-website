@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { CharacterPicker, PalettePicker } from "@/components/cofounder/Pickers";
 import { replaceWorkspace, resetWorkspace, useWorkspace } from "@/lib/cofounder/profile";
 import { authEnabled, supabase, useAuth } from "@/lib/supabase";
+import { paymentsEnabled, usePlan } from "@/lib/cofounder/plan";
+import { openBillingPortal } from "@/lib/cofounder/billing";
 import { cn } from "@/lib/utils";
 
 function Card({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
@@ -24,6 +26,7 @@ export default function SettingsPage() {
   const { resolvedTheme, setTheme } = useTheme();
   const { ws, update } = useWorkspace();
   const { user } = useAuth();
+  const { pro } = usePlan();
   const [mounted, setMounted] = useState(false);
   const [confirm, setConfirm] = useState<"" | "reset" | "delete">("");
   const [msg, setMsg] = useState("");
@@ -49,8 +52,12 @@ export default function SettingsPage() {
       <Card title="Account" sub={user ? "Your progress saves to your account and syncs across devices." : "You're using LevelUp as a guest. Progress saves in this browser only."}>
         {user ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="flex items-center gap-2 text-sm"><Cloud size={16} className="text-good" aria-hidden /> Signed in as <b>{user.email}</b></p>
-            <button type="button" onClick={signOut} className="btn-glass text-sm"><LogOut size={15} aria-hidden /> Sign out</button>
+            <p className="flex items-center gap-2 text-sm"><Cloud size={16} className="text-good" aria-hidden /> Signed in as <b>{user.email}</b> · {pro ? "Pro" : "Free plan"}</p>
+            <div className="flex flex-wrap gap-2">
+              {pro && paymentsEnabled && <button type="button" onClick={() => openBillingPortal().catch((e) => setMsg((e as Error).message))} className="btn-soft text-sm">Manage billing</button>}
+              {!pro && <Link href="/app/upgrade" className="btn-glow text-sm">Upgrade to Pro</Link>}
+              <button type="button" onClick={signOut} className="btn-glass text-sm"><LogOut size={15} aria-hidden /> Sign out</button>
+            </div>
           </div>
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-3">
