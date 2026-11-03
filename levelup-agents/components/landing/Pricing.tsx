@@ -7,11 +7,11 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { fadeUp, spring, stagger, viewportOnce } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-// Pricing is a placeholder until launch. Yearly = 2 months free.
+// Prices are placeholders until launch. Yearly = 2 months free. "Schools & clubs" is per student.
 const TIERS = [
-  { name: "Starter", monthly: 29, plus: false, for: "Solo founders and local shops getting consistent.", features: ["All 6 agents", "2 platforms", "Up to 12 posts a month", "Weekly plan and results"] },
-  { name: "Growth", monthly: 99, plus: false, featured: true, for: "Businesses ready to post every day.", features: ["Everything in Starter", "All 4 platforms", "Up to 60 posts a month", "Trend alerts", "Brand voice training"] },
-  { name: "Scale", monthly: 499, plus: true, for: "Brands with high volume or many locations.", features: ["Everything in Growth", "Usage-based posting volume", "Multiple brands", "Priority support"] },
+  { name: "Student", monthly: 0, plus: false, for: "For student founders building their first startup.", features: ["All 6 co-founder agents", "Startup HQ and weekly check-ins", "Opportunities board", "Guided plans for every step"] },
+  { name: "Pro", monthly: 9, plus: false, featured: true, for: "For founders who want AI that writes for their exact startup.", features: ["Everything in Student", "AI-written plans for your startup", "Unlimited re-runs", "Pitch practice (coming soon)"] },
+  { name: "Schools & clubs", monthly: 3, plus: true, for: "For schools, clubs and programs that teach entrepreneurship.", features: ["Pro for every student", "Teacher dashboard (coming soon)", "Cohort progress tracking", "Per-student pricing"] },
 ];
 
 export function Pricing() {
@@ -41,12 +41,12 @@ export function Pricing() {
                 <div className="flex items-center justify-between"><h3 className="text-2xl font-bold">{t.name}</h3>{t.featured && <Badge tone="accent">Most popular</Badge>}</div>
                 <p className="mt-2 min-h-[48px] text-sm text-muted">{t.for}</p>
                 <div className="mt-6 flex items-end gap-1">
-                  <span className="text-sm text-muted">{t.plus ? "from " : ""}</span>
+                  <span className="text-sm text-muted">{t.plus ? "per student " : ""}</span>
                   <motion.span key={price} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="font-display text-5xl font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>${price}</motion.span>
-                  <span className="mb-1.5 text-muted">/mo{t.plus ? "+" : ""}</span>
+                  <span className="mb-1.5 text-muted">{t.monthly === 0 ? "forever" : "/mo"}</span>
                 </div>
-                <p className="mt-1 h-5 text-xs text-muted">{yearly ? `Billed yearly at $${t.monthly * 10}${t.plus ? "+" : ""}` : "Billed monthly"}</p>
-                <a href="#waitlist" className={cn("mt-6 block rounded-full py-3 text-center font-semibold transition-transform hover:-translate-y-0.5", t.featured ? "bg-cta" : "hairline")}>Join waitlist</a>
+                <p className="mt-1 h-5 text-xs text-muted">{t.monthly === 0 ? "No card needed" : yearly ? `Billed yearly at $${t.monthly * 10}` : "Billed monthly"}</p>
+                <a href={t.monthly === 0 ? "/app" : "#waitlist"} className={cn("mt-6 block rounded-full py-3 text-center font-semibold transition-transform hover:-translate-y-0.5", t.featured ? "bg-cta" : "hairline")}>{t.monthly === 0 ? "Start free" : "Join waitlist"}</a>
                 <ul className="mt-7 space-y-3 text-[15px]">
                   {t.features.map((f) => <li key={f} className="flex gap-2.5"><Check size={17} className="mt-0.5 shrink-0 text-good" aria-hidden />{f}</li>)}
                 </ul>

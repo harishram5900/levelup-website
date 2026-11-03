@@ -1,10 +1,11 @@
-import { Bot, CalendarDays, LayoutDashboard, Lock, Settings, Wand2, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Settings, Trophy, type LucideIcon } from "lucide-react";
+import { AGENTS } from "@/lib/agents";
 
-export const NAV: { href: string; label: string; icon: LucideIcon; soon?: boolean }[] = [
-  { href: "/app", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/app/agents", label: "Agents", icon: Bot },
-  { href: "/app/calendar", label: "Content calendar", icon: CalendarDays },
-  { href: "/app/create", label: "Create", icon: Wand2 },
-  { href: "/app/nurture", label: "Nurture Flow", icon: Lock, soon: true },
+export type NavItem = { href: string; label: string; icon: LucideIcon; group?: string };
+
+export const NAV: NavItem[] = [
+  { href: "/app", label: "Startup HQ", icon: LayoutDashboard },
+  ...AGENTS.map((a) => ({ href: `/app/agents/${a.id}`, label: `${a.name} agent`, icon: a.icon, group: "Co-founder agents" })),
+  { href: "/app/opportunities", label: "Opportunities", icon: Trophy },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ];

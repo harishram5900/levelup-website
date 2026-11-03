@@ -5,14 +5,6 @@ import { AGENTS } from "@/lib/agents";
 import { ease } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-const CAPTIONS = [
-  "Finds what's trending in your niche today",
-  "Writes hooks and scripts in your voice",
-  "Edits clips with captions for each platform",
-  "Checks tone, facts and brand rules",
-  "Posts when your audience is online",
-  "Learns from results, updates the plan",
-];
 
 /** One agent node. Lights up when it's the active step. */
 export function AgentNode({ index, active }: { index: number; active: boolean }) {
@@ -29,7 +21,7 @@ export function AgentNode({ index, active }: { index: number; active: boolean })
         <Icon size={24} aria-hidden />
       </motion.div>
       <p className={cn("mt-4 font-display text-lg font-bold transition-colors", active ? "text-fg" : "text-muted")}>{a.name}</p>
-      <p className="mt-1 max-w-[150px] text-sm text-muted">{CAPTIONS[index]}</p>
+      <p className="mt-1 max-w-[150px] text-sm text-muted">{a.stage}</p>
     </div>
   );
 }
@@ -71,7 +63,7 @@ export function Pipeline() {
           return (
             <li key={a.id} className="relative flex items-center gap-5">
               <span className={cn("relative z-10 grid h-16 w-16 shrink-0 place-items-center rounded-2xl transition-colors duration-500", on ? "bg-accent text-white" : "glass text-muted")}><Icon size={22} aria-hidden /></span>
-              <div><p className="font-display text-lg font-bold">{a.name}</p><p className="text-sm text-muted">{CAPTIONS[i]}</p></div>
+              <div><p className="font-display text-lg font-bold">{a.name}</p><p className="text-sm text-muted">{a.stage}</p></div>
             </li>
           );
         })}

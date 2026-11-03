@@ -43,30 +43,30 @@ export function Hero() {
       <Backdrop />
       <div className="relative mx-auto grid max-w-site items-center gap-12 lg:grid-cols-[1fr_auto_1fr] lg:gap-8">
         <div className="text-center lg:text-left">
-          <motion.a href="#nurture" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
+          <motion.a href="#try" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
             className="mb-6 inline-flex items-center gap-2 rounded-full hairline bg-bg-2/60 px-3 py-1.5 text-xs text-muted transition-colors hover:text-fg">
             <span className="rounded-full bg-cta px-2 py-0.5 text-[10px] font-bold uppercase">New</span>
-            Nurture Flow is coming soon <ArrowRight size={12} aria-hidden />
+            Free for student founders <ArrowRight size={12} aria-hidden />
           </motion.a>
           <h1 className="text-[clamp(64px,9vw,118px)] leading-[0.88]">
-            <motion.span className="block" {...reveal(0.1)}>Market</motion.span>
+            <motion.span className="block" {...reveal(0.1)}>Build</motion.span>
             <motion.span className="block" {...reveal(0.18)}>your</motion.span>
-            <motion.span className="block" {...reveal(0.26)}>business</motion.span>
+            <motion.span className="block" {...reveal(0.26)}>startup</motion.span>
           </h1>
           <motion.p initial={{ y: 10 }} animate={{ y: 0 }} transition={{ duration: 0.7, ease, delay: 0.2 }} className="mx-auto mt-6 max-w-sm text-[15px] leading-relaxed text-muted lg:mx-0">
-            Six AI agents research trends, write scripts, edit videos and post to TikTok, Reels, Shorts and Facebook. Then they learn what works. No agency bill.
+            Got an idea but no co-founder, mentor or money? Six AI agents help you validate it, find customers, build it, pitch it, price it and launch it.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease, delay: 0.5 }} className="mt-7 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
             <Magnetic>
-              <a href="#waitlist" className="inline-flex items-center gap-2 rounded-xl bg-cta px-6 py-3.5 font-semibold shadow-[0_12px_40px_-12px_rgb(var(--amber)/0.9)] transition-colors">
-                Join the waitlist <ArrowRight size={18} aria-hidden />
+              <a href="/app" className="inline-flex items-center gap-2 rounded-xl bg-cta px-6 py-3.5 font-semibold shadow-[0_12px_40px_-12px_rgb(var(--amber)/0.9)] transition-colors">
+                Start building free <ArrowRight size={18} aria-hidden />
               </a>
             </Magnetic>
-            <a href="#free-plan" className="inline-flex items-center gap-2 rounded-xl hairline bg-bg-2/40 px-5 py-3.5 font-semibold transition-colors hover:bg-fg/5">
-              <Play size={16} aria-hidden /> Free plan tool
+            <a href="#try" className="inline-flex items-center gap-2 rounded-xl hairline bg-bg-2/40 px-5 py-3.5 font-semibold transition-colors hover:bg-fg/5">
+              <Play size={16} aria-hidden /> Check my idea
             </a>
           </motion.div>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-5 text-sm text-muted">Free during beta · No card needed</motion.p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-5 text-sm text-muted">Built by student founders · No card needed</motion.p>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease, delay: 0.3 }}>
@@ -77,11 +77,11 @@ export function Hero() {
           <p className="font-display text-[clamp(64px,9vw,118px)] uppercase leading-[0.88]">
             <motion.span className="block" {...reveal(0.34)}>With</motion.span>
             <motion.span className="block" {...reveal(0.42)}><span className="select-box text-fg">LevelUp</span></motion.span>
-            <motion.span className="block text-gradient" {...reveal(0.5)}>Agents</motion.span>
+            <motion.span className="block text-gradient" {...reveal(0.5)}>Co-founder</motion.span>
           </p>
         </div>
       </div>
-      <span className="sr-only">Market your business with LevelUp agents.</span>
+      <span className="sr-only">Build your startup with LevelUp, your AI co-founder.</span>
     </section>
   );
 }

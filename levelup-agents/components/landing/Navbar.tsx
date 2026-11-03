@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { href: "#how", label: "How it works" },
   { href: "#agents", label: "Agents" },
-  { href: "#free-plan", label: "Free plan tool" },
+  { href: "#try", label: "Try it" },
   { href: "#pricing", label: "Pricing" },
   { href: "#faq", label: "FAQ" },
 ];
@@ -40,8 +40,8 @@ export function Navbar() {
         </ul>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link href="/app" className="hidden rounded-full px-3 py-2 text-sm text-muted transition-colors hover:text-fg sm:block">Demo app</Link>
-          <a href="#waitlist" className="hidden rounded-xl bg-cta px-4 py-2 text-sm font-semibold transition-transform hover:-translate-y-0.5 sm:block">Join waitlist</a>
+          <Link href="/app" className="hidden rounded-full px-3 py-2 text-sm text-muted transition-colors hover:text-fg sm:block">Open app</Link>
+          <a href="/app" className="hidden rounded-xl bg-cta px-4 py-2 text-sm font-semibold transition-transform hover:-translate-y-0.5 sm:block">Start free</a>
           <button type="button" className="grid h-9 w-9 place-items-center rounded-full hairline md:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
             {open ? <X size={16} aria-hidden /> : <Menu size={16} aria-hidden />}
           </button>
@@ -49,7 +49,7 @@ export function Navbar() {
       </motion.nav>
       {open && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="glass mx-auto mt-2 max-w-site rounded-3xl p-3 md:hidden">
-          {[...LINKS, { href: "/app", label: "Demo app" }, { href: "#waitlist", label: "Join waitlist" }].map((l) => (
+          {[...LINKS, { href: "/app", label: "Open app" }, { href: "#waitlist", label: "Join waitlist" }].map((l) => (
             <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block rounded-2xl px-4 py-3 text-sm hover:bg-fg/5">{l.label}</a>
           ))}
         </motion.div>

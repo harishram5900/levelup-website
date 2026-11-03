@@ -3,7 +3,6 @@ import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } fro
 import { Check, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AGENTS } from "@/lib/agents";
-import { PlatformIcon } from "@/components/ui/PlatformIcon";
 
 /** Phone mockup of the LevelUp app that tilts toward the cursor. Everything shown is sample content. */
 export function HeroMockup() {
@@ -27,9 +26,9 @@ export function HeroMockup() {
   }, []);
 
   const tracks = [
-    { w: "38%", l: "4%", c: "bg-violet/70", label: "Hook" },
-    { w: "30%", l: "46%", c: "bg-violet/40", label: "B-roll" },
-    { w: "52%", l: "10%", c: "bg-amber/80", label: "Captions" },
+    { w: "100%", l: "0%", c: "bg-good/80", label: "Idea ✓" },
+    { w: "100%", l: "0%", c: "bg-good/80", label: "Customers ✓" },
+    { w: "55%", l: "0%", c: "bg-amber/80", label: "Build" },
   ];
 
   return (
@@ -43,14 +42,14 @@ export function HeroMockup() {
           {/* Today's post card */}
           <div className="mx-3 mt-2 rounded-2xl bg-cta p-3.5">
             <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-black/70">
-              <span>Today's post · Reel</span><span className="rounded-full bg-black/15 px-2 py-0.5">Sample</span>
+              <span>Your one-liner</span><span className="rounded-full bg-black/15 px-2 py-0.5">Sample</span>
             </div>
-            <p className="mt-2 font-display text-[22px] leading-[1.02] text-black">“Nobody tells you this about opening at 6am…”</p>
-            <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-semibold text-black/70"><Sparkles size={11} aria-hidden /> Written by Script agent</div>
+            <p className="mt-2 font-display text-[22px] leading-[1.02] text-black">“StudyBuddy matches students with study partners.”</p>
+            <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-semibold text-black/70"><Sparkles size={11} aria-hidden /> Written by Pitch agent</div>
           </div>
           {/* Editing timeline */}
           <div className="mx-3 mt-3 rounded-2xl bg-white/[0.05] p-3">
-            <div className="mb-2 flex items-center justify-between text-[10px] text-white/60"><span>00:14 / 00:22</span><span>Edit agent</span></div>
+            <div className="mb-2 flex items-center justify-between text-[10px] text-white/60"><span>Your journey</span><span>2 of 6 done</span></div>
             <div className="relative space-y-1.5">
               {tracks.map((t, i) => (
                 <div key={t.label} className="relative h-4 rounded bg-white/[0.04]">
@@ -58,7 +57,6 @@ export function HeroMockup() {
                     initial={{ width: 0 }} animate={{ width: t.w }} transition={{ duration: 1, delay: 0.6 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}>{t.label}</motion.div>
                 </div>
               ))}
-              <motion.span aria-hidden className="absolute -top-1 bottom-[-4px] w-0.5 rounded bg-white" animate={reduce ? { left: "62%" } : { left: ["8%", "88%", "8%"] }} transition={{ duration: 8, repeat: Infinity, ease: "linear" }} />
             </div>
           </div>
           {/* Agent status */}
@@ -69,7 +67,7 @@ export function HeroMockup() {
               return (
                 <motion.div key={a.id} animate={{ opacity: on ? 1 : 0.55 }} className="flex items-center gap-2.5 rounded-xl bg-white/[0.04] px-2.5 py-2 text-[11px]">
                   <span className={`grid h-6 w-6 place-items-center rounded-lg ${on ? "bg-violet" : "bg-white/10"}`}><Icon size={12} aria-hidden /></span>
-                  <span className="flex-1"><b className="font-semibold">{a.name}</b> <span className="text-white/55">{["cut a 22s reel", "approved 4 posts", "scheduled 6:30pm", "found what works"][i]}</span></span>
+                  <span className="flex-1"><b className="font-semibold">{a.name}</b> <span className="text-white/55">{["planning your MVP", "pitch is next", "pricing math ready", "launch plan ready"][i]}</span></span>
                   {on ? <Sparkles size={12} className="text-amber" aria-hidden /> : <Check size={12} className="text-good" aria-hidden />}
                 </motion.div>
               );
@@ -79,7 +77,7 @@ export function HeroMockup() {
       </motion.div>
       <motion.div animate={reduce ? {} : { y: [0, 8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
         className="absolute -left-20 top-[3%] hidden items-center gap-2 rounded-2xl border border-white/10 bg-[#21232E]/90 px-3.5 py-2.5 text-xs text-white backdrop-blur lg:flex">
-        <span className="grid h-6 w-6 place-items-center rounded-full bg-cta"><PlatformIcon name="tiktok" size={13} /></span> Scheduled for 6:30pm
+        <span className="grid h-6 w-6 place-items-center rounded-full bg-cta text-black"><Check size={13} aria-hidden /></span> This week: talk to 5 customers
       </motion.div>
       <motion.div animate={reduce ? {} : { y: [0, -8, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
         className="absolute -right-20 bottom-24 hidden items-center gap-1.5 rounded-2xl border border-white/10 bg-[#21232E]/90 px-3 py-2.5 backdrop-blur lg:flex" aria-hidden>

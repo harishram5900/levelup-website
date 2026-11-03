@@ -5,9 +5,9 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "LevelUp: your AI marketing team",
+  title: "LevelUp: your AI co-founder",
   description:
-    "A team of AI agents that researches trends, writes scripts, edits videos, publishes to TikTok, Reels, Shorts and Facebook, then learns from what works.",
+    "Six AI agents that help young entrepreneurs validate an idea, find customers, build, pitch, price and launch their startup.",
 };
 
 export const viewport: Viewport = {

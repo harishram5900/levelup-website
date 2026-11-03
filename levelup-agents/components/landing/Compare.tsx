@@ -2,11 +2,11 @@ import { Check, Minus } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 
 const ROWS = [
-  ["Time to first post", "Weeks of onboarding, briefs and calls", "Same day: tell us your brand, get a plan"],
-  ["Your effort", "Write briefs, chase drafts, approve by email", "Approve or tweak in one tap"],
-  ["Cost", "A monthly retainer most small businesses can't afford", "A simple plan, free during beta"],
-  ["Speed on trends", "Slow, because ideas wait for the next meeting", "Daily: agents watch trends as they happen"],
-  ["Learning from results", "A report at the end of the month", "Every post's results shape the next plan"],
+  ["Getting started", "Search YouTube and blogs, then guess what to do first", "Six steps in order, with a clear next step every day"],
+  ["Feedback on your idea", "Friends and family say it's great", "Honest risks, plus tests you can run this week"],
+  ["Pitch and applications", "Start from a blank page the night before", "One-liner, pitch and deck outline ready to edit"],
+  ["Cost", "Mentors and courses most students can't afford", "Free for student founders"],
+  ["Accountability", "Nobody notices when you stop", "A weekly check-in that keeps you shipping"],
 ];
 
 export function Compare() {
@@ -15,8 +15,8 @@ export function Compare() {
       <div className="glass overflow-hidden rounded-[24px]">
         <div className="grid grid-cols-[1fr_1fr] border-b border-fg/[0.07] text-sm font-semibold sm:grid-cols-[200px_1fr_1fr]">
           <div className="hidden p-5 sm:block" />
-          <div className="p-5 text-muted">A typical agency</div>
-          <div className="relative p-5"><span className="text-gradient">LevelUp</span></div>
+          <div className="p-5 text-muted">Building alone</div>
+          <div className="relative p-5"><span className="text-gradient">With LevelUp</span></div>
         </div>
         {ROWS.map(([k, a, b]) => (
           <div key={k} className="grid grid-cols-[1fr_1fr] border-b border-fg/[0.07] last:border-0 sm:grid-cols-[200px_1fr_1fr]">

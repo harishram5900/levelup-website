@@ -1,12 +1,12 @@
 import { Accordion } from "@/components/ui/Accordion";
 
 const FAQ = [
-  { q: "Do I still need to film anything?", a: "Yes, for now. Send raw clips or photos from your phone and the agents handle the rest: ideas, scripts, editing, captions and posting. Real footage of your business performs better than stock video anyway." },
-  { q: "Will it sound like a robot?", a: "No. You set your tone once and the Script and Review agents keep every post in your voice. You can approve, edit or reject anything before it goes live." },
-  { q: "Which platforms does it post to?", a: "TikTok, Instagram Reels, YouTube Shorts and Facebook. Connections are being built now and turn on during the beta." },
-  { q: "What does it cost?", a: "LevelUp is free during the beta. After that, plans start at $29 a month, a small fraction of a typical agency retainer." },
-  { q: "Is my content and data safe?", a: "Your brand info and footage are only used to make your content. You can export or delete everything at any time." },
-  { q: "What is Nurture Flow?", a: "An upcoming feature that finds leads from your content and sends each one a personal follow-up. It isn't live yet. Join the waitlist to hear when it is." },
+  { q: "Who is LevelUp for?", a: "Young entrepreneurs, mostly ages 13 to 22, who have an idea or a side project and want help turning it into a real startup. You don't need experience, a co-founder or money." },
+  { q: "Is it really free?", a: "Yes. The Student plan includes all six agents, Startup HQ and the opportunities board. Pro adds AI-written plans tailored to your exact startup." },
+  { q: "Does it replace a real co-founder or mentor?", a: "No. It gets you unstuck and moving fast, with a clear plan and honest feedback. We still recommend finding people to build with, and the Customer and Pitch agents help you do that." },
+  { q: "Will the AI make things up about my startup?", a: "Our agents are told never to invent users, revenue, awards or numbers. Plans are built from what you tell them. Always check anything you submit to a competition." },
+  { q: "Where is my data stored?", a: "Right now, your startup info and plans stay in your own browser. Accounts that sync across devices are coming." },
+  { q: "I'm under 18. Can I use it?", a: "Yes. LevelUp is built for students. For anything involving money, bank accounts or contracts, the Money agent reminds you to involve a parent or guardian." },
 ];
 
 export function Faq() {

@@ -3,10 +3,8 @@ import { Navbar } from "@/components/landing/Navbar";
 import { PlatformMarquee } from "@/components/landing/PlatformMarquee";
 import { Pipeline } from "@/components/landing/Pipeline";
 import { AgentGrid } from "@/components/landing/AgentGrid";
-import { Showcase } from "@/components/landing/Showcase";
+import { TryIdea } from "@/components/landing/TryIdea";
 import { Compare } from "@/components/landing/Compare";
-import { FreePlanTool } from "@/components/landing/FreePlanTool";
-import { NurtureTeaser } from "@/components/landing/NurtureTeaser";
 import { Pricing } from "@/components/landing/Pricing";
 import { Faq } from "@/components/landing/Faq";
 import { Waitlist } from "@/components/landing/Waitlist";
@@ -27,27 +25,22 @@ export default function Home() {
         <PlatformMarquee />
 
         <Section id="how">
-          <Reveal><SectionHeading kicker="How it works" title={<>Six agents. <span className="text-gradient">One loop.</span></>} sub="Each agent does one job well, then hands off to the next. After every post, the loop starts again, a little smarter." /></Reveal>
+          <Reveal><SectionHeading kicker="How it works" title={<>Six agents. <span className="text-gradient">One startup.</span></>} sub="Each agent handles one step of building a startup, in the order you need them. You always know what to do next." /></Reveal>
           <Pipeline />
         </Section>
 
         <Section id="agents" className="pt-0">
-          <Reveal><SectionHeading kicker="The team" title="Meet your marketing team" sub="No hiring, no briefs, no waiting on drafts." /></Reveal>
+          <Reveal><SectionHeading kicker="Your co-founders" title="A whole founding team, on day one" sub="The help most young founders never get: honest feedback, a plan, and someone keeping you on track." /></Reveal>
           <AgentGrid />
         </Section>
 
-        <Section className="pt-0">
-          <Reveal><SectionHeading kicker="The product" title="Everything in one calm place" /></Reveal>
-          <Reveal><Showcase /></Reveal>
-        </Section>
-
-        <Section id="free-plan" className="pt-0">
-          <Reveal><SectionHeading kicker="Free tool · Works today" title={<>Get a week of posts <span className="text-gradient">in 10 seconds</span></>} sub="Tell us about your business and get 7 ready-to-film ideas with hooks, shot lists and captions. Free, no sign-up." /></Reveal>
-          <Reveal><FreePlanTool /></Reveal>
+        <Section id="try" className="pt-0">
+          <Reveal><SectionHeading kicker="Try it free · No sign-up" title={<>Is your idea <span className="text-gradient">worth building?</span></>} sub="Answer a few questions and the Idea agent gives you a one-liner, your strengths, your biggest risks and three tests to run this week." /></Reveal>
+          <Reveal><TryIdea /></Reveal>
         </Section>
 
         <Section className="pt-0">
-          <Reveal><SectionHeading kicker="Why LevelUp" title="An agency's work, without the agency" /></Reveal>
+          <Reveal><SectionHeading kicker="Why LevelUp" title="Building alone vs. building with LevelUp" /></Reveal>
           <Compare />
         </Section>
 
@@ -56,7 +49,7 @@ export default function Home() {
             <div className="grid gap-6 sm:grid-cols-3">
               {realStats.map((s) => (
                 <Reveal key={s.label} className="text-center">
-                  <CountUp to={s.value!} suffix={s.suffix} className="font-display text-5xl font-bold" />
+                  <CountUp to={s.value!} suffix={s.suffix} className="font-display text-6xl" />
                   <p className="mt-2 text-muted">{s.label}</p>
                 </Reveal>
               ))}
@@ -64,10 +57,8 @@ export default function Home() {
           </Section>
         )}
 
-        <Section id="nurture" className="pt-0"><NurtureTeaser /></Section>
-
         <Section id="pricing" className="pt-0">
-          <Reveal><SectionHeading kicker="Pricing" title="Simple plans that grow with you" sub="A fraction of an agency retainer. Every plan is free while we're in beta." /></Reveal>
+          <Reveal><SectionHeading kicker="Pricing" title="Free for student founders" sub="Start free. Upgrade when you want AI that writes for your exact startup." /></Reveal>
           <Pricing />
         </Section>
 
@@ -80,8 +71,8 @@ export default function Home() {
           <Reveal>
             <div className="relative overflow-hidden rounded-[32px] glass px-6 py-16 text-center sm:px-12">
               <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgb(var(--violet)/0.25),transparent_60%)]" />
-              <h2 className="mx-auto max-w-2xl text-5xl sm:text-7xl">Get your marketing team <span className="text-gradient">this week</span></h2>
-              <p className="mx-auto mb-9 mt-4 max-w-lg text-lg text-muted">Join the waitlist for early access. Free during beta.</p>
+              <h2 className="mx-auto max-w-2xl text-5xl sm:text-7xl">Get Pro <span className="text-gradient">first</span></h2>
+              <p className="mx-auto mb-9 mt-4 max-w-lg text-lg text-muted">Join the waitlist for AI-written plans, pitch practice and early access to new agents.</p>
               <Waitlist />
             </div>
           </Reveal>

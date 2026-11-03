@@ -9,7 +9,3 @@ export function Badge({ children, tone = "default", className }: { children: Rea
   };
   return <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider", tones[tone], className)}>{children}</span>;
 }
-
-export function SampleTag({ className }: { className?: string }) {
-  return <Badge className={className}>Sample data</Badge>;
-}

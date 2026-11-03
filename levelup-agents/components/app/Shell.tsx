@@ -14,17 +14,18 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
   const path = usePathname();
   return (
     <ul className="space-y-1">
-      {NAV.map((n) => {
+      {NAV.map((n, i) => {
+        const header = n.group && NAV[i - 1]?.group !== n.group ? n.group : null;
         const active = n.href === "/app" ? path === "/app" : path.startsWith(n.href);
         const Icon = n.icon;
         return (
           <li key={n.href}>
+            {header && !collapsed && <p className="kicker px-3 pb-1 pt-4 text-[10px]">{header}</p>}
             <Link href={n.href} onClick={onNavigate} aria-current={active ? "page" : undefined} title={collapsed ? n.label : undefined}
               className={cn("relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors", active ? "text-fg" : "text-muted hover:text-fg")}>
               {active && <motion.span layoutId="nav-active" transition={spring} className="absolute inset-0 rounded-xl bg-fg/[0.07]" />}
               <Icon size={18} className="relative shrink-0" aria-hidden />
               {!collapsed && <span className="relative flex-1 truncate">{n.label}</span>}
-              {!collapsed && n.soon && <span className="relative rounded-full bg-amber/15 px-2 py-0.5 text-[10px] font-semibold text-amber">Soon</span>}
             </Link>
           </li>
         );
@@ -81,9 +82,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <h1 className="font-sans text-base font-semibold tracking-normal">{title}</h1>
           </div>
           <div className="flex items-center gap-2">
-            <span className="hidden rounded-full border border-amber/30 bg-amber/10 px-3 py-1 text-xs font-semibold text-amber sm:inline">Demo · sample data</span>
+            <span className="hidden rounded-full border border-amber/30 bg-amber/10 px-3 py-1 text-xs font-semibold text-amber sm:inline">Beta</span>
             <ThemeToggle />
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-accent text-sm font-bold text-white" aria-label="Your account">SC</span>
+            
           </div>
         </header>
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
