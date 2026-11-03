@@ -6,66 +6,82 @@ import { Magnetic } from "@/components/ui/Magnetic";
 import { ease } from "@/lib/motion";
 import { HeroMockup } from "./HeroMockup";
 
-const HEADLINE = ["Your", "AI", "marketing", "team.", "Working", "while", "you", "build."];
-
-function Orbs() {
+/** Deep blue glow plus the glowing curve that sweeps behind the hero. */
+function Backdrop() {
   const reduce = useReducedMotion();
   const x = useSpring(useMotionValue(0), { stiffness: 40, damping: 20 });
   const y = useSpring(useMotionValue(0), { stiffness: 40, damping: 20 });
   useEffect(() => {
     if (reduce) return;
-    const onMove = (e: PointerEvent) => { x.set((e.clientX / innerWidth - 0.5) * 30); y.set((e.clientY / innerHeight - 0.5) * 30); };
+    const onMove = (e: PointerEvent) => { x.set((e.clientX / innerWidth - 0.5) * 24); y.set((e.clientY / innerHeight - 0.5) * 16); };
     addEventListener("pointermove", onMove);
     return () => removeEventListener("pointermove", onMove);
   }, [x, y, reduce]);
-  const orb = "absolute rounded-full blur-[90px] will-change-transform";
   return (
-    <motion.div aria-hidden style={{ x, y }} className="pointer-events-none absolute inset-0 overflow-hidden">
-      <motion.div className={`${orb} left-[8%] top-[6%] h-[420px] w-[420px] bg-violet/30`} animate={reduce ? {} : { x: [0, 60, 0], y: [0, 40, 0] }} transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
-      <motion.div className={`${orb} right-[4%] top-[22%] h-[380px] w-[380px] bg-cyan/25`} animate={reduce ? {} : { x: [0, -50, 0], y: [0, 60, 0] }} transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }} />
-      <motion.div className={`${orb} bottom-[0%] left-[38%] h-[300px] w-[300px] bg-amber/15`} animate={reduce ? {} : { x: [0, 40, 0], y: [0, -30, 0] }} transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }} />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(var(--line)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgb(var(--line)/0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
-    </motion.div>
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_45%,rgb(var(--violet)/0.28),transparent_70%)]" />
+      <motion.svg style={{ x, y }} viewBox="0 0 1440 700" preserveAspectRatio="none" className="absolute inset-x-0 top-[12%] h-[78%] w-full">
+        <defs>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+          <linearGradient id="curve" x1="0" x2="1"><stop offset="0" stopColor="rgb(var(--violet))" stopOpacity="0" /><stop offset=".2" stopColor="rgb(var(--violet))" /><stop offset=".8" stopColor="rgb(var(--violet))" /><stop offset="1" stopColor="rgb(var(--violet))" stopOpacity="0" /></linearGradient>
+        </defs>
+        <motion.path d="M-40 120 C 140 140, 160 640, 380 640 S 560 360, 720 300 S 980 40, 1120 120 S 1300 560, 1480 520" fill="none" stroke="url(#curve)" strokeWidth="3" filter="url(#glow)"
+          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2.2, ease, delay: 0.2 }} />
+      </motion.svg>
+      <div className="absolute inset-x-[6%] bottom-10 flex items-center">
+        <span className="h-2 w-2 rounded-full bg-violet" /><span className="h-px flex-1 bg-violet/60" /><span className="h-2 w-2 rounded-full bg-violet" />
+      </div>
+    </div>
   );
 }
 
+const reveal = (delay: number) => ({ initial: { opacity: 0.01, y: 28 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, ease, delay } });
+
 export function Hero() {
   return (
-    <section className="relative overflow-hidden px-5 pb-20 pt-36 sm:pt-44">
-      <Orbs />
-      <div className="relative mx-auto grid max-w-site items-center gap-16 lg:grid-cols-[1.05fr_1fr]">
-        <div>
-          <motion.a href="#nurture" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }} className="mb-7 inline-flex items-center gap-2 rounded-full hairline bg-bg-2/40 px-3 py-1.5 text-xs text-muted transition-colors hover:text-fg">
-            <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase text-white">New</span>
+    <section className="relative overflow-hidden px-5 pb-24 pt-32 sm:pt-36">
+      <Backdrop />
+      <div className="relative mx-auto grid max-w-site items-center gap-12 lg:grid-cols-[1fr_auto_1fr] lg:gap-8">
+        <div className="text-center lg:text-left">
+          <motion.a href="#nurture" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
+            className="mb-6 inline-flex items-center gap-2 rounded-full hairline bg-bg-2/60 px-3 py-1.5 text-xs text-muted transition-colors hover:text-fg">
+            <span className="rounded-full bg-cta px-2 py-0.5 text-[10px] font-bold uppercase">New</span>
             Nurture Flow is coming soon <ArrowRight size={12} aria-hidden />
           </motion.a>
-          <h1 className="text-[44px] font-extrabold leading-[1.02] sm:text-6xl lg:text-[68px]">
-            {HEADLINE.map((w, i) => (
-              <motion.span key={i} className={`mr-[0.22em] inline-block ${i >= 4 ? "text-gradient" : ""}`} initial={{ opacity: 0.01, y: 24, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.7, ease, delay: 0.1 + i * 0.06 }}>
-                {w}
-              </motion.span>
-            ))}
+          <h1 className="text-[clamp(64px,9vw,118px)] leading-[0.88]">
+            <motion.span className="block" {...reveal(0.1)}>Market</motion.span>
+            <motion.span className="block" {...reveal(0.18)}>your</motion.span>
+            <motion.span className="block" {...reveal(0.26)}>business</motion.span>
           </h1>
-          {/* Visible from first paint (it is the LCP element); only slides in. */}
-          <motion.p initial={{ y: 10 }} animate={{ y: 0 }} transition={{ duration: 0.7, ease, delay: 0.2 }} className="mt-6 max-w-xl text-lg text-muted sm:text-xl">
-            Six AI agents research trends, write your scripts, edit your videos and post to TikTok, Reels, Shorts and Facebook. Then they learn what works and do more of it. No agency bill.
+          <motion.p initial={{ y: 10 }} animate={{ y: 0 }} transition={{ duration: 0.7, ease, delay: 0.2 }} className="mx-auto mt-6 max-w-sm text-[15px] leading-relaxed text-muted lg:mx-0">
+            Six AI agents research trends, write scripts, edit videos and post to TikTok, Reels, Shorts and Facebook. Then they learn what works. No agency bill.
           </motion.p>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease, delay: 0.8 }} className="mt-9 flex flex-wrap items-center gap-3">
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease, delay: 0.5 }} className="mt-7 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
             <Magnetic>
-              <a href="#waitlist" className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-white shadow-[0_10px_40px_-10px_rgb(var(--violet)/0.8)] transition-shadow hover:shadow-[0_16px_50px_-10px_rgb(var(--cyan)/0.7)]">
+              <a href="#waitlist" className="inline-flex items-center gap-2 rounded-xl bg-cta px-6 py-3.5 font-semibold shadow-[0_12px_40px_-12px_rgb(var(--amber)/0.9)] transition-colors">
                 Join the waitlist <ArrowRight size={18} aria-hidden />
               </a>
             </Magnetic>
-            <a href="#free-plan" className="inline-flex items-center gap-2 rounded-full hairline px-6 py-3.5 font-semibold transition-colors hover:bg-fg/5">
-              <Play size={16} aria-hidden /> Try the free plan tool
+            <a href="#free-plan" className="inline-flex items-center gap-2 rounded-xl hairline bg-bg-2/40 px-5 py-3.5 font-semibold transition-colors hover:bg-fg/5">
+              <Play size={16} aria-hidden /> Free plan tool
             </a>
           </motion.div>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }} className="mt-6 text-sm text-muted">Free during beta · No card needed</motion.p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-5 text-sm text-muted">Free during beta · No card needed</motion.p>
         </div>
-        <motion.div initial={{ opacity: 0, y: 30, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease, delay: 0.4 }}>
+
+        <motion.div initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease, delay: 0.3 }}>
           <HeroMockup />
         </motion.div>
+
+        <div className="text-center lg:text-right" aria-hidden>
+          <p className="font-display text-[clamp(64px,9vw,118px)] uppercase leading-[0.88]">
+            <motion.span className="block" {...reveal(0.34)}>With</motion.span>
+            <motion.span className="block" {...reveal(0.42)}><span className="select-box text-fg">LevelUp</span></motion.span>
+            <motion.span className="block text-gradient" {...reveal(0.5)}>Agents</motion.span>
+          </p>
+        </div>
       </div>
+      <span className="sr-only">Market your business with LevelUp agents.</span>
     </section>
   );
 }

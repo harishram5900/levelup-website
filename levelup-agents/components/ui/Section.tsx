@@ -15,7 +15,7 @@ export function SectionHeading({ kicker, title, sub, center = true }: { kicker: 
   return (
     <div className={cn("mb-14 max-w-2xl", center && "mx-auto text-center")}>
       <p className="kicker mb-4">{kicker}</p>
-      <h2 className="text-4xl font-bold sm:text-5xl">{title}</h2>
+      <h2 className="text-5xl sm:text-7xl">{title}</h2>
       {sub && <p className="mt-5 text-lg text-muted">{sub}</p>}
     </div>
   );

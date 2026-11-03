@@ -41,7 +41,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <Link href="/app" className="hidden rounded-full px-3 py-2 text-sm text-muted transition-colors hover:text-fg sm:block">Demo app</Link>
-          <a href="#waitlist" className="hidden rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5 sm:block">Join waitlist</a>
+          <a href="#waitlist" className="hidden rounded-xl bg-cta px-4 py-2 text-sm font-semibold transition-transform hover:-translate-y-0.5 sm:block">Join waitlist</a>
           <button type="button" className="grid h-9 w-9 place-items-center rounded-full hairline md:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
             {open ? <X size={16} aria-hidden /> : <Menu size={16} aria-hidden />}
           </button>

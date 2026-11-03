@@ -10,7 +10,7 @@ export function NurtureTeaser() {
         <div className="relative grid items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
           <div>
             <Badge tone="amber">Coming soon</Badge>
-            <h2 className="mt-5 text-4xl font-bold sm:text-5xl">Nurture Flow</h2>
+            <h2 className="mt-5 text-5xl sm:text-7xl">Nurture Flow</h2>
             <p className="mt-4 max-w-lg text-lg text-muted">Your content brings people in. Nurture Flow will find the leads among them and follow up with messages made for each one, so interest turns into customers.</p>
             <a href="#waitlist" className="mt-7 inline-flex items-center gap-2 rounded-full hairline px-5 py-3 font-semibold transition-colors hover:bg-fg/5"><Bell size={16} aria-hidden /> Get notified</a>
           </div>

@@ -46,7 +46,7 @@ export function Pricing() {
                   <span className="mb-1.5 text-muted">/mo{t.plus ? "+" : ""}</span>
                 </div>
                 <p className="mt-1 h-5 text-xs text-muted">{yearly ? `Billed yearly at $${t.monthly * 10}${t.plus ? "+" : ""}` : "Billed monthly"}</p>
-                <a href="#waitlist" className={cn("mt-6 block rounded-full py-3 text-center font-semibold transition-transform hover:-translate-y-0.5", t.featured ? "bg-accent text-white" : "hairline")}>Join waitlist</a>
+                <a href="#waitlist" className={cn("mt-6 block rounded-full py-3 text-center font-semibold transition-transform hover:-translate-y-0.5", t.featured ? "bg-cta" : "hairline")}>Join waitlist</a>
                 <ul className="mt-7 space-y-3 text-[15px]">
                   {t.features.map((f) => <li key={f} className="flex gap-2.5"><Check size={17} className="mt-0.5 shrink-0 text-good" aria-hidden />{f}</li>)}
                 </ul>

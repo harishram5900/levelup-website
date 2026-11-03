@@ -1,4 +1,4 @@
-@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource/bebas-neue/latin-400.css";
 
 @tailwind base;
 @tailwind components;
@@ -6,38 +6,40 @@
 
 /* Design tokens. Colors are RGB triplets so Tailwind can apply opacity. */
 :root {
-  --bg: 248 248 251;
+  /* Light mode: soft paper with the same blue + tangerine accents */
+  --bg: 244 245 249;
   --bg-2: 255 255 255;
-  --fg: 17 17 24;
-  --muted: 92 94 112;
-  --line: 17 17 24;
-  --violet: 109 75 255;
-  --cyan: 0 158 196;
-  --amber: 214 120 20;
+  --fg: 20 21 30;
+  --muted: 86 90 110;
+  --line: 20 21 30;
+  --violet: 16 91 255;   /* Royal Blue #105BFF (primary accent) */
+  --cyan: 77 141 255;    /* lighter blue for gradients */
+  --amber: 254 133 0;    /* Tangerine Orange #FE8500 (calls to action) */
   --good: 22 150 90;
   --glass: 255 255 255;
-  --glass-alpha: 0.72;
-  --line-alpha: 0.09;
-  --shadow: 0 20px 50px -24px rgba(30, 20, 80, 0.25);
-  --grain-opacity: 0.025;
+  --glass-alpha: 0.78;
+  --line-alpha: 0.1;
+  --shadow: 0 20px 50px -24px rgba(16, 40, 120, 0.25);
+  --grain-opacity: 0.02;
   color-scheme: light;
 }
 
 .dark {
-  --bg: 7 7 11;
-  --bg-2: 14 14 20;
-  --fg: 238 238 245;
-  --muted: 150 152 172;
+  /* Charcoal Black #21232E family */
+  --bg: 20 21 29;
+  --bg-2: 33 35 46;      /* #21232E */
+  --fg: 240 242 248;
+  --muted: 150 156 180;
   --line: 255 255 255;
-  --violet: 139 108 255;
-  --cyan: 34 211 238;
-  --amber: 251 176 64;
+  --violet: 16 91 255;   /* Royal Blue #105BFF */
+  --cyan: 92 152 255;
+  --amber: 254 133 0;    /* Tangerine Orange #FE8500 */
   --good: 52 211 153;
-  --glass: 255 255 255;
-  --glass-alpha: 0.035;
-  --line-alpha: 0.09;
+  --glass: 33 35 46;
+  --glass-alpha: 0.72;
+  --line-alpha: 0.1;
   --shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
-  --grain-opacity: 0.05;
+  --grain-opacity: 0.04;
   color-scheme: dark;
 }
 
@@ -47,7 +49,8 @@
     @apply bg-bg text-fg font-sans antialiased;
     text-rendering: optimizeLegibility;
   }
-  h1, h2, h3 { @apply font-display; letter-spacing: -0.035em; text-wrap: balance; }
+  h1, h2, h3 { @apply font-display; font-weight: 400; letter-spacing: 0.01em; line-height: 0.95; text-transform: uppercase; text-wrap: balance; }
+  .font-display, h1, h2, h3 { font-synthesis: none; }
   :focus-visible { outline: 2px solid rgb(var(--violet)); outline-offset: 3px; border-radius: 10px; }
   ::selection { background: rgb(var(--violet) / 0.35); }
 }
@@ -62,10 +65,17 @@
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), var(--shadow);
   }
   .text-gradient {
-    background: linear-gradient(100deg, rgb(var(--violet)), rgb(var(--cyan)) 70%);
+    background: linear-gradient(100deg, rgb(var(--violet)), rgb(var(--cyan)) 80%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .bg-accent { background-image: linear-gradient(110deg, rgb(var(--violet)), rgb(var(--cyan))); }
+  /* Tangerine call-to-action buttons */
+  .bg-cta { background-color: rgb(var(--amber)); color: #1a1100; }
+  .bg-cta:hover { background-color: rgb(255 150 30); }
+  /* Selection box with corner handles, like a design-tool selection */
+  .select-box { position: relative; display: inline-block; padding: 0 .12em; outline: 2px solid rgb(var(--violet)); outline-offset: 2px; background: rgb(var(--violet) / .12); }
+  .select-box::before, .select-box::after { content: ""; position: absolute; width: 9px; height: 9px; background: #fff; border: 2px solid rgb(var(--violet)); top: -7px; left: -7px; }
+  .select-box::after { top: auto; left: auto; bottom: -7px; right: -7px; }
   .kicker { @apply text-xs font-semibold uppercase tracking-[0.18em] text-muted; }
 }
 

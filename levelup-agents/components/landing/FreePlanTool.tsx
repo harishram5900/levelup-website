@@ -50,7 +50,7 @@ export function FreePlanTool() {
             <button type="button" key={p.id} aria-pressed={plats.includes(p.id)} onClick={() => toggle(p.id)} className={cn("flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors", plats.includes(p.id) ? "border border-violet/50 bg-violet/10" : "hairline text-muted hover:text-fg")}><PlatformIcon name={p.id} size={16} />{p.name.split(" ")[0]}</button>
           ))}</div>
         </fieldset>
-        <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 font-semibold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-70">{loading ? <><Loader2 size={18} className="animate-spin" aria-hidden /> Writing your plan…</> : <><Wand2 size={18} aria-hidden /> Make my week of posts</>}</button>
+        <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-full bg-cta py-3.5 font-semibold transition-transform hover:-translate-y-0.5 disabled:opacity-70">{loading ? <><Loader2 size={18} className="animate-spin" aria-hidden /> Writing your plan…</> : <><Wand2 size={18} aria-hidden /> Make my week of posts</>}</button>
         <p className="text-xs text-muted">Free, no sign-up. Our Script agent writes a plan for your business in a few seconds.</p>
       </form>
 

@@ -58,7 +58,7 @@ export function Waitlist() {
             <label htmlFor="wl-email" className="sr-only">Email address</label>
             <input id="wl-email" type="email" required value={email} onChange={(e) => { setEmail(e.target.value); if (state === "error") setState("idle"); }} placeholder="you@business.com" className="flex-1 rounded-full hairline bg-bg-2/70 px-6 py-4 outline-none transition-colors focus:border-violet/60" aria-describedby="wl-msg" />
             <Magnetic strength={0.15}>
-              <button type="submit" disabled={state === "loading"} className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-7 py-4 font-semibold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-70 sm:w-auto">
+              <button type="submit" disabled={state === "loading"} className="flex w-full items-center justify-center gap-2 rounded-full bg-cta px-7 py-4 font-semibold transition-transform hover:-translate-y-0.5 disabled:opacity-70 sm:w-auto">
                 {state === "loading" ? <Loader2 size={18} className="animate-spin" aria-hidden /> : <>Join waitlist <ArrowRight size={18} aria-hidden /></>}
               </button>
             </Magnetic>

@@ -80,7 +80,7 @@ export default function Home() {
           <Reveal>
             <div className="relative overflow-hidden rounded-[32px] glass px-6 py-16 text-center sm:px-12">
               <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgb(var(--violet)/0.25),transparent_60%)]" />
-              <h2 className="mx-auto max-w-2xl text-4xl font-bold sm:text-5xl">Get your marketing team <span className="text-gradient">this week</span></h2>
+              <h2 className="mx-auto max-w-2xl text-5xl sm:text-7xl">Get your marketing team <span className="text-gradient">this week</span></h2>
               <p className="mx-auto mb-9 mt-4 max-w-lg text-lg text-muted">Join the waitlist for early access. Free during beta.</p>
               <Waitlist />
             </div>

@@ -20,7 +20,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
-        display: ["'Bricolage Grotesque Variable'", "var(--font-geist-sans)", "system-ui", "sans-serif"],
+        display: ["'Bebas Neue'", "Impact", "'Arial Narrow'", "sans-serif"],
       },
       borderRadius: { xl2: "1.25rem" },
       maxWidth: { site: "1200px" },
