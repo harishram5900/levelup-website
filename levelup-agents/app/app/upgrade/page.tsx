@@ -63,6 +63,39 @@ function Checkout({ pro, signedIn }: { pro: boolean; signedIn: boolean }) {
   );
 }
 
+/** Promo codes are checked on the server; the list of valid codes never reaches the browser. */
+function PromoBox({ signedIn }: { signedIn: boolean }) {
+  const [code, setCode] = useState("");
+  const [state, setState] = useState<"idle" | "busy" | "ok" | "err">("idle");
+  const [msg, setMsg] = useState("");
+  const redeem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setState("busy"); setMsg("");
+    const sb = (await import("@/lib/supabase")).supabase();
+    const { data } = (await sb?.auth.getSession()) ?? { data: { session: null } };
+    const res = await fetch("/api/promo", { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${data.session?.access_token ?? ""}` }, body: JSON.stringify({ code }) }).catch(() => null);
+    const body = await res?.json().catch(() => ({}));
+    if (res?.ok) { setState("ok"); setMsg("Code applied. Welcome to LevelUp Pro! 🎉"); await refreshPlan(); }
+    else { setState("err"); setMsg(body?.error ?? (res?.status === 429 ? "Too many tries. Wait a minute and try again." : "That code didn't work.")); }
+  };
+  return (
+    <form id="promo" onSubmit={redeem} className="glass flex flex-col gap-3 rounded-[24px] p-5 sm:flex-row sm:items-center">
+      <div className="flex-1">
+        <p className="font-semibold">Have a promo code?</p>
+        <p className="text-sm text-muted">{signedIn ? "Enter it to unlock Pro." : "Sign in first, then enter your code."}</p>
+        {msg && <p className={`mt-1 text-sm ${state === "ok" ? "text-good" : "text-red-500"}`} role={state === "ok" ? "status" : "alert"}>{msg}</p>}
+      </div>
+      {signedIn ? (
+        <div className="flex gap-2">
+          <label htmlFor="promo-code" className="sr-only">Promo code</label>
+          <input id="promo-code" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={64} autoComplete="off" spellCheck={false} placeholder="PROMO CODE" className="min-w-0 rounded-xl hairline bg-bg-2/60 px-3 py-2.5 font-mono text-sm uppercase outline-none focus:border-violet/60" />
+          <button type="submit" disabled={state === "busy" || code.trim().length < 4} className="btn-soft">{state === "busy" ? <Loader2 size={15} className="animate-spin" aria-hidden /> : "Apply"}</button>
+        </div>
+      ) : <Link href="/signin" className="btn-glass">Sign in</Link>}
+    </form>
+  );
+}
+
 function Upgrade() {
   const { ws } = useWorkspace();
   const { pro, signedIn } = usePlan();
@@ -93,6 +126,7 @@ function Upgrade() {
       </div>
 
       {paymentsEnabled && <Checkout pro={pro} signedIn={signedIn} />}
+      {!pro && <PromoBox signedIn={signedIn} />}
 
       {!paymentsEnabled && !pro && (
         <form onSubmit={join} className="glass flex flex-col gap-3 rounded-[24px] p-5 sm:flex-row sm:items-center">

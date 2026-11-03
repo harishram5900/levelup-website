@@ -1,4 +1,4 @@
-import { Banknote, Flame, Gem, Hammer, Handshake, Layers, Lightbulb, Megaphone, Palette, Presentation, Radar, Rocket, Target, TrendingUp, Users, Video, type LucideIcon } from "lucide-react";
+import { Banknote, Flame, UserPlus, UsersRound, Gem, Hammer, Handshake, Layers, Lightbulb, Megaphone, Palette, Presentation, Radar, Rocket, Target, TrendingUp, Users, Video, type LucideIcon } from "lucide-react";
 import { AGENTS } from "../agents";
 import type { Workspace } from "./profile";
 
@@ -15,7 +15,7 @@ export const LEVELS = [
   { at: 1900, title: "Legend" },
 ];
 
-export type Badge = { id: string; name: string; how: string; icon: LucideIcon; earned: (w: Workspace, streak: number) => boolean };
+export type Badge = { id: string; name: string; how: string; icon: LucideIcon; earned: (w: Workspace, streak: number, bonus: number) => boolean };
 
 export const BADGES: Badge[] = [
   { id: "first-step", name: "First Step", how: "Finish the Idea agent", icon: Lightbulb, earned: (w) => !!w.results.idea },
@@ -33,6 +33,8 @@ export const BADGES: Badge[] = [
   { id: "deck-master", name: "Deck Master", how: "Build your pitch deck", icon: Layers, earned: (w) => !!w.deck },
   { id: "goal-getter", name: "Goal Getter", how: "Complete 3 weekly goals", icon: Target, earned: (w) => w.goals.filter((g) => g.done).length >= 3 },
   { id: "on-fire", name: "On Fire", how: "Show up 3 days in a row", icon: Flame, earned: (_w, s) => s >= 3 },
+  { id: "recruiter", name: "Recruiter", how: "Invite a friend who signs up", icon: UserPlus, earned: (_w, _s, b) => b >= 50 },
+  { id: "team-player", name: "Team Player", how: "Create or join a team", icon: UsersRound, earned: (w) => !!w.team },
   { id: "all-in", name: "All In", how: "Finish all 12 agents", icon: Rocket, earned: (w) => AGENTS.every((a) => w.results[a.id]) },
 ];
 
@@ -48,16 +50,16 @@ export function streakOf(days: string[], todayStr: string): number {
   return n;
 }
 
-export function gameStats(w: Workspace, todayStr: string) {
+export function gameStats(w: Workspace, todayStr: string, bonus = 0) {
   const agentsDone = AGENTS.filter((a) => w.results[a.id]).length;
   const goalsDone = w.goals.filter((g) => g.done).length;
   const streak = streakOf(w.days, todayStr);
-  const xp = agentsDone * XP.agent + goalsDone * XP.goal + (w.deck ? XP.deck : 0) + new Set(w.days).size * XP.day;
+  const xp = agentsDone * XP.agent + goalsDone * XP.goal + (w.deck ? XP.deck : 0) + new Set(w.days).size * XP.day + bonus;
   let li = 0;
   LEVELS.forEach((l, i) => { if (xp >= l.at) li = i; });
   const cur = LEVELS[li];
   const next = LEVELS[li + 1];
   const pctToNext = next ? Math.round(((xp - cur.at) / (next.at - cur.at)) * 100) : 100;
-  const badges = BADGES.filter((b) => b.earned(w, streak)).map((b) => b.id);
+  const badges = BADGES.filter((b) => b.earned(w, streak, bonus)).map((b) => b.id);
   return { xp, level: li + 1, title: cur.title, next, pctToNext, toNext: next ? next.at - xp : 0, streak, agentsDone, goalsDone, badges };
 }

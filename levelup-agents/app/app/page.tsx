@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Award, BookOpen, Check, Crown, ExternalLink, Flame, Layers, Lock, Pencil, Plus, Sparkles, Star, Trash2, Trophy, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Award, Gift, Medal, BookOpen, Check, Crown, ExternalLink, Flame, Layers, Lock, Pencil, Plus, Sparkles, Star, Trash2, Trophy, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { PlaybookCard } from "@/components/cofounder/PlaybookCard";
@@ -106,7 +106,7 @@ export default function HQ() {
   const { ws, ready, update } = useWorkspace();
   const [editing, setEditing] = useState(false);
   const [goal, setGoal] = useState("");
-  const { pro } = usePlan();
+  const { pro, bonusXp } = usePlan();
   if (!ready) return null;
 
   const save = (p: Profile) => { update((w) => ({ ...w, profile: p })); setEditing(false); };
@@ -115,7 +115,7 @@ export default function HQ() {
   const p = ws.profile;
   const ch = ws.prefs.character;
   const buddy = characterById(ch);
-  const g = gameStats(ws, today());
+  const g = gameStats(ws, today(), bonusXp);
   const quests = [...AGENTS.map((a) => ({ id: a.id, href: `/app/agents/${a.id}`, name: `${a.name} agent`, stage: a.stage, icon: a.icon, done: !!ws.results[a.id], xp: XP.agent, boss: false, world: a.world, locked: !pro && isProAgent(a.id) })),
     { id: "deck", href: "/app/deck", name: "Pitch deck", stage: "Boss level: design your deck", icon: Layers, done: !!ws.deck, xp: XP.deck, boss: true, world: 4, locked: !pro }];
   const current = quests.find((q) => !q.done && !q.locked);
@@ -287,6 +287,15 @@ export default function HQ() {
               <input id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="Add a goal" maxLength={100} className="min-w-0 flex-1 rounded-xl hairline bg-bg-2/60 px-3 py-2 text-sm outline-none focus:border-violet/60" />
               <button type="submit" aria-label="Add goal" className="grid h-9 w-9 place-items-center rounded-xl bg-accent text-white shadow-lg shadow-violet/30 transition hover:scale-105"><Plus size={16} aria-hidden /></button>
             </form>
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="grid grid-cols-2 gap-3">
+            <Link href="/app/friends" className="group rounded-[20px] bg-gradient-to-br from-pink-500 to-rose-600 p-4 text-white transition-transform hover:-translate-y-0.5">
+              <Gift size={20} aria-hidden /><p className="mt-2 font-bold leading-tight">Invite friends</p><p className="text-xs text-white/80">+50 XP each</p>
+            </Link>
+            <Link href="/app/leaderboard" className="group rounded-[20px] bg-gradient-to-br from-amber to-orange-600 p-4 text-[#1a1100] transition-transform hover:-translate-y-0.5">
+              <Medal size={20} aria-hidden /><p className="mt-2 font-bold leading-tight">Leaderboard</p><p className="text-xs opacity-75">See your rank</p>
+            </Link>
           </motion.div>
 
           <motion.div variants={fadeUp} data-tour="playbook">

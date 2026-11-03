@@ -32,8 +32,9 @@ function Account() {
 
 function Stats() {
   const { ws, ready } = useWorkspace();
+  const { bonusXp } = usePlan();
   if (!ready || !ws.profile) return null;
-  const g = gameStats(ws, today());
+  const g = gameStats(ws, today(), bonusXp);
   return (
     <Link href="/app" data-tour="top-stats" className="flex items-center gap-1.5 rounded-full hairline py-1 pl-1 pr-3 text-xs font-semibold hover:bg-fg/5" aria-label={`Level ${g.level} ${g.title}, ${g.xp} XP, ${g.streak} day streak`}>
       <span className="grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-white">{g.level}</span>

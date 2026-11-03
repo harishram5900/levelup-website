@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { BADGES, gameStats } from "@/lib/cofounder/game";
 import { today, useWorkspace } from "@/lib/cofounder/profile";
+import { usePlan } from "@/lib/cofounder/plan";
 import { Buddy } from "./Pip";
 
 const COLORS = ["#105BFF", "#FE8500", "#4D8DFF", "#FFD08A", "#34D399"];
@@ -31,10 +32,11 @@ export function Celebrator() {
   const { ws, ready, update } = useWorkspace();
   const reduce = useReducedMotion();
   const [moment, setMoment] = useState<Moment | null>(null);
+  const { bonusXp, ready: planReady } = usePlan();
 
   useEffect(() => {
-    if (!ready || !ws.profile || moment) return;
-    const g = gameStats(ws, today());
+    if (!ready || !planReady || !ws.profile || moment) return;
+    const g = gameStats(ws, today(), bonusXp);
     const newBadge = g.badges.find((b) => !ws.seen.badges.includes(b));
     if (g.level > ws.seen.level) {
       setMoment({ kind: "level", title: `Level ${g.level}: ${g.title}`, sub: g.next ? `${g.toNext} XP to ${g.next.title}. Keep going!` : "You've maxed out. Legend status." });
@@ -46,7 +48,7 @@ export function Celebrator() {
     } else if (g.level < ws.seen.level) {
       update((w) => ({ ...w, seen: { ...w.seen, level: g.level } })); // after a reset
     }
-  }, [ws, ready, moment, update]);
+  }, [ws, ready, planReady, bonusXp, moment, update]);
 
   useEffect(() => {
     if (!moment) return;

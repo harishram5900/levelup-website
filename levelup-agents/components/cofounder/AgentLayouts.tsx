@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { AgentId } from "@/lib/agents";
 import type { Section } from "@/lib/cofounder/profile";
 import { cn } from "@/lib/utils";
+import { useWorkspace } from "@/lib/cofounder/profile";
 
 /** Each agent's look: a color, a layout name and a gradient for its header. */
 export const AGENT_STYLE: Record<AgentId, { color: string; layout: string }> = {
@@ -35,6 +36,19 @@ function CopyBtn({ text, label = "Copy" }: { text: string; label?: string }) {
   const [ok, setOk] = useState(false);
   return <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(text); setOk(true); setTimeout(() => setOk(false), 1500); } catch { /* blocked */ } }} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-muted hover:bg-fg/5 hover:text-fg">{ok ? <Check size={12} aria-hidden /> : <Copy size={12} aria-hidden />}{ok ? "Copied" : label}</button>;
 }
+/** Turns a plan step into a weekly goal on the dashboard (+25 XP when done). */
+function AddGoal({ text, className }: { text: string; className?: string }) {
+  const { ws, update } = useWorkspace();
+  const t = text.replace(/^[^:]{1,20}:\s*/, "").replace(/\s+/g, " ").trim().split(/(?<=[.!?])\s/)[0].slice(0, 100);
+  const added = ws.goals.some((g) => g.text === t);
+  return (
+    <button type="button" disabled={added} onClick={() => update((w) => ({ ...w, goals: [...w.goals, { id: String(Date.now()), text: t, done: false }].slice(-10) }))}
+      className={cn("inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold transition", added ? "text-good" : "bg-fg/[0.06] text-muted hover:bg-fg/10 hover:text-fg", className)}
+      aria-label={added ? "Added to weekly goals" : `Add "${t}" to weekly goals`}>
+      {added ? <><Check size={11} aria-hidden /> In goals</> : <>+ Goal</>}
+    </button>
+  );
+}
 const Empty = () => <p className="text-sm text-muted">Nothing here yet. Add more detail and run again.</p>;
 
 /* 1. Idea: scorecard */
@@ -54,7 +68,7 @@ function IdeaLayout(p: P) {
       </div>
       <Card><Label icon={Target}>{tests.title}</Label>
         <ol className="relative ml-3 space-y-5 border-l-2 border-dashed border-fg/15 pl-6">
-          {tests.items.map((t, i) => <li key={i} className="relative"><span className="absolute -left-[35px] grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-white" style={{ background: "var(--ag)" }}>{i + 1}</span><p className="text-xs font-semibold text-muted">{["Days 1–2", "Days 3–5", "Days 6–7", "Bonus"][i] ?? "Next"}</p><p className="text-[15px]">{t}</p></li>)}
+          {tests.items.map((t, i) => <li key={i} className="relative"><span className="absolute -left-[35px] grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-white" style={{ background: "var(--ag)" }}>{i + 1}</span><div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-muted">{["Days 1–2", "Days 3–5", "Days 6–7", "Bonus"][i] ?? "Next"}</p><AddGoal text={t} /></div><p className="text-[15px]">{t}</p></li>)}
         </ol>
       </Card>
     </div>
@@ -162,7 +176,7 @@ function BuildLayout(p: P) {
       <Card><Label icon={CalendarDays}>{plan.title}</Label>
         <ol className="grid gap-3 md:grid-cols-4">{plan.items.map((t, i) => {
           const [when, ...rest] = t.split(":");
-          return <li key={i} className="relative rounded-xl bg-bg-2 p-3 ring-1 ring-fg/[0.06]"><span className="mb-2 block h-1.5 rounded-full" style={{ background: "var(--ag)", opacity: 0.35 + i * 0.2 }} /><p className="text-xs font-bold" style={{ color: "var(--ag)" }}>{rest.length ? when : `Step ${i + 1}`}</p><p className="mt-1 text-sm">{rest.length ? rest.join(":").trim() : t}</p></li>;
+          return <li key={i} className="relative rounded-xl bg-bg-2 p-3 ring-1 ring-fg/[0.06]"><span className="mb-2 block h-1.5 rounded-full" style={{ background: "var(--ag)", opacity: 0.35 + i * 0.2 }} /><div className="flex items-center justify-between gap-1"><p className="text-xs font-bold" style={{ color: "var(--ag)" }}>{rest.length ? when : `Step ${i + 1}`}</p><AddGoal text={t} /></div><p className="mt-1 text-sm">{rest.length ? rest.join(":").trim() : t}</p></li>;
         })}</ol>
       </Card>
     </div>
@@ -273,7 +287,7 @@ function SalesLayout(p: P) {
         })}</div>
       </Card>
       <div><Label icon={CalendarDays}>{week.title}</Label>
-        <div className="grid gap-2 sm:grid-cols-4">{week.items.map((t, i) => { const [d, ...r] = t.split(":"); return <div key={i} className="rounded-xl bg-fg/[0.04] p-3"><p className="text-xs font-bold" style={{ color: "var(--ag)" }}>{r.length ? d : `Day ${i + 1}`}</p><p className="mt-1 text-sm">{r.length ? r.join(":").trim() : t}</p></div>; })}</div>
+        <div className="grid gap-2 sm:grid-cols-4">{week.items.map((t, i) => { const [d, ...r] = t.split(":"); return <div key={i} className="rounded-xl bg-fg/[0.04] p-3"><div className="flex items-center justify-between gap-1"><p className="text-xs font-bold" style={{ color: "var(--ag)" }}>{r.length ? d : `Day ${i + 1}`}</p><AddGoal text={t} /></div><p className="mt-1 text-sm">{r.length ? r.join(":").trim() : t}</p></div>; })}</div>
       </div>
     </div>
   );
@@ -297,7 +311,7 @@ function LaunchLayout(p: P) {
         <div className="grid grid-cols-2 gap-3">{nums.items.map((t, i) => <div key={i} className="rounded-2xl bg-fg/[0.04] p-4 ring-1 ring-fg/[0.06]"><p className="text-3xl font-black text-muted">—</p><p className="mt-1 text-sm">{t}</p></div>)}</div>
       </div>
       <div><Label>{weeks.title}</Label>
-        <div className="grid gap-3 md:grid-cols-4">{weeks.items.map((t, i) => { const [w, ...r] = t.split(":"); return <div key={i} className="rounded-2xl p-4 ring-1 ring-fg/[0.08]" style={{ background: `color-mix(in srgb, var(--ag) ${8 + i * 6}%, transparent)` }}><p className="text-xs font-black uppercase tracking-wider" style={{ color: "var(--ag)" }}>{r.length ? w : `Week ${i + 1}`}</p><p className="mt-1 text-sm">{r.length ? r.join(":").trim() : t}</p></div>; })}</div>
+        <div className="grid gap-3 md:grid-cols-4">{weeks.items.map((t, i) => { const [w, ...r] = t.split(":"); return <div key={i} className="rounded-2xl p-4 ring-1 ring-fg/[0.08]" style={{ background: `color-mix(in srgb, var(--ag) ${8 + i * 6}%, transparent)` }}><div className="flex items-center justify-between gap-1"><p className="text-xs font-black uppercase tracking-wider" style={{ color: "var(--ag)" }}>{r.length ? w : `Week ${i + 1}`}</p><AddGoal text={t} /></div><p className="mt-1 text-sm">{r.length ? r.join(":").trim() : t}</p></div>; })}</div>
       </div>
       <Card><Label>{ideas.title}</Label><div className="flex flex-wrap gap-2">{ideas.items.map((t, i) => <span key={i} className="rounded-full bg-bg-2 px-3 py-1.5 text-sm ring-1 ring-fg/10">{t}</span>)}</div></Card>
     </div>

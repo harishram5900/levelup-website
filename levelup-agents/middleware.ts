@@ -47,7 +47,7 @@ export function middleware(req: NextRequest) {
     const len = Number(req.headers.get("content-length") ?? 0);
     if (len > MAX_API_BODY) return deny(413, "Request too large");
     if (!/^application\/json/i.test(req.headers.get("content-type") ?? "") && !pathname.startsWith("/api/account/")) return deny(415, "JSON only");
-    const strict = pathname.startsWith("/api/waitlist") || pathname.startsWith("/api/account/") ? 5 : 30;
+    const strict = pathname.startsWith("/api/waitlist") || pathname.startsWith("/api/account/") || pathname.startsWith("/api/promo") ? 5 : 30;
     if (limited(`api:${pathname}:${ip}`, strict, 60_000)) return deny(429, "Too many requests. Please wait a minute.");
   }
   return NextResponse.next();

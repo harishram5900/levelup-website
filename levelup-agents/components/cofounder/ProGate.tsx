@@ -30,6 +30,7 @@ export function ProGate({ title, line }: { title: string; line: string }) {
             <b className="text-amber">{buddy.name}:</b> This one's part of LevelUp Pro. Keep crushing the free quests, and unlock this when you're ready to pitch, sell and raise.
           </p>
           <Link href="/app/upgrade" className="btn-play mt-6 text-lg"><Crown size={18} aria-hidden /> See LevelUp Pro</Link>
+          <Link href="/app/upgrade#promo" className="mt-3 text-sm text-white/75 underline-offset-2 hover:underline">Have a promo code?</Link>
         </div>
       </div>
       <ul className="mt-6 grid gap-3 sm:grid-cols-2">

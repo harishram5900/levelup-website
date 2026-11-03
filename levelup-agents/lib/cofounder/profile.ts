@@ -26,6 +26,7 @@ export type Workspace = {
   seen: { level: number; badges: string[] }; // what we've already celebrated
   prefs: Prefs;
   saved: string[]; // bookmarked opportunity ids
+  team?: string | null; // name of the team you're on (for the Team Player badge)
   updatedAt?: number; // for syncing with the account backend
 };
 

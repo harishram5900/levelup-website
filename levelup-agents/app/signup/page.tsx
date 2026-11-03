@@ -1,14 +1,23 @@
 "use client";
 import { Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { AuthCard, authInput, NotEnabled } from "@/components/auth/AuthCard";
 import { authEnabled, friendlyAuthError, supabase, useAuth } from "@/lib/supabase";
 
-export default function SignUp() {
+export default function SignUpPage() { return <Suspense fallback={null}><SignUp /></Suspense>; }
+
+function SignUp() {
   const router = useRouter();
   const { user, ready } = useAuth();
+  const params = useSearchParams();
+  const [ref, setRef] = useState("");
+  useEffect(() => {
+    // Invite codes come from ?ref=CODE (also remembered if they browse around first).
+    const fromUrl = (params.get("ref") ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+    try { if (fromUrl) localStorage.setItem("lu-ref", fromUrl); setRef(fromUrl || localStorage.getItem("lu-ref") || ""); } catch { setRef(fromUrl); }
+  }, [params]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
@@ -30,7 +39,7 @@ export default function SignUp() {
     if (!agree) { setErr("Please agree to the Terms and Privacy Policy."); return; }
     const sb = supabase(); if (!sb) return;
     setBusy(true);
-    const { data, error } = await sb.auth.signUp({ email: email.trim(), password: pw, options: { data: { display_name: name.trim().slice(0, 60), age_confirmed: true }, emailRedirectTo: `${location.origin}/app` } });
+    const { data, error } = await sb.auth.signUp({ email: email.trim(), password: pw, options: { data: { display_name: name.trim().slice(0, 60), age_confirmed: true, ...(ref ? { ref } : {}) }, emailRedirectTo: `${location.origin}/app` } });
     setBusy(false);
     if (error) { setErr(friendlyAuthError(error.message)); return; }
     if (data.session) router.replace("/app");
@@ -53,6 +62,7 @@ export default function SignUp() {
     <AuthCard title="Sign up free" sub="Save your startup, XP and deck across all your devices." footer={<>Already have an account? <Link href="/signin" className="font-semibold text-violet hover:underline">Sign in</Link></>}>
       {!authEnabled ? <NotEnabled /> : (
         <form onSubmit={submit} className="space-y-4" noValidate>
+          {ref && <p className="rounded-xl bg-good/10 p-3 text-sm">🎉 A friend invited you. You'll be friends on LevelUp as soon as you sign up.</p>}
           <div><label htmlFor="su-name" className="mb-1.5 block text-sm font-semibold">First name</label><input id="su-name" autoComplete="given-name" className={authInput} value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="e.g. Harish" /></div>
           <div><label htmlFor="su-email" className="mb-1.5 block text-sm font-semibold">Email</label><input id="su-email" type="email" required autoComplete="email" className={authInput} value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} placeholder="you@example.com" /></div>
           <div>

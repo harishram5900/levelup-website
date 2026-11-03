@@ -22,8 +22,18 @@ export const PRO_FEATURES = [
   { title: "Investor & VC list", line: "Youth-friendly funds and investors in Opportunities" },
 ];
 
-type State = { plan: Plan; ready: boolean; uid: string | null };
+type State = { plan: Plan; ready: boolean; uid: string | null; bonus?: number };
 let state: State = { plan: "free", ready: false, uid: null };
+
+/** Reads plan + invite bonus XP. Falls back to plan only if the social upgrade (002) hasn't been run yet. */
+async function readProfile(uid: string): Promise<{ plan: Plan; bonus: number }> {
+  const sb = supabase();
+  if (!sb) return { plan: "free", bonus: 0 };
+  let { data, error } = await sb.from("profiles").select("plan, bonus_xp").eq("id", uid).maybeSingle();
+  if (error) ({ data } = await sb.from("profiles").select("plan").eq("id", uid).maybeSingle());
+  const row = (data ?? {}) as { plan?: string; bonus_xp?: number };
+  return { plan: row.plan === "pro" ? "pro" : "free", bonus: Number(row.bonus_xp ?? 0) || 0 };
+}
 const subs = new Set<() => void>();
 const set = (s: State) => { state = s; subs.forEach((f) => f()); };
 const SERVER: State = { plan: "free", ready: false, uid: null };
@@ -41,11 +51,9 @@ export function usePlan() {
     if (state.uid === uid && state.ready) return;
     const sb = supabase();
     if (!sb) { set({ plan: "free", ready: true, uid }); return; }
-    sb.from("profiles").select("plan").eq("id", uid).maybeSingle().then(({ data }) => {
-      set({ plan: data?.plan === "pro" ? "pro" : "free", ready: true, uid });
-    });
+    readProfile(uid).then((r) => set({ plan: r.plan, bonus: r.bonus, ready: true, uid }));
   }, [ready, user?.id]);
-  return { pro: s.plan === "pro", ready: s.ready && ready, signedIn: !!user };
+  return { pro: s.plan === "pro", ready: s.ready && ready, signedIn: !!user, bonusXp: s.bonus ?? 0 };
 }
 
 /** Re-read the plan from the database (e.g. right after paying). Returns true if the user is now Pro. */
@@ -54,10 +62,9 @@ export async function refreshPlan(): Promise<boolean> {
   if (!sb) return false;
   const { data: u } = await sb.auth.getUser();
   if (!u.user) return false;
-  const { data } = await sb.from("profiles").select("plan").eq("id", u.user.id).maybeSingle();
-  const plan: Plan = data?.plan === "pro" ? "pro" : "free";
-  set({ plan, ready: true, uid: u.user.id });
-  return plan === "pro";
+  const r = await readProfile(u.user.id);
+  set({ plan: r.plan, bonus: r.bonus, ready: true, uid: u.user.id });
+  return r.plan === "pro";
 }
 
 /** True when Stripe is set up (Vercel env NEXT_PUBLIC_PAYMENTS=on). */

@@ -22,8 +22,11 @@ export async function POST(req: Request) {
 
   const setPlan = async (where: { id?: string; customer?: string }, plan: "pro" | "free", subId?: string | null) => {
     const patch: Record<string, unknown> = { plan };
+    if (plan === "pro") patch.pro_source = "stripe";
     if (subId !== undefined) patch.stripe_subscription_id = subId;
-    const q = db.from("profiles").update(patch);
+    let q = db.from("profiles").update(patch);
+    // Cancelling a subscription never removes Pro that came from a promo code.
+    if (plan === "free") q = q.or("pro_source.is.null,pro_source.eq.stripe");
     const { error } = where.id ? await q.eq("id", where.id) : await q.eq("stripe_customer_id", where.customer!);
     if (error) throw new Error(error.message);
   };
