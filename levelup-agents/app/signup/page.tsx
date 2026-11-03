@@ -5,6 +5,24 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { AuthCard, authInput, NotEnabled } from "@/components/auth/AuthCard";
 import { authEnabled, friendlyAuthError, supabase, useAuth } from "@/lib/supabase";
+import { checkEmail } from "@/lib/emailCheck";
+
+function ResendButton({ email }: { email: string }) {
+  const [state, setState] = useState<"idle" | "busy" | "sent" | "err">("idle");
+  const [msg, setMsg] = useState("");
+  const resend = async () => {
+    const sb = supabase(); if (!sb) return;
+    setState("busy");
+    const { error } = await sb.auth.resend({ type: "signup", email: email.trim(), options: { emailRedirectTo: `${location.origin}/app` } });
+    if (error) { setState("err"); setMsg(friendlyAuthError(error.message)); } else { setState("sent"); setMsg("Sent again. It can take a minute."); }
+  };
+  return (
+    <div>
+      <button type="button" onClick={resend} disabled={state === "busy" || state === "sent"} className="btn-soft w-full justify-center">{state === "busy" ? "Sending…" : "Resend confirmation email"}</button>
+      {msg && <p className={`mt-2 text-sm ${state === "err" ? "text-red-500" : "text-good"}`} role="status">{msg}</p>}
+    </div>
+  );
+}
 
 export default function SignUpPage() { return <Suspense fallback={null}><SignUp /></Suspense>; }
 
@@ -35,6 +53,8 @@ function SignUp() {
     e.preventDefault();
     setErr("");
     if (age !== "13+") { setErr("You need to be 13 or older to create an account."); return; }
+    const ec = checkEmail(email);
+    if (!ec.ok) { setErr(ec.error!); if (ec.suggestion) setEmail(ec.suggestion); return; }
     if (!strong) { setErr("Use at least 8 characters with letters and numbers."); return; }
     if (!agree) { setErr("Please agree to the Terms and Privacy Policy."); return; }
     const sb = supabase(); if (!sb) return;
@@ -52,6 +72,7 @@ function SignUp() {
         <div className="space-y-4 text-center">
           <MailCheck size={40} className="mx-auto text-good" aria-hidden />
           <p className="text-sm text-muted">Click the link to activate your account, then you'll land in your HQ. Don't see it? Check spam.</p>
+          <ResendButton email={email} />
           <Link href="/signin" className="btn-glass w-full">Back to sign in</Link>
         </div>
       </AuthCard>

@@ -42,6 +42,7 @@ export function friendlyAuthError(msg: string) {
   if (/already registered|already been registered/i.test(msg)) return "There's already an account with that email. Try signing in.";
   if (/email not confirmed/i.test(msg)) return "Please confirm your email first. Check your inbox (and spam).";
   if (/rate limit|too many/i.test(msg)) return "Too many attempts. Please wait a few minutes and try again.";
+  if (/temporary inbox|real email/i.test(msg)) return "Please use your real email. Temporary inboxes aren't allowed.";
   if (/password/i.test(msg) && /(short|least|weak)/i.test(msg)) return "Please use a stronger password: at least 8 characters with letters and numbers.";
   return "Something went wrong. Please try again.";
 }

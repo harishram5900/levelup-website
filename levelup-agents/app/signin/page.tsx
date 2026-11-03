@@ -15,6 +15,13 @@ export default function SignIn() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
+  const [unconfirmed, setUnconfirmed] = useState(false);
+  const resend = async () => {
+    const sb = supabase(); if (!sb) return;
+    const { error } = await sb.auth.resend({ type: "signup", email: email.trim(), options: { emailRedirectTo: `${location.origin}/app` } });
+    setErr(""); setUnconfirmed(false);
+    if (error) setErr(friendlyAuthError(error.message)); else setMsg("Confirmation email sent. Check your inbox (and spam).");
+  };
 
   useEffect(() => { if (ready && user) router.replace("/app"); }, [ready, user, router]);
 
@@ -25,7 +32,7 @@ export default function SignIn() {
     setBusy(true);
     const { error } = await sb.auth.signInWithPassword({ email: email.trim(), password: pw });
     setBusy(false);
-    if (error) setErr(friendlyAuthError(error.message));
+    if (error) { setErr(friendlyAuthError(error.message)); setUnconfirmed(/not confirmed/i.test(error.message)); }
     else router.replace("/app");
   };
   const forgot = async () => {
@@ -50,6 +57,7 @@ export default function SignIn() {
             </div>
           </div>
           {err && <p className="rounded-xl bg-red-500/10 p-3 text-sm text-red-500" role="alert">{err}</p>}
+          {unconfirmed && <button type="button" onClick={resend} className="btn-soft w-full justify-center">Resend confirmation email</button>}
           {msg && <p className="rounded-xl bg-good/10 p-3 text-sm text-good" role="status">{msg}</p>}
           <button type="submit" disabled={busy} className="btn-play w-full">{busy && <Loader2 size={18} className="animate-spin" aria-hidden />}Sign in</button>
           <Link href="/app" className="btn-glass w-full">Continue as guest</Link>
