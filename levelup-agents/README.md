@@ -11,7 +11,12 @@ LevelUp helps young entrepreneurs go from idea to launch. You describe your star
 | Money | Pricing, break-even math, funding young founders can get, money basics |
 | Launch | Launch checklist, 4-week plan, content ideas, numbers to track |
 
-Also included: a journey tracker, a weekly goals check-in, and a list of competitions and programs for young founders.
+Also included:
+
+- **Pitch deck builder** (`/app/deck`): one click builds a 10-slide deck from your HQ info and agent answers. Edit any slide, pick a theme (Royal, Tangerine, Paper), present full-screen with arrow keys, or **Download PDF** (browser print, one 16:9 slide per page). Anything LevelUp doesn't know appears as a highlighted [blank]; it never invents numbers.
+- **Pip**, the robot co-founder mascot (`components/cofounder/Pip.tsx`), which guides setup and every agent.
+- **Game layer** (`lib/cofounder/game.ts`): XP (agent +100, deck +150, goal +25, each active day +10), 7 levels from Dreamer to Legend, a daily streak, 10 badges, a quest map, and confetti for level-ups and badges.
+- A weekly goals check-in and a list of competitions and programs for young founders.
 
 ## It runs free
 
@@ -43,8 +48,9 @@ Import the repo and set **Root Directory** to `levelup-agents`. You can optional
 | Route | What it is |
 | --- | --- |
 | `/` | Landing page with a free idea check (`#try`) |
-| `/app` | Startup HQ: setup, journey, up next, weekly goals |
+| `/app` | Startup HQ: 3-step setup with Pip, level and XP, quest map, today's quest, goals, trophy case |
 | `/app/agents/[id]` | One agent: questions, run, result, copy |
+| `/app/deck` | Pitch deck builder, present mode, PDF download |
 | `/app/opportunities` | Competitions and programs |
 | `/app/settings` | Theme, start over |
 | `/api/agent` | Claude agent endpoint (structured JSON), guided fallback without a key |

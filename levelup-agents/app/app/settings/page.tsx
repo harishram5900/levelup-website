@@ -2,12 +2,12 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { useWorkspace } from "@/lib/cofounder/profile";
+import { resetWorkspace } from "@/lib/cofounder/profile";
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const { resolvedTheme, setTheme } = useTheme();
-  const { update } = useWorkspace();
+
   const [mounted, setMounted] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [cleared, setCleared] = useState(false);
@@ -36,7 +36,7 @@ export default function SettingsPage() {
           <div className="mt-4 rounded-xl border border-red-500/40 bg-red-500/10 p-4">
             <p className="text-sm">This deletes your startup info, every agent plan and your goals. This can't be undone.</p>
             <div className="mt-3 flex gap-2">
-              <button type="button" onClick={() => { update(() => ({ profile: null, results: {}, answers: {}, goals: [] })); setConfirm(false); setCleared(true); }} className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white">Delete everything</button>
+              <button type="button" onClick={() => { resetWorkspace(); setConfirm(false); setCleared(true); }} className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white">Delete everything</button>
               <button type="button" onClick={() => setConfirm(false)} className="rounded-xl hairline px-4 py-2 text-sm font-semibold hover:bg-fg/5">Cancel</button>
             </div>
           </div>

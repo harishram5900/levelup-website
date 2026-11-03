@@ -1,4 +1,4 @@
-const OUTPUTS = ["Idea check", "Customer interview script", "MVP plan", "Pitch deck outline", "30-second pitch", "Pricing math", "Funding options", "Launch plan", "Weekly goals", "Competition prep"];
+const OUTPUTS = ["Idea check", "Customer interview script", "MVP plan", "Pitch deck (PDF)", "30-second pitch", "Pricing math", "Funding options", "Launch plan", "Weekly goals", "Competition prep", "XP & badges"];
 
 export function PlatformMarquee() {
   const row = [...OUTPUTS, ...OUTPUTS];

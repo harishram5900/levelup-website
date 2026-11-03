@@ -7,6 +7,8 @@ import { AGENTS, type AgentId } from "@/lib/agents";
 import { ease } from "@/lib/motion";
 import { useWorkspace } from "@/lib/cofounder/profile";
 import { runAgent } from "@/lib/cofounder/runAgent";
+import { XP } from "@/lib/cofounder/game";
+import { Pip, PipSays } from "./Pip";
 import { cn } from "@/lib/utils";
 
 /** One agent's workspace: answer a few questions, get a document you can copy and use. */
@@ -56,7 +58,9 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
           <span className="grid h-12 w-12 place-items-center rounded-2xl bg-accent text-white"><Icon size={22} aria-hidden /></span>
           <div><h2 className="font-display text-3xl uppercase leading-none">{agent.name} agent</h2><p className="text-sm text-muted">{agent.role}</p></div>
         </div>
-        <p className="text-[15px] text-muted">{agent.line}</p>
+        <PipSays mood={loading ? "think" : result ? "cheer" : "happy"} size={64}>
+          {loading ? "Thinking about your startup…" : result ? <>Quest complete! Tweak your answers and run again anytime.</> : <>{agent.line} <span className="text-muted">Skip any question you're unsure about.</span></>}
+        </PipSays>
         {agent.fields.map((f) => (
           <div key={f.id}>
             <label htmlFor={`f-${f.id}`} className="mb-2 block text-sm font-semibold">{f.label}</label>
@@ -66,7 +70,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
           </div>
         ))}
         <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-cta py-3.5 font-semibold transition-transform hover:-translate-y-0.5 disabled:opacity-70">
-          {loading ? <><Loader2 size={18} className="animate-spin" aria-hidden /> Working on it…</> : <><Wand2 size={18} aria-hidden /> {result ? "Run again" : `Run the ${agent.name} agent`}</>}
+          {loading ? <><Loader2 size={18} className="animate-spin" aria-hidden /> Working on it…</> : <><Wand2 size={18} aria-hidden /> {result ? "Run again" : `Run the ${agent.name} agent`}{!result && <span className="rounded-full bg-black/15 px-2 py-0.5 text-xs">+{XP.agent} XP</span>}</>}
         </button>
         <p className="text-xs text-muted">Uses your Startup HQ info: {profile.startup}, for {profile.customer}.</p>
       </form>
@@ -76,7 +80,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
           {!result ? (
             <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid h-full min-h-[380px] place-items-center text-center">
               <div>
-                {loading ? <Loader2 className="mx-auto mb-4 animate-spin text-violet" size={32} aria-hidden /> : <Icon className="mx-auto mb-4 text-violet" size={32} aria-hidden />}
+                <Pip mood={loading ? "think" : "happy"} size={110} className="mx-auto mb-4" />
                 <p className="font-display text-3xl uppercase">{loading ? "Your co-founder is thinking" : "Your plan appears here"}</p>
                 <p className="mt-2 text-muted">You'll get: {agent.sections.join(" · ")}</p>
               </div>
@@ -100,9 +104,15 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
                   </motion.section>
                 ))}
               </div>
+              {!nextAgent && (
+                <Link href="/app/deck" className="mt-6 flex items-center justify-between gap-4 rounded-2xl bg-cta p-5 transition-transform hover:-translate-y-0.5">
+                  <span><span className="text-xs font-bold uppercase tracking-widest opacity-70">Boss level · +{XP.deck} XP</span><span className="mt-1 block font-semibold">Turn it all into a pitch deck</span></span>
+                  <ArrowRight size={20} aria-hidden />
+                </Link>
+              )}
               {nextAgent && (
                 <Link href={`/app/agents/${nextAgent.id}`} className="mt-6 flex items-center justify-between gap-4 rounded-2xl border border-violet/30 bg-violet/10 p-5 transition-colors hover:bg-violet/15">
-                  <span><span className="kicker">Next step</span><span className="mt-1 block font-semibold">{nextAgent.name} agent: {nextAgent.stage}</span></span>
+                  <span><span className="kicker">Next quest · +{XP.agent} XP</span><span className="mt-1 block font-semibold">{nextAgent.name} agent: {nextAgent.stage}</span></span>
                   <ArrowRight size={20} aria-hidden />
                 </Link>
               )}

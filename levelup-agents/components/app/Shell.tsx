@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronsLeft, Menu, X } from "lucide-react";
+import { ChevronsLeft, Flame, Menu, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -9,6 +9,23 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ease, spring } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { NAV } from "./nav";
+import { Celebrator } from "@/components/cofounder/Celebrate";
+import { gameStats } from "@/lib/cofounder/game";
+import { today, useWorkspace } from "@/lib/cofounder/profile";
+
+function Stats() {
+  const { ws, ready } = useWorkspace();
+  if (!ready || !ws.profile) return null;
+  const g = gameStats(ws, today());
+  return (
+    <Link href="/app" className="flex items-center gap-1.5 rounded-full hairline py-1 pl-1 pr-3 text-xs font-semibold hover:bg-fg/5" aria-label={`Level ${g.level} ${g.title}, ${g.xp} XP, ${g.streak} day streak`}>
+      <span className="grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-white">{g.level}</span>
+      <span className="hidden sm:inline">{g.title}</span>
+      <span className="flex items-center gap-0.5 text-violet"><Zap size={13} aria-hidden />{g.xp}</span>
+      <span className={cn("flex items-center gap-0.5", g.streak ? "text-amber" : "text-muted")}><Flame size={13} aria-hidden />{g.streak}</span>
+    </Link>
+  );
+}
 
 function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
   const path = usePathname();
@@ -82,12 +99,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <h1 className="font-sans text-base font-semibold tracking-normal">{title}</h1>
           </div>
           <div className="flex items-center gap-2">
-            <span className="hidden rounded-full border border-amber/30 bg-amber/10 px-3 py-1 text-xs font-semibold text-amber sm:inline">Beta</span>
+            <Stats />
             <ThemeToggle />
-            
           </div>
         </header>
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <Celebrator />
       </div>
     </div>
   );

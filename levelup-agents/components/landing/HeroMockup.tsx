@@ -3,6 +3,7 @@ import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } fro
 import { Check, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AGENTS } from "@/lib/agents";
+import { Pip } from "@/components/cofounder/Pip";
 
 /** Phone mockup of the LevelUp app that tilts toward the cursor. Everything shown is sample content. */
 export function HeroMockup() {
@@ -80,9 +81,10 @@ export function HeroMockup() {
         <span className="grid h-6 w-6 place-items-center rounded-full bg-cta text-black"><Check size={13} aria-hidden /></span> This week: talk to 5 customers
       </motion.div>
       <motion.div animate={reduce ? {} : { y: [0, -8, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-        className="absolute -right-20 bottom-24 hidden items-center gap-1.5 rounded-2xl border border-white/10 bg-[#21232E]/90 px-3 py-2.5 backdrop-blur lg:flex" aria-hidden>
-        {["bg-violet", "bg-cta", "bg-good", "bg-white", "bg-violet/50", "bg-amber/60"].map((c) => <span key={c} className={`h-3 w-3 rounded-full ${c}`} />)}
+        className="absolute -right-24 bottom-16 hidden items-center gap-2 rounded-2xl border border-white/10 bg-[#21232E]/90 px-3 py-2.5 text-xs font-semibold text-white backdrop-blur lg:flex" aria-hidden>
+        <span className="grid h-6 w-6 place-items-center rounded-full bg-accent">⚡</span> Level 4 · Hustler · +100 XP
       </motion.div>
+      <div className="absolute -bottom-6 -left-10 hidden sm:block" aria-hidden><Pip mood="wave" size={92} className="text-black" /></div>
     </div>
   );
 }

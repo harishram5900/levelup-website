@@ -93,3 +93,18 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
 }
+
+/* Pitch deck PDF export: print only the slides, one per landscape page. */
+.print-deck { display: none; }
+@media print {
+  @page { size: 1280px 720px; margin: 0; }
+  html, body { background: #fff !important; }
+  body > *:not(.print-deck) { display: none !important; }
+  .grain::after { display: none !important; }
+  .print-deck { display: block; }
+  .print-page { width: 1280px; height: 720px; overflow: hidden; break-after: page; page-break-after: always; }
+  .print-page:last-child { break-after: auto; page-break-after: auto; }
+}
+
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgb(var(--amber) / .55); } 100% { box-shadow: 0 0 0 18px rgb(var(--amber) / 0); } }
+.pulse-ring { animation: pulse-ring 1.6s ease-out infinite; }

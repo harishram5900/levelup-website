@@ -4,7 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 const ROWS = [
   ["Getting started", "Search YouTube and blogs, then guess what to do first", "Six steps in order, with a clear next step every day"],
   ["Feedback on your idea", "Friends and family say it's great", "Honest risks, plus tests you can run this week"],
-  ["Pitch and applications", "Start from a blank page the night before", "One-liner, pitch and deck outline ready to edit"],
+  ["Pitch and applications", "Start from a blank page the night before", "One-liner, pitch and a 10-slide deck you can present or download"],
   ["Cost", "Mentors and courses most students can't afford", "Free for student founders"],
   ["Accountability", "Nobody notices when you stop", "A weekly check-in that keeps you shipping"],
 ];

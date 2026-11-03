@@ -1,0 +1,56 @@
+import { Banknote, Flame, Hammer, Layers, Lightbulb, Megaphone, Presentation, Rocket, Target, Users, type LucideIcon } from "lucide-react";
+import { AGENTS } from "../agents";
+import type { Workspace } from "./profile";
+
+export const XP = { agent: 100, goal: 25, deck: 150, day: 10 } as const;
+
+export const LEVELS = [
+  { at: 0, title: "Dreamer" },
+  { at: 100, title: "Explorer" },
+  { at: 250, title: "Builder" },
+  { at: 450, title: "Hustler" },
+  { at: 700, title: "Launcher" },
+  { at: 1000, title: "Founder" },
+  { at: 1400, title: "Legend" },
+];
+
+export type Badge = { id: string; name: string; how: string; icon: LucideIcon; earned: (w: Workspace, streak: number) => boolean };
+
+export const BADGES: Badge[] = [
+  { id: "first-step", name: "First Step", how: "Finish the Idea agent", icon: Lightbulb, earned: (w) => !!w.results.idea },
+  { id: "talk-to-users", name: "People Person", how: "Finish the Customer agent", icon: Users, earned: (w) => !!w.results.customer },
+  { id: "shipper", name: "Shipper", how: "Finish the Build agent", icon: Hammer, earned: (w) => !!w.results.build },
+  { id: "storyteller", name: "Storyteller", how: "Finish the Pitch agent", icon: Presentation, earned: (w) => !!w.results.pitch },
+  { id: "money-brain", name: "Money Brain", how: "Finish the Money agent", icon: Banknote, earned: (w) => !!w.results.money },
+  { id: "launcher", name: "Liftoff", how: "Finish the Launch agent", icon: Megaphone, earned: (w) => !!w.results.launch },
+  { id: "deck-master", name: "Deck Master", how: "Build your pitch deck", icon: Layers, earned: (w) => !!w.deck },
+  { id: "goal-getter", name: "Goal Getter", how: "Complete 3 weekly goals", icon: Target, earned: (w) => w.goals.filter((g) => g.done).length >= 3 },
+  { id: "on-fire", name: "On Fire", how: "Show up 3 days in a row", icon: Flame, earned: (_w, s) => s >= 3 },
+  { id: "all-in", name: "All In", how: "Finish all six agents", icon: Rocket, earned: (w) => AGENTS.every((a) => w.results[a.id]) },
+];
+
+const dayNum = (d: string) => Math.round(new Date(`${d}T12:00:00`).getTime() / 86_400_000);
+
+/** Consecutive days up to today (or yesterday, so a streak survives until you miss a full day). */
+export function streakOf(days: string[], todayStr: string): number {
+  const set = new Set(days.map(dayNum));
+  let d = dayNum(todayStr);
+  if (!set.has(d)) d -= 1;
+  let n = 0;
+  while (set.has(d)) { n++; d--; }
+  return n;
+}
+
+export function gameStats(w: Workspace, todayStr: string) {
+  const agentsDone = AGENTS.filter((a) => w.results[a.id]).length;
+  const goalsDone = w.goals.filter((g) => g.done).length;
+  const streak = streakOf(w.days, todayStr);
+  const xp = agentsDone * XP.agent + goalsDone * XP.goal + (w.deck ? XP.deck : 0) + new Set(w.days).size * XP.day;
+  let li = 0;
+  LEVELS.forEach((l, i) => { if (xp >= l.at) li = i; });
+  const cur = LEVELS[li];
+  const next = LEVELS[li + 1];
+  const pctToNext = next ? Math.round(((xp - cur.at) / (next.at - cur.at)) * 100) : 100;
+  const badges = BADGES.filter((b) => b.earned(w, streak)).map((b) => b.id);
+  return { xp, level: li + 1, title: cur.title, next, pctToNext, toNext: next ? next.at - xp : 0, streak, agentsDone, goalsDone, badges };
+}
