@@ -20,7 +20,7 @@ function idea(p: Profile, a: A): Section[] {
   else risks.push("You don't know how people solve this today. If nobody tries to solve it, it may not hurt enough.");
   risks.push(`Riskiest assumption: that ${p.customer} will use ${p.startup} more than once. Test it before building more.`);
   return [
-    { title: "Your one-liner", items: [`${p.startup} helps ${p.customer} ${p.idea.replace(/^(to |helps? )/i, "")}.`] },
+    { title: "Your one-liner", items: [/^(lets|helps|gives|makes|turns|matches|connects|teaches)\b/i.test(p.idea.trim()) ? `${p.startup} ${p.idea.trim().replace(/\.$/, "")} for ${p.customer}.` : `${p.startup} helps ${p.customer} ${p.idea.trim().replace(/^(to )/i, "").replace(/\.$/, "")}.`] },
     { title: "What's strong", items: strong },
     { title: "Biggest risks", items: risks },
     { title: "Test it this week", items: [

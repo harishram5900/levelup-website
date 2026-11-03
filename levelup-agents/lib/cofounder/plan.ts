@@ -35,6 +35,8 @@ export function usePlan() {
   useEffect(() => {
     if (!ready) return;
     const uid = user?.id ?? null;
+    // Local development only: localStorage "lu-dev-pro" = "1" previews Pro. Removed from production builds.
+    if (process.env.NODE_ENV !== "production") { try { if (localStorage.getItem("lu-dev-pro") === "1") { set({ plan: "pro", ready: true, uid }); return; } } catch { /* ignore */ } }
     if (!uid) { set({ plan: "free", ready: true, uid: null }); return; }
     if (state.uid === uid && state.ready) return;
     const sb = supabase();
