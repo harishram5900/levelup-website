@@ -7,6 +7,8 @@ export const TRACTION: { label: string; value: number | null; suffix?: string }[
   // Founder-provided: total users across LevelUp products (including the earlier LevelUp platform).
   // Keep this wording: it is NOT the user count of the co-founder app alone.
   { label: "Users across LevelUp products", value: 50000, suffix: "+" },
+  // Founder-provided: student startups helped across LevelUp products.
+  { label: "Student startups helped across LevelUp products", value: 200, suffix: "+" },
   { label: "Agent plans created", value: null }, // TODO: real number after launch
   { label: "Competitions entered", value: null }, // TODO: from user surveys
 ];

@@ -46,7 +46,7 @@ export function Hero() {
           <motion.a href="#try" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}
             className="mb-6 inline-flex items-center gap-2 rounded-full hairline bg-bg-2/60 px-3 py-1.5 text-xs text-muted transition-colors hover:text-fg">
             <span className="rounded-full bg-cta px-2 py-0.5 text-[10px] font-bold uppercase">50K+</span>
-            users across LevelUp products <ArrowRight size={12} aria-hidden />
+            users · 200+ student startups helped across LevelUp products <ArrowRight size={12} aria-hidden />
           </motion.a>
           <h1 className="text-[clamp(64px,9vw,118px)] leading-[0.88]">
             <motion.span className="block" {...reveal(0.1)}>Build</motion.span>
