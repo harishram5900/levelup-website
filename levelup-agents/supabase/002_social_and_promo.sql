@@ -17,7 +17,7 @@ alter table public.profiles
   add column if not exists xp int not null default 0,
   add column if not exists bonus_xp int not null default 0,
   add column if not exists startup text,
-  add column if not exists character text not null default 'pip',
+  add column if not exists "character" text not null default 'pip',
   add column if not exists on_leaderboard boolean not null default false;
 update public.profiles set invite_code = public.gen_code() where invite_code is null;
 
@@ -82,7 +82,7 @@ begin
   update public.profiles set
     xp = least(agents, 12) * 100 + least(goals, 200) * 25 + deck * 150 + least(days, 365) * 10,
     startup = left(coalesce(d -> 'profile' ->> 'startup', ''), 60),
-    character = case when ch in ('pip', 'blaze', 'sage', 'nova', 'rocco') then ch else 'pip' end
+    "character" = case when ch in ('pip', 'blaze', 'sage', 'nova', 'rocco') then ch else 'pip' end
   where id = new.user_id;
   return new;
 end; $$;
@@ -195,7 +195,7 @@ end; $$;
 -- ---------- Leaderboard ----------
 -- Global: only people who opted in. Friends: you + your friends. Team: your team.
 create or replace function public.leaderboard(scope text default 'global')
-returns table (name text, startup text, character text, total_xp int, is_me boolean)
+returns table (name text, startup text, "character" text, total_xp int, is_me boolean)
 language sql stable security definer set search_path = '' as $$
   select coalesce(nullif(p.display_name, ''), 'Founder'), nullif(p.startup, ''), p.character, p.xp + p.bonus_xp, p.id = auth.uid()
   from public.profiles p
