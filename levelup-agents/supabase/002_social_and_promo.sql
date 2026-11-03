@@ -18,7 +18,7 @@ alter table public.profiles
   add column if not exists bonus_xp int not null default 0,
   add column if not exists startup text,
   add column if not exists "character" text not null default 'pip',
-  add column if not exists on_leaderboard boolean not null default false;
+  add column if not exists on_leaderboard boolean not null default true;
 update public.profiles set invite_code = public.gen_code() where invite_code is null;
 
 -- Users may only change their name and whether they appear on the global leaderboard.

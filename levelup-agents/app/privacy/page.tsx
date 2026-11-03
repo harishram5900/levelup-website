@@ -18,6 +18,8 @@ export default function Privacy() {
         <li>To run the app and save your progress across devices.</li>
         <li>When AI mode is on, your startup details and answers are sent to our AI provider (Anthropic) to write your plan. They are not used to identify you.</li>
       </ul>
+      <h2>Leaderboards</h2>
+      <p>Signed-in users appear on the "Everyone" leaderboard with only their first name, startup name and XP (never email or last name). You can hide yourself anytime on the Leaderboard page. Friends you invite or add can always see each other.</p>
       <h2>Kids and teens</h2>
       <p>You must be 13 or older to create an account. Under 13, you can use LevelUp as a guest with nothing stored on our servers. If you believe a child under 13 created an account, contact us and we'll delete it.</p>
       <h2>Security</h2>

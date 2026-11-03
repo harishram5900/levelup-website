@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Crown, Globe2, Loader2, Medal, Users, UsersRound } from "lucide-react";
+import { Crown, Globe2, Loader2, Medal, Users } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
@@ -12,9 +12,8 @@ import { useAuth } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 const TABS: { id: Board; label: string; icon: React.ElementType; empty: string }[] = [
-  { id: "global", label: "Global", icon: Globe2, empty: "Be the first founder on the global board!" },
+  { id: "global", label: "Everyone", icon: Globe2, empty: "You're one of the first founders here. Invite people to fill the board!" },
   { id: "friends", label: "Friends", icon: Users, empty: "Invite friends to see how you stack up." },
-  { id: "team", label: "Team", icon: UsersRound, empty: "Create or join a team to compete with your teammates." },
 ];
 const levelOf = (xp: number) => { let i = 0; LEVELS.forEach((l, k) => { if (xp >= l.at) i = k; }); return { n: i + 1, title: LEVELS[i].title }; };
 const ch = (c: string) => (["pip", "blaze", "sage", "nova", "rocco"].includes(c) ? c : "pip") as CharacterId;
@@ -24,7 +23,7 @@ export default function LeaderboardPage() { return <Suspense fallback={null}><Le
 function Leaderboard() {
   const { user, ready } = useAuth();
   const params = useSearchParams();
-  const [tab, setTab] = useState<Board>((params.get("tab") as Board) || "global");
+  const [tab, setTab] = useState<Board>(params.get("tab") === "friends" ? "friends" : "global");
   const [rows, setRows] = useState<BoardRow[] | null>(null);
   const [onBoard, setOnBoard] = useState<boolean | null>(null);
   const [err, setErr] = useState("");
@@ -38,7 +37,7 @@ function Leaderboard() {
   useEffect(() => { if (user) mySocial(user.id).then((s) => setOnBoard(s.on_leaderboard)).catch(() => {}); }, [user]);
 
   if (!ready) return null;
-  if (!user) return <SignInGate title="Climb the leaderboard" line="Sign up to see where you rank against other young founders, your friends and your team." />;
+  if (!user) return <SignInGate title="Climb the leaderboard" line="Sign up to see where you rank against every young founder on LevelUp and against your friends." />;
 
   const toggle = async () => { const v = !onBoard; setOnBoard(v); try { await setOnLeaderboard(user.id, v); load(); } catch (e) { setErr((e as Error).message); setOnBoard(!v); } };
   const top = (rows ?? []).slice(0, 3);
@@ -54,7 +53,7 @@ function Leaderboard() {
         {me >= 0 && <span className="rounded-full bg-amber/15 px-4 py-2 text-sm font-bold text-amber">You're #{me + 1}</span>}
       </div>
 
-      <div className="grid grid-cols-3 gap-1 rounded-2xl bg-fg/[0.05] p-1" role="tablist">
+      <div className="grid grid-cols-2 gap-1 rounded-2xl bg-fg/[0.05] p-1" role="tablist">
         {TABS.map((x) => (
           <button key={x.id} type="button" role="tab" aria-selected={tab === x.id} onClick={() => setTab(x.id)} className={cn("flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-sm font-semibold transition", tab === x.id ? "bg-bg-2 shadow" : "text-muted hover:text-fg")}><x.icon size={15} aria-hidden />{x.label}</button>
         ))}
@@ -62,15 +61,15 @@ function Leaderboard() {
 
       {tab === "global" && onBoard !== null && (
         <div className="glass flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-center">
-          <p className="flex-1 text-sm">{onBoard ? "You're on the global leaderboard. Others see your first name, startup name and XP." : "You're hidden from the global board. Join to show your first name, startup name and XP."}</p>
-          <button type="button" onClick={toggle} className={onBoard ? "btn-glass text-sm" : "btn-play px-4 py-2 text-sm"}>{onBoard ? "Hide me" : "Join the global board"}</button>
+          <p className="flex-1 text-sm">{onBoard ? "Every LevelUp founder is on this board. Others see only your first name, startup name and XP." : "You're hidden from the Everyone board. Your friends can still see you."}</p>
+          <button type="button" onClick={toggle} className={onBoard ? "btn-glass text-sm" : "btn-play px-4 py-2 text-sm"}>{onBoard ? "Hide me" : "Show me again"}</button>
         </div>
       )}
 
       {err && <p className="rounded-xl bg-amber/10 p-4 text-sm" role="alert">{err}</p>}
       {rows === null ? <div className="grid h-60 place-items-center"><Loader2 className="animate-spin text-violet" aria-hidden /></div> : rows.length <= 1 && !err ? (
         <div className="glass rounded-[24px] p-8 text-center"><p className="font-semibold">{t.empty}</p>
-          <div className="mt-4 flex justify-center gap-2">{tab === "team" ? <Link href="/app/team" className="btn-play px-4 py-2 text-sm">Go to Team</Link> : <Link href="/app/friends" className="btn-play px-4 py-2 text-sm">Invite friends</Link>}</div>
+          <div className="mt-4 flex justify-center gap-2"><Link href="/app/friends" className="btn-play px-4 py-2 text-sm">Invite friends</Link></div>
           {rows.length === 1 && <p className="mt-4 text-sm text-muted">Right now it's just you with {rows[0].total_xp} XP.</p>}
         </div>
       ) : (
@@ -112,7 +111,7 @@ function Leaderboard() {
           </ol>
         </>
       )}
-      <p className="text-center text-xs text-muted">Only first names, startup names and XP are shown. The global board is opt-in.</p>
+      <p className="text-center text-xs text-muted">Only first names, startup names and XP are shown. Anyone can hide from the Everyone board.</p>
     </div>
   );
 }

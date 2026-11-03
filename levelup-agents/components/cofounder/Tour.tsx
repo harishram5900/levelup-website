@@ -22,7 +22,7 @@ const STEPS: Step[] = [
   { target: "nav-deck", fallback: "open-menu", title: "Pitch deck designer (Pro)", body: "Pick a layout, colors, font and logo, add your own photos, and I'll build a 10-slide deck from your answers. Present it full screen or download a PDF." },
   { target: "nav-playbooks", fallback: "open-menu", title: "Playbooks", body: "All the frameworks from top entrepreneurs and investors in one place." },
   { target: "nav-opps", fallback: "open-menu", title: "Opportunities", body: "60 competitions, programs, grants, free credits, accelerators and investors. Filter by age and type, and save your favorites." },
-  { target: "nav-community", fallback: "open-menu", title: "Community", body: "Climb the leaderboard, invite friends (+50 XP each when they join) and build with your team: shared goals and shared plans." },
+  { target: "nav-community", fallback: "open-menu", title: "Community", body: "Climb the Everyone and Friends leaderboards, invite friends (+50 XP each when they join) and build with your team: shared goals and shared plans." },
   { target: "nav-pro", fallback: "open-menu", title: "Go Pro", body: "Items with a PRO tag (the deck designer, Offer, Sales and Investor agents, and the investor list) unlock with LevelUp Pro. Everything else is free." },
   { target: "nav-settings", fallback: "open-menu", title: "Settings", body: "Switch your co-founder character, change your dashboard colors, manage your account, or replay this tour." },
   { target: "top-stats", title: "Always on top", body: "Your level, XP and streak follow you on every page. That's it. Let's build something!" },
