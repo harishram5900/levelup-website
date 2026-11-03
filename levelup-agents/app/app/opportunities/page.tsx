@@ -6,6 +6,10 @@ import { BuddySays } from "@/components/cofounder/Pip";
 import { AGES, OPP_TYPES, OPPORTUNITIES, type Age, type OppType } from "@/lib/cofounder/opportunities";
 import { useWorkspace } from "@/lib/cofounder/profile";
 import { cn } from "@/lib/utils";
+import { Lock } from "lucide-react";
+import Link from "next/link";
+import { ProBadge } from "@/components/cofounder/ProGate";
+import { usePlan } from "@/lib/cofounder/plan";
 
 const TYPE_TONE: Record<OppType, string> = {
   Competition: "bg-amber/15 text-amber", Hackathon: "bg-cyan/15 text-cyan", Program: "bg-violet/15 text-violet", Fellowship: "bg-pink-500/15 text-pink-500",
@@ -18,6 +22,7 @@ export default function OpportunitiesPage() {
   const [type, setType] = useState<OppType | "All" | "Saved" | "For you">("For you");
   const [age, setAge] = useState<Age | "All">("All");
   const stage = ws.profile?.stage;
+  const { pro } = usePlan();
 
   const list = useMemo(() => OPPORTUNITIES.filter((o) => {
     if (type === "Saved" && !ws.saved.includes(o.id)) return false;
@@ -71,6 +76,16 @@ export default function OpportunitiesPage() {
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-3">
         {list.map((o, i) => {
           const saved = ws.saved.includes(o.id);
+          if (o.type === "Investor" && !pro) return (
+            <motion.article key={o.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 12) * 0.03 }} className="glass relative flex flex-col overflow-hidden rounded-[22px] p-5">
+              <div className="flex items-start justify-between gap-3"><span className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", TYPE_TONE[o.type])}>{o.type}</span><ProBadge /></div>
+              <h3 className="mt-3 font-display text-3xl uppercase leading-none blur-[6px] select-none" aria-hidden>{o.name}</h3>
+              <p className="mt-3 flex-1 text-[15px] blur-[5px] select-none" aria-hidden>{o.what}</p>
+              <div className="absolute inset-0 grid place-items-center bg-bg/30">
+                <Link href="/app/upgrade" className="btn-play px-4 py-2 text-sm"><Lock size={14} aria-hidden /> Unlock investors with Pro</Link>
+              </div>
+            </motion.article>
+          );
           return (
             <motion.article key={o.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 12) * 0.03 }} className="glass flex flex-col rounded-[22px] p-5">
               <div className="flex items-start justify-between gap-3">

@@ -12,6 +12,8 @@ import { runAgent } from "@/lib/cofounder/runAgent";
 import { cn } from "@/lib/utils";
 import { Buddy, BuddySays, characterById } from "./Pip";
 import { PlaybookCard } from "./PlaybookCard";
+import { ProGate } from "./ProGate";
+import { isProAgent, usePlan } from "@/lib/cofounder/plan";
 
 /** One agent's workspace: answer a few questions, get a document you can copy and use. */
 // Takes an id (not the agent object) so a server page can render it: icons are functions.
@@ -25,6 +27,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
   const nextAgent = AGENTS[AGENTS.findIndex((a) => a.id === agent.id) + 1];
   const ch = ws.prefs.character;
   const buddy = characterById(ch);
+  const plan = usePlan();
 
   useEffect(() => { if (ready) setAnswers(ws.answers[agent.id] ?? {}); }, [ready, agent.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -40,6 +43,8 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
     );
   }
   const profile = ws.profile;
+  if (isProAgent(agent.id) && !plan.ready) return null;
+  if (isProAgent(agent.id) && !plan.pro) return <ProGate title={`${agent.name} agent`} line={agent.line} />;
 
   const run = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,14 +125,14 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
                   </motion.section>
                 ))}
               </div>
-              {nextAgent ? (
+              {nextAgent && !(isProAgent(nextAgent.id) && !plan.pro) ? (
                 <Link href={`/app/agents/${nextAgent.id}`} className="group mt-6 flex items-center justify-between gap-4 rounded-2xl border border-violet/30 bg-violet/10 p-5 transition-colors hover:bg-violet/15">
                   <span><span className="kicker">Next quest · +{XP.agent} XP</span><span className="mt-1 block font-semibold">{nextAgent.name} agent: {nextAgent.stage}</span></span>
                   <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" aria-hidden />
                 </Link>
               ) : (
-                <Link href="/app/deck" className="btn-play mt-6 w-full justify-between">
-                  <span className="text-left"><span className="block text-xs font-bold uppercase tracking-widest opacity-70">Boss level · +{XP.deck} XP</span>Turn it all into a pitch deck</span>
+                <Link href={plan.pro ? "/app/deck" : "/app/upgrade"} className="btn-play mt-6 w-full justify-between">
+                  <span className="text-left"><span className="block text-xs font-bold uppercase tracking-widest opacity-70">{plan.pro ? `Boss level · +${XP.deck} XP` : "Pro · Boss level"}</span>{plan.pro ? "Turn it all into a pitch deck" : "Unlock the pitch deck designer"}</span>
                   <Crown size={22} aria-hidden />
                 </Link>
               )}

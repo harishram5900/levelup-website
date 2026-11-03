@@ -15,6 +15,8 @@ import { today, useWorkspace } from "@/lib/cofounder/profile";
 import { Tour } from "@/components/cofounder/Tour";
 import { Buddy } from "@/components/cofounder/Pip";
 import { authEnabled, useAuth } from "@/lib/supabase";
+import { ProBadge } from "@/components/cofounder/ProGate";
+import { usePlan } from "@/lib/cofounder/plan";
 
 function Account() {
   const { user, ready } = useAuth();
@@ -44,10 +46,11 @@ function Stats() {
 
 function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
   const path = usePathname();
+  const { pro } = usePlan();
   return (
     <ul className="space-y-1">
-      {NAV.map((n, i) => {
-        const header = n.group && NAV[i - 1]?.group !== n.group ? n.group : null;
+      {NAV.filter((n) => !(pro && n.href === "/app/upgrade")).map((n, i, arr) => {
+        const header = n.group && arr[i - 1]?.group !== n.group ? n.group : null;
         const active = n.href === "/app" ? path === "/app" : path.startsWith(n.href);
         const Icon = n.icon;
         return (
@@ -58,6 +61,7 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
               {active && <motion.span layoutId="nav-active" transition={spring} className="absolute inset-0 rounded-xl bg-fg/[0.07]" />}
               <Icon size={18} className="relative shrink-0" aria-hidden />
               {!collapsed && <span className="relative flex-1 truncate">{n.label}</span>}
+              {!collapsed && n.pro && !pro && <ProBadge className="relative" />}
             </Link>
           </li>
         );

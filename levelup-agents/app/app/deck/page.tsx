@@ -11,6 +11,8 @@ import { buildDeck, hasGap } from "@/lib/cofounder/deck";
 import { XP } from "@/lib/cofounder/game";
 import { DEFAULT_STYLE, useWorkspace, type DeckStyle, type Slide } from "@/lib/cofounder/profile";
 import { cn } from "@/lib/utils";
+import { ProGate } from "@/components/cofounder/ProGate";
+import { usePlan } from "@/lib/cofounder/plan";
 
 function Present({ slides, style, logo, startup, start, onClose }: { slides: Slide[]; style: DeckStyle; logo?: string; startup: string; start: number; onClose: () => void }) {
   const [i, setI] = useState(start);
@@ -128,6 +130,7 @@ export default function DeckPage() {
   const [mounted, setMounted] = useState(false);
   const [draft, setDraft] = useState<{ style: DeckStyle; logo?: string }>({ style: DEFAULT_STYLE });
   const [imgErr, setImgErr] = useState("");
+  const plan = usePlan();
   useEffect(() => setMounted(true), []);
   const closePresent = useCallback(() => setPresenting(false), []);
 
@@ -143,6 +146,8 @@ export default function DeckPage() {
       </div>
     );
   }
+  if (!plan.ready) return null;
+  if (!plan.pro) return <ProGate title="Pitch deck designer" line="Pick a layout, colors, font and logo, add your photos, and get a 10-slide deck written from your answers. Present it full screen or download a PDF." />;
   const p = ws.profile;
   const deck = ws.deck;
   const build = (style: DeckStyle, logo?: string) => { update((w) => ({ ...w, deck: { style, logo, slides: buildDeck(w), at: Date.now() } })); setCur(0); setTab("edit"); };

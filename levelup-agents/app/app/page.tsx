@@ -13,6 +13,8 @@ import { today, useWorkspace, type Profile, type Stage } from "@/lib/cofounder/p
 import { playbookOfTheDay, recommend } from "@/lib/cofounder/recommend";
 import { fadeUp, stagger } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { isProAgent, usePlan } from "@/lib/cofounder/plan";
+import { ProBadge } from "@/components/cofounder/ProGate";
 
 const STAGES: { id: Stage; label: string; emoji: string }[] = [
   { id: "idea", label: "Just an idea", emoji: "💡" },
@@ -104,6 +106,7 @@ export default function HQ() {
   const { ws, ready, update } = useWorkspace();
   const [editing, setEditing] = useState(false);
   const [goal, setGoal] = useState("");
+  const { pro } = usePlan();
   if (!ready) return null;
 
   const save = (p: Profile) => { update((w) => ({ ...w, profile: p })); setEditing(false); };
@@ -113,10 +116,10 @@ export default function HQ() {
   const ch = ws.prefs.character;
   const buddy = characterById(ch);
   const g = gameStats(ws, today());
-  const quests = [...AGENTS.map((a) => ({ id: a.id, href: `/app/agents/${a.id}`, name: `${a.name} agent`, stage: a.stage, icon: a.icon, done: !!ws.results[a.id], xp: XP.agent, boss: false, world: a.world })),
-    { id: "deck", href: "/app/deck", name: "Pitch deck", stage: "Boss level: design your deck", icon: Layers, done: !!ws.deck, xp: XP.deck, boss: true, world: 4 }];
-  const current = quests.find((q) => !q.done);
-  const recs = recommend(ws);
+  const quests = [...AGENTS.map((a) => ({ id: a.id, href: `/app/agents/${a.id}`, name: `${a.name} agent`, stage: a.stage, icon: a.icon, done: !!ws.results[a.id], xp: XP.agent, boss: false, world: a.world, locked: !pro && isProAgent(a.id) })),
+    { id: "deck", href: "/app/deck", name: "Pitch deck", stage: "Boss level: design your deck", icon: Layers, done: !!ws.deck, xp: XP.deck, boss: true, world: 4, locked: !pro }];
+  const current = quests.find((q) => !q.done && !q.locked);
+  const recs = recommend(ws, pro);
   const pb = playbookOfTheDay();
 
   const tip: { mood: Mood; text: React.ReactNode } =
@@ -209,12 +212,12 @@ export default function HQ() {
           </div>
           {[0, 1, 2, 3, 4].map((wi) => {
             const items = quests.filter((q) => q.world === wi);
-            const wDone = items.every((q) => q.done);
+            const wDone = items.every((q) => q.done || q.locked);
             return (
               <div key={wi} className="mt-5 first:mt-0">
                 <div className={cn("mb-3 flex items-center justify-between rounded-xl px-3 py-2", wi === 4 ? "bg-amber/10" : "bg-fg/[0.04]")}>
                   <span className="text-sm font-bold uppercase tracking-wider">{wi === 4 ? "👑 Final boss" : `World ${wi + 1}: ${WORLDS[wi].name}`}</span>
-                  <span className="text-xs text-muted">{wi === 4 ? "Design your deck" : wDone ? "Cleared ⭐" : WORLDS[wi].line}</span>
+                  <span className="text-xs text-muted">{wi === 4 ? (pro ? "Design your deck" : "Pro") : wDone ? "Cleared ⭐" : WORLDS[wi].line}</span>
                 </div>
                 <ol className="space-y-2">
                   {items.map((q, k) => {
@@ -224,21 +227,21 @@ export default function HQ() {
                     qi++;
                     return (
                       <li key={q.id} className={isCur ? "pt-5" : undefined} style={{ paddingLeft: `calc(${off} * min(4rem, 8vw))` }}>
-                        <Link href={q.href} className="group flex items-center gap-4 py-1">
+                        <Link href={q.locked ? "/app/upgrade" : q.href} className="group flex items-center gap-4 py-1">
                           <span className="relative">
                             {isCur && <span className="absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-amber px-2 py-0.5 text-xs font-bold text-[#1a1100] shadow">START<span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-amber" /></span>}
                             <motion.span whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
                               className={cn("grid place-items-center rounded-full border-b-[6px] transition-colors",
                                 q.boss ? "h-[84px] w-[84px]" : "h-[66px] w-[66px]",
                                 q.done ? "border-black/25 bg-good text-white" : isCur ? "pulse-ring border-black/25 bg-amber text-[#1a1100]" : "border-fg/15 bg-fg/[0.08] text-muted")}>
-                              {q.done ? <Check size={28} strokeWidth={3} aria-hidden /> : q.boss ? <Crown size={32} aria-hidden /> : <Icon size={26} aria-hidden />}
+                              {q.done ? <Check size={28} strokeWidth={3} aria-hidden /> : q.locked ? <Lock size={24} aria-hidden /> : q.boss ? <Crown size={32} aria-hidden /> : <Icon size={26} aria-hidden />}
                             </motion.span>
                             {q.done && <Star size={18} className="absolute -right-1 -top-1 fill-amber text-amber" aria-hidden />}
                           </span>
                           <span className="min-w-0">
-                            <span className="block font-semibold group-hover:text-violet"><span className="mr-1 text-xs text-muted">{qi}.</span>{q.name}</span>
+                            <span className="flex items-center gap-1.5 font-semibold group-hover:text-violet"><span className="text-xs text-muted">{qi}.</span>{q.name}{q.locked && <ProBadge />}</span>
                             <span className="block text-sm leading-snug text-muted">{q.stage}</span>
-                            <span className={cn("mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold", q.done ? "bg-good/15 text-good" : "bg-violet/10 text-violet")}>{q.done ? `+${q.xp} XP earned` : `+${q.xp} XP`}</span>
+                            <span className={cn("mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold", q.done ? "bg-good/15 text-good" : "bg-violet/10 text-violet")}>{q.done ? `+${q.xp} XP earned` : q.locked ? "Unlock with Pro" : `+${q.xp} XP`}</span>
                           </span>
                         </Link>
                       </li>
@@ -261,7 +264,7 @@ export default function HQ() {
                 <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1100] px-4 py-2 text-sm font-semibold text-white">Play <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden /> <span className="text-amber">+{current.xp} XP</span></span>
               </Link>
             ) : (
-              <div className="glass rounded-[24px] p-6"><p className="font-display text-3xl uppercase">All quests complete 👑</p><p className="mt-2 text-sm text-muted">Re-run agents as your startup changes, and keep your streak alive with weekly goals.</p></div>
+              <div className="glass rounded-[24px] p-6"><p className="font-display text-3xl uppercase">{pro ? "All quests complete 👑" : "Free quests complete 👑"}</p>{!pro && <Link href="/app/upgrade" className="btn-play mt-3 px-4 py-2 text-sm">Unlock Pro quests</Link>}<p className="mt-2 text-sm text-muted">Re-run agents as your startup changes, and keep your streak alive with weekly goals.</p></div>
             )}
           </motion.div>
 

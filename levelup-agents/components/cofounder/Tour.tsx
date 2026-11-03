@@ -19,9 +19,10 @@ const STEPS: Step[] = [
   { target: "playbook", title: "Playbook of the day", body: "A framework from founders like Alex Hormozi, Bill Gates and Paul Graham, with one thing to do today. The source is on every card." },
   { target: "badges", title: "Trophy case", body: "16 badges to unlock. Locked ones tell you exactly how to earn them." },
   { target: "nav-agents", fallback: "open-menu", title: "Your agents", body: "Every agent lives in the sidebar, grouped by world. Open any one anytime: you don't have to go in order." },
-  { target: "nav-deck", fallback: "open-menu", title: "Pitch deck designer", body: "Pick a layout, colors, font and logo, add your own photos, and I'll build a 10-slide deck from your answers. Present it full screen or download a PDF." },
+  { target: "nav-deck", fallback: "open-menu", title: "Pitch deck designer (Pro)", body: "Pick a layout, colors, font and logo, add your own photos, and I'll build a 10-slide deck from your answers. Present it full screen or download a PDF." },
   { target: "nav-playbooks", fallback: "open-menu", title: "Playbooks", body: "All the frameworks from top entrepreneurs and investors in one place." },
   { target: "nav-opps", fallback: "open-menu", title: "Opportunities", body: "60 competitions, programs, grants, free credits, accelerators and investors. Filter by age and type, and save your favorites." },
+  { target: "nav-pro", fallback: "open-menu", title: "Go Pro", body: "Items with a PRO tag (the deck designer, Offer, Sales and Investor agents, and the investor list) unlock with LevelUp Pro. Everything else is free." },
   { target: "nav-settings", fallback: "open-menu", title: "Settings", body: "Switch your co-founder character, change your dashboard colors, manage your account, or replay this tour." },
   { target: "top-stats", title: "Always on top", body: "Your level, XP and streak follow you on every page. That's it. Let's build something!" },
 ];

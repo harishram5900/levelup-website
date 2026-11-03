@@ -32,6 +32,12 @@ Also included:
 
 `/api/agent` is rate-limited to 10 runs per IP per 10 minutes. The limit is kept in memory, per server instance.
 
+## Free vs Pro
+
+Pro (`lib/cofounder/plan.ts`): pitch deck designer, Offer, Sales and Investor agents, and the investor list in Opportunities. Everything else is free. The plan is stored in `profiles.plan` in Supabase; users can't edit it (column-level grants). Until payments are added, give someone Pro in Supabase → Table Editor → profiles → `plan = pro`. The upgrade page (`/app/upgrade`) collects a Pro waitlist.
+
+Note: Pro checks happen in the browser, so a technical user could get around them. When you add payments (e.g. Stripe), also check the plan on the server for anything valuable.
+
 ## Accounts and data (Supabase)
 
 1. Create a free project at supabase.com.

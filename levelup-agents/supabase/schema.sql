@@ -28,11 +28,19 @@ alter table public.profiles enable row level security;
 alter table public.workspaces enable row level security;
 alter table public.waitlist enable row level security;
 
+-- Plan: "free" or "pro". Users can never change this themselves (see column grants below).
+-- To give someone Pro (e.g. yourself, a tester or a paying user): Table Editor → profiles → set plan to pro.
+alter table public.profiles add column if not exists plan text not null default 'free' check (plan in ('free', 'pro'));
+
 -- Profiles: you can read and update only your own. Rows are created by the trigger below.
 drop policy if exists "own profile read" on public.profiles;
 create policy "own profile read" on public.profiles for select to authenticated using ((select auth.uid()) = id);
 drop policy if exists "own profile update" on public.profiles;
 create policy "own profile update" on public.profiles for update to authenticated using ((select auth.uid()) = id) with check ((select auth.uid()) = id);
+
+-- Users may only edit their display name, never their plan or age flag.
+revoke update on public.profiles from anon, authenticated;
+grant update (display_name) on public.profiles to authenticated;
 
 -- Workspaces: full access to your own row only.
 drop policy if exists "own workspace" on public.workspaces;
