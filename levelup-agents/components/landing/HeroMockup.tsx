@@ -50,7 +50,7 @@ export function HeroMockup() {
           </div>
           {/* Editing timeline */}
           <div className="mx-3 mt-3 rounded-2xl bg-white/[0.05] p-3">
-            <div className="mb-2 flex items-center justify-between text-[10px] text-white/60"><span>Your journey</span><span>2 of 6 done</span></div>
+            <div className="mb-2 flex items-center justify-between text-[10px] text-white/60"><span>Your journey</span><span>2 of 12 done</span></div>
             <div className="relative space-y-1.5">
               {tracks.map((t, i) => (
                 <div key={t.label} className="relative h-4 rounded bg-white/[0.04]">
@@ -62,7 +62,7 @@ export function HeroMockup() {
           </div>
           {/* Agent status */}
           <div className="mx-3 mb-4 mt-3 space-y-1.5">
-            {AGENTS.slice(2, 6).map((a, i) => {
+            {["build", "pitch", "money", "launch"].map((id) => AGENTS.find((x) => x.id === id)!).map((a, i) => {
               const on = step === i;
               const Icon = a.icon;
               return (
