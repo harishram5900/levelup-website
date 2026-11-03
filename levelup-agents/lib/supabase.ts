@@ -8,7 +8,7 @@ import { useSyncExternalStore } from "react";
  * If the env vars aren't set, accounts are switched off and the app runs in guest mode.
  */
 const URL_ = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 export const authEnabled = !!(URL_ && KEY);
 
 let client: SupabaseClient | null = null;
