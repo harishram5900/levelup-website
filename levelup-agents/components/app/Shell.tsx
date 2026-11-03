@@ -4,7 +4,7 @@ import { ChevronsLeft, Flame, Menu, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LogoMark } from "@/components/ui/Logo";
+import { LogoMark, Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ease, spring } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -83,12 +83,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const toggle = () => setCollapsed((c) => { try { localStorage.setItem("lu-collapsed", c ? "0" : "1"); } catch {} return !c; });
 
   return (
-    <div className="flex min-h-dvh">
+    <div className="app-scope flex min-h-dvh">
       {/* Desktop sidebar */}
       <motion.aside animate={{ width: collapsed ? 76 : 248 }} transition={{ duration: 0.35, ease }} className="sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-fg/[0.07] bg-bg-2/40 p-3 md:flex">
         <div className="mb-6 flex items-center gap-2.5 px-2 pt-2">
           <Link href="/" aria-label="LevelUp home"><LogoMark /></Link>
-          {!collapsed && <span className="font-display text-lg font-bold">LevelUp</span>}
+          {!collapsed && <Wordmark />}
           {!collapsed && ws.profile && <Buddy character={ws.prefs.character} size={30} className="ml-auto" />}
         </div>
         <nav aria-label="App" className="-mx-1 flex-1 overflow-y-auto px-1"><NavList collapsed={collapsed} /></nav>
@@ -104,7 +104,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawer(false)} className="fixed inset-0 z-40 bg-black/50 md:hidden" />
             <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ duration: 0.3, ease }} className="fixed inset-y-0 left-0 z-50 w-[260px] border-r border-fg/[0.07] bg-bg p-3 md:hidden" aria-label="App menu">
               <div className="mb-6 flex items-center justify-between px-2 pt-2">
-                <span className="flex items-center gap-2.5 font-display text-lg font-bold"><LogoMark /> LevelUp</span>
+                <span className="flex items-center gap-2.5"><LogoMark /><Wordmark /></span>
                 <button type="button" onClick={() => setDrawer(false)} aria-label="Close menu" className="grid h-9 w-9 place-items-center rounded-full hairline"><X size={16} aria-hidden /></button>
               </div>
               <nav aria-label="App mobile" className="max-h-[calc(100dvh-90px)] overflow-y-auto"><NavList onNavigate={() => setDrawer(false)} /></nav>

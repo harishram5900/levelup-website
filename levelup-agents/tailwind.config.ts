@@ -21,6 +21,7 @@ const config: Config = {
         sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
         display: ["'Bebas Neue'", "Impact", "'Arial Narrow'", "sans-serif"],
+        brand: ["'Plus Jakarta Sans Variable'", "var(--font-geist-sans)", "system-ui", "sans-serif"],
       },
       borderRadius: { xl2: "1.25rem" },
       maxWidth: { site: "1200px" },

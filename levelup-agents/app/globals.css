@@ -1,4 +1,5 @@
 @import "@fontsource/bebas-neue/latin-400.css";
+@import "@fontsource-variable/plus-jakarta-sans/index.css";
 
 @tailwind base;
 @tailwind components;
@@ -133,3 +134,27 @@
   .btn-icon { @apply btn h-9 w-9 rounded-xl; background: rgb(var(--fg) / .05); border: 1px solid rgb(var(--line) / .12); }
   .btn-icon:hover { background: rgb(var(--violet) / .15); color: rgb(var(--violet)); }
 }
+
+/* ---------- In-app typography: clean startup sans instead of the poster font ---------- */
+.app-scope { font-family: 'Plus Jakarta Sans Variable', var(--font-geist-sans), system-ui, sans-serif; }
+.app-scope :is(h1, h2, h3, .font-display) {
+  font-family: 'Plus Jakarta Sans Variable', var(--font-geist-sans), system-ui, sans-serif !important;
+  text-transform: none !important;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+/* The poster font is tall and narrow; scale headings so the wider font keeps the same rhythm. */
+.app-scope .font-display.text-7xl, .app-scope h2.text-7xl { font-size: 3.25rem !important; }
+.app-scope .font-display.text-6xl, .app-scope h2.text-6xl { font-size: 2.75rem !important; }
+.app-scope .font-display.text-5xl, .app-scope h2.text-5xl { font-size: 2.25rem !important; }
+.app-scope .font-display.text-4xl { font-size: 1.75rem !important; }
+.app-scope .font-display.text-3xl { font-size: 1.4rem !important; }
+.app-scope .font-display.text-2xl { font-size: 1.15rem !important; }
+.app-scope .font-display.text-xl { font-size: 1rem !important; }
+@media (min-width: 640px) {
+  .app-scope .font-display.sm\:text-7xl { font-size: 3.25rem !important; }
+  .app-scope .font-display.sm\:text-6xl { font-size: 2.75rem !important; }
+}
+/* Big numbers (XP, stats, level) stay bold and tabular. */
+.app-scope .font-display.leading-none { line-height: 1.05; }
