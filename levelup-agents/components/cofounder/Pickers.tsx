@@ -1,5 +1,7 @@
 "use client";
-import { Check } from "lucide-react";
+import { Check, Crown } from "lucide-react";
+import Link from "next/link";
+import { usePlan } from "@/lib/cofounder/plan";
 import { PALETTES } from "@/lib/cofounder/palettes";
 import type { PaletteId, Prefs } from "@/lib/cofounder/profile";
 import { cn } from "@/lib/utils";
@@ -26,10 +28,18 @@ export function CharacterPicker({ value, onChange }: { value: Prefs["character"]
 }
 
 export function PalettePicker({ value, onChange }: { value: PaletteId; onChange: (p: PaletteId) => void }) {
+  const { pro } = usePlan();
   return (
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-6" role="radiogroup" aria-label="Dashboard colors">
+    <div className="grid grid-cols-4 gap-2 sm:grid-cols-8" role="radiogroup" aria-label="Dashboard colors">
       {PALETTES.map((p) => {
         const on = value === p.id;
+        if (p.pro && !pro) return (
+          <Link key={p.id} href="/app/upgrade" className="relative rounded-2xl p-2 text-center ring-2 ring-amber/40 transition hover:ring-amber" aria-label={`${p.name} theme (Pro)`}>
+            <span className="flex h-12 overflow-hidden rounded-xl opacity-60"><span className="flex-[2]" style={{ background: `rgb(${p.primary})` }} /><span className="flex-1" style={{ background: `rgb(${p.secondary})` }} /><span className="flex-1" style={{ background: `rgb(${p.cta})` }} /></span>
+            <span className="absolute left-1/2 top-5 grid h-6 w-6 -translate-x-1/2 place-items-center rounded-full bg-amber text-[#1a1100]"><Crown size={12} aria-hidden /></span>
+            <span className="mt-1.5 block text-xs font-semibold text-amber">{p.name}</span>
+          </Link>
+        );
         return (
           <button key={p.id} type="button" role="radio" aria-checked={on} onClick={() => onChange(p.id)}
             className={cn("rounded-2xl p-2 text-center ring-2 transition", on ? "ring-fg" : "ring-transparent hover:ring-fg/20")}>

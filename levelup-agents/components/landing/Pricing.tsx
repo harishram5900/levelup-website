@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 // Prices are placeholders until launch. Yearly = 2 months free. "Schools & clubs" is per student.
 const TIERS = [
-  { name: "Student", monthly: 0, plus: false, for: "For student founders building their first startup.", features: ["7 co-founder agents (starter plans)", "Startup HQ, XP, badges and leaderboards", "Playbooks from top founders", "Competitions, grants and free credits"] },
+  { name: "Student", monthly: 0, plus: false, for: "For student founders building their first startup.", features: ["6 co-founder agents (starter plans)", "Startup HQ, XP, badges and leaderboards", "Playbooks from top founders", "Competitions, grants and free credits"] },
   { name: "Pro", monthly: 9, plus: false, featured: true, for: "For founders ready to pitch, sell and raise.", features: ["AI co-founder chat that remembers you", "1:1 call with the founder", "Full plans + Pro deep dives on all 12 agents", "Pitch deck designer, Launch Galaxy and investor list"] },
   { name: "Schools & clubs", monthly: 3, plus: true, for: "For schools, clubs and programs that teach entrepreneurship.", features: ["Pro for every student", "Teacher dashboard (coming soon)", "Cohort progress tracking", "Per-student pricing"] },
 ];

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { applyPalette } from "@/lib/cofounder/palettes";
+import { applyPalette, paletteById } from "@/lib/cofounder/palettes";
+import { usePlan } from "@/lib/cofounder/plan";
 import { getWorkspace, onWorkspaceChange, replaceWorkspace, useWorkspace, type Workspace } from "@/lib/cofounder/profile";
 import { supabase, useAuth } from "@/lib/supabase";
 
@@ -16,7 +17,9 @@ export function AuthSync() {
   const uid = user?.id;
   const loadedFor = useRef<string | null>(null);
 
-  useEffect(() => { if (ready) applyPalette(ws.prefs.palette); }, [ready, ws.prefs.palette]);
+  const { pro, ready: planReady } = usePlan();
+  // Pro-only themes fall back to Royal if the founder isn't (or is no longer) Pro.
+  useEffect(() => { if (ready && planReady) applyPalette(paletteById(ws.prefs.palette).pro && !pro ? "royal" : ws.prefs.palette); }, [ready, planReady, pro, ws.prefs.palette]);
 
   // On sign-in: pull the saved workspace, or upload this device's progress if the account is new.
   useEffect(() => {

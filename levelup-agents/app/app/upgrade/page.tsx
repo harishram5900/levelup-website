@@ -11,9 +11,10 @@ import { paymentsEnabled, PRO_FEATURES, refreshPlan, usePlan } from "@/lib/cofou
 import { useWorkspace } from "@/lib/cofounder/profile";
 import { useAuth } from "@/lib/supabase";
 
-const FREE = ["Startup HQ, XP, streaks, badges and leaderboards", "7 agents (top 3 points of each plan)", "Playbooks from top founders", "Competitions, programs, grants and credits", "Friends, teams and weekly goals"];
+const FREE = ["Startup HQ, XP, streaks, badges and leaderboards", "6 agents: Idea, Customer, Scout, Build, Brand, Pitch (starter plans)", "Playbooks from top founders", "Competitions, programs, grants and credits", "Friends, teams and weekly goals"];
 const ROWS: [string, boolean, boolean][] = [
-  ["7 agents: Idea, Customer, Scout, Build, Brand, Pitch, Money", true, true],
+  ["6 agents: Idea, Customer, Scout, Build, Brand, Pitch", true, true],
+  ["Money agent: pricing, break-even math, funding plan", false, true],
   ["Full plans (every point) + Pro deep dive on every agent", false, true],
   ["AI co-founder chat that remembers you", false, true],
   ["1:1 call with the founder", false, true],
@@ -23,6 +24,7 @@ const ROWS: [string, boolean, boolean][] = [
   ["Competitions, grants, programs and free credits", true, true],
   ["Pitch deck designer + PDF + present mode", false, true],
   ["Offer and Sales agents", false, true],
+  ["Exclusive Gold and Aurora themes", false, true],
   ["Investor & VC list", false, true],
 ];
 
@@ -125,7 +127,7 @@ function Upgrade() {
             <ProBadge />
             <h2 className="mt-2 font-display text-6xl uppercase leading-none">LevelUp Pro</h2>
             <p className="mt-2 max-w-lg text-white/85">{pro ? "You're Pro. Everything is unlocked. Go build something big!" : `Everything you need to pitch, sell and raise. ${buddy.name} will be right there with you.`}</p>
-            {!pro && <p className="mt-3"><span className="font-display text-5xl">$9</span><span className="text-white/70"> /month</span> <span className="ml-2 text-sm text-white/60">(launch price, subject to change)</span></p>}
+            {!pro && <p className="mt-3"><span className="font-display text-5xl">$9</span><span className="text-white/70"> /month</span> <span className="ml-2 text-sm text-white/60">less than $0.30 a day · cancel anytime</span></p>}
           </div>
         </div>
       </div>

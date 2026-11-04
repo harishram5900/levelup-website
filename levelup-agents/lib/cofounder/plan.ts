@@ -11,8 +11,8 @@ import { supabase, useAuth } from "../supabase";
  */
 export type Plan = "free" | "pro";
 
-// Pro: the whole Launch Galaxy world plus Offer and Sales.
-export const PRO_AGENTS: AgentId[] = ["offer", "sales", "launch", "content", "investor"];
+// Free: Idea, Customer, Scout, Build, Brand, Pitch. Pro: everything that makes money, sells, launches and raises.
+export const PRO_AGENTS: AgentId[] = ["money", "offer", "sales", "launch", "content", "investor"];
 export const isProAgent = (id: string) => (PRO_AGENTS as string[]).includes(id);
 
 export const PRO_FEATURES = [
@@ -20,7 +20,8 @@ export const PRO_FEATURES = [
   { title: "1:1 call with the founder", line: "Request a call with Harish, LevelUp's founder, to talk through your startup" },
   { title: "Full plans + Pro deep dives", line: "Every point in every plan, plus advanced sections on all agents: kill criteria, scripts, scorecards, roadmaps" },
   { title: "Launch Galaxy", line: "Launch, Content and Investor agents: go-to-market, audience building and fundraising" },
-  { title: "Offer & Sales agents", line: "Hormozi's Value Equation offer builder, outreach scripts and objection handling" },
+  { title: "Money, Offer & Sales agents", line: "Pricing and break-even math, Hormozi's Value Equation offer builder, outreach scripts and objection handling" },
+  { title: "Exclusive Pro looks", line: "Gold and Aurora dashboard themes and a Pro crown" },
   { title: "Pitch deck designer", line: "4 layouts, custom colors and fonts, your logo and photos, present mode and PDF" },
   { title: "Investor & VC list", line: "Youth-friendly funds and investors in Opportunities" },
 ];

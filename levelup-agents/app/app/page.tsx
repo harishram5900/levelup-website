@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { PlaybookCard } from "@/components/cofounder/PlaybookCard";
 import { FounderCall } from "@/components/cofounder/FounderCall";
+import { ProBanner } from "@/components/cofounder/ProBanner";
 import { Buddy, BuddySays, characterById, type Mood } from "@/components/cofounder/Pip";
 import { CharacterPicker, PalettePicker } from "@/components/cofounder/Pickers";
 import { CountUp } from "@/components/ui/CountUp";
@@ -181,6 +182,8 @@ export default function HQ() {
           </motion.div>
         ))}
       </motion.div>
+
+      {!pro && <ProBanner />}
 
       {/* CO-FOUNDER RECOMMENDS */}
       <motion.section variants={fadeUp} data-tour="recs" className="glass rounded-[28px] p-5 sm:p-7">

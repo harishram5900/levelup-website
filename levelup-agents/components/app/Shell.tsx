@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronsLeft, Flame, Menu, Zap, X } from "lucide-react";
+import { ChevronsLeft, Crown, Flame, Menu, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,7 +8,7 @@ import { LogoMark, Wordmark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ease, spring } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import { NAV } from "./nav";
+import { NAV, PRO_GROUP } from "./nav";
 import { Celebrator } from "@/components/cofounder/Celebrate";
 import { gameStats } from "@/lib/cofounder/game";
 import { today, useWorkspace } from "@/lib/cofounder/profile";
@@ -56,9 +56,14 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
         const Icon = n.icon;
         return (
           <li key={n.href}>
-            {header && !collapsed && <p className="kicker px-3 pb-1 pt-4 text-[10px]">{header}</p>}
+            {header && !collapsed && (header === PRO_GROUP ? (
+              <div className="mx-1 mb-1 mt-4 flex items-center justify-between rounded-xl bg-gradient-to-r from-amber/25 to-amber/5 px-2.5 py-1.5 ring-1 ring-amber/40">
+                <span className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-amber"><Crown size={12} aria-hidden /> {header}</span>
+                {pro ? <span className="text-[10px] font-bold text-good">Active ✓</span> : <Link href="/app/upgrade" onClick={onNavigate} className="rounded-md bg-amber px-2 py-0.5 text-[10px] font-extrabold text-[#1a1100] hover:brightness-110">Unlock</Link>}
+              </div>
+            ) : <p className="kicker px-3 pb-1 pt-4 text-[10px]">{header}</p>)}
             <Link href={n.href} onClick={onNavigate} data-tour={n.tour} aria-current={active ? "page" : undefined} title={collapsed ? n.label : undefined}
-              className={cn("relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors", active ? "text-fg" : "text-muted hover:text-fg")}>
+              className={cn("relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors", active ? "text-fg" : "text-muted hover:text-fg", n.group === PRO_GROUP && !pro && "opacity-90")}>
               {active && <motion.span layoutId="nav-active" transition={spring} className="absolute inset-0 rounded-xl bg-fg/[0.07]" />}
               <Icon size={18} className="relative shrink-0" aria-hidden />
               {!collapsed && <span className="relative flex-1 truncate">{n.label}</span>}
