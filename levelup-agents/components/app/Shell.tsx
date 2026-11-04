@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronsLeft, Crown, Flame, Menu, Zap, X } from "lucide-react";
+import { ChevronDown, ChevronsLeft, Crown, Flame, Menu, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -48,27 +48,51 @@ function Stats() {
 function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
   const path = usePathname();
   const { pro } = usePlan();
+  const items = NAV.filter((n) => !(pro && n.href === "/app/upgrade"));
+  const onProPage = items.some((n) => n.group === PRO_GROUP && n.href !== "/app" && path.startsWith(n.href));
+  // The Pro section is a dropdown: closed by default, opens on Pro pages, remembers the choice.
+  const [proOpen, setProOpen] = useState(false);
+  useEffect(() => { try { setProOpen(localStorage.getItem("lu-pro-open") === "1"); } catch { /* ignore */ } }, []);
+  useEffect(() => { if (onProPage) setProOpen(true); }, [onProPage]);
+  const toggle = () => setProOpen((o) => { try { localStorage.setItem("lu-pro-open", o ? "0" : "1"); } catch { /* ignore */ } return !o; });
+  const proCount = items.filter((n) => n.group === PRO_GROUP).length;
+
   return (
     <ul className="space-y-1">
-      {NAV.filter((n) => !(pro && n.href === "/app/upgrade")).map((n, i, arr) => {
+      {items.map((n, i, arr) => {
         const header = n.group && arr[i - 1]?.group !== n.group ? n.group : null;
         const active = n.href === "/app" ? path === "/app" : path.startsWith(n.href);
         const Icon = n.icon;
+        const inPro = n.group === PRO_GROUP;
+        const hidden = inPro && (!proOpen || collapsed);
         return (
           <li key={n.href}>
-            {header && !collapsed && (header === PRO_GROUP ? (
-              <div className="mx-1 mb-1 mt-4 flex items-center justify-between rounded-xl bg-gradient-to-r from-amber/25 to-amber/5 px-2.5 py-1.5 ring-1 ring-amber/40">
-                <span className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-amber"><Crown size={12} aria-hidden /> {header}</span>
-                {pro ? <span className="text-[10px] font-bold text-good">Active ✓</span> : <Link href="/app/upgrade" onClick={onNavigate} className="rounded-md bg-amber px-2 py-0.5 text-[10px] font-extrabold text-[#1a1100] hover:brightness-110">Unlock</Link>}
+            {header && header === PRO_GROUP && (collapsed ? (
+              <button type="button" onClick={toggle} title="LevelUp Pro" aria-expanded={proOpen} className="mx-auto my-2 grid h-9 w-9 place-items-center rounded-xl bg-amber/20 text-amber ring-1 ring-amber/40"><Crown size={16} aria-hidden /></button>
+            ) : (
+              <div className="mx-1 mb-1 mt-4 flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber/25 to-amber/5 py-1 pl-1 pr-2 ring-1 ring-amber/40">
+                <button type="button" onClick={toggle} aria-expanded={proOpen} aria-controls="pro-nav" data-tour="nav-pro-group" className="flex min-w-0 flex-1 items-center gap-1.5 whitespace-nowrap rounded-lg px-1.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.06em] text-amber hover:bg-amber/10">
+                  <Crown size={12} className="shrink-0" aria-hidden /> <span className="shrink-0 whitespace-nowrap">{header}</span>
+                  <span className="shrink-0 rounded-full bg-amber/20 px-1.5 text-[9px] tracking-normal">{proCount}</span>
+                  <motion.span animate={{ rotate: proOpen ? 180 : 0 }} className="ml-auto"><ChevronDown size={14} aria-hidden /></motion.span>
+                </button>
+                {pro ? <span className="shrink-0 whitespace-nowrap text-[10px] font-bold text-good">Active ✓</span> : <Link href="/app/upgrade" onClick={onNavigate} className="shrink-0 rounded-md bg-amber px-2 py-0.5 text-[10px] font-extrabold text-[#1a1100] hover:brightness-110">Unlock</Link>}
               </div>
-            ) : <p className="kicker px-3 pb-1 pt-4 text-[10px]">{header}</p>)}
-            <Link href={n.href} onClick={onNavigate} data-tour={n.tour} aria-current={active ? "page" : undefined} title={collapsed ? n.label : undefined}
-              className={cn("relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors", active ? "text-fg" : "text-muted hover:text-fg", n.group === PRO_GROUP && !pro && "opacity-90")}>
-              {active && <motion.span layoutId="nav-active" transition={spring} className="absolute inset-0 rounded-xl bg-fg/[0.07]" />}
-              <Icon size={18} className="relative shrink-0" aria-hidden />
-              {!collapsed && <span className="relative flex-1 truncate">{n.label}</span>}
-              {!collapsed && n.pro && !pro && <ProBadge className="relative" />}
-            </Link>
+            ))}
+            {header && header !== PRO_GROUP && !collapsed && <p className="kicker px-3 pb-1 pt-4 text-[10px]">{header}</p>}
+            <AnimatePresence initial={false}>
+              {!hidden && (
+                <motion.div id={inPro ? "pro-nav" : undefined} initial={inPro ? { height: 0, opacity: 0 } : false} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22, ease }} className={inPro ? "overflow-hidden" : undefined}>
+                  <Link href={n.href} onClick={onNavigate} data-tour={n.tour} aria-current={active ? "page" : undefined} title={collapsed ? n.label : undefined}
+                    className={cn("relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors", active ? "text-fg" : "text-muted hover:text-fg", inPro && "ml-2")}>
+                    {active && <motion.span layoutId="nav-active" transition={spring} className="absolute inset-0 rounded-xl bg-fg/[0.07]" />}
+                    <Icon size={18} className="relative shrink-0" aria-hidden />
+                    {!collapsed && <span className="relative flex-1 truncate">{n.label}</span>}
+                    {!collapsed && n.pro && !pro && <ProBadge className="relative" />}
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </li>
         );
       })}

@@ -1,4 +1,5 @@
 @import "@fontsource/bebas-neue/latin-400.css";
+@import "@fontsource/anton/latin-400.css";
 @import "@fontsource-variable/plus-jakarta-sans/index.css";
 
 @tailwind base;
@@ -169,3 +170,10 @@
 }
 .landing-light .bg-cta, .landing-light .btn-play { color: #fff; }
 .landing-light .bg-cta:hover { background-color: rgb(255 80 50); }
+
+/* Landing: solid accent words instead of gradient text, editorial display font */
+.landing-light .text-gradient { background: none; -webkit-text-fill-color: currentColor; color: rgb(var(--violet)); }
+.landing-light :is(h1, h2, h3, .font-display) { font-family: 'Anton', 'Bebas Neue', Impact, sans-serif; letter-spacing: 0.005em; line-height: 0.95; }
+@keyframes drift { from { transform: translateX(-12%); } to { transform: translateX(112vw); } }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .cloud, .ticker-track { animation: none !important; } }
