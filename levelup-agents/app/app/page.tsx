@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Award, Gift, Medal, BookOpen, Check, Crown, Exte
 import Link from "next/link";
 import { useState } from "react";
 import { PlaybookCard } from "@/components/cofounder/PlaybookCard";
+import { FounderCall } from "@/components/cofounder/FounderCall";
 import { Buddy, BuddySays, characterById, type Mood } from "@/components/cofounder/Pip";
 import { CharacterPicker, PalettePicker } from "@/components/cofounder/Pickers";
 import { CountUp } from "@/components/ui/CountUp";
@@ -289,6 +290,15 @@ export default function HQ() {
             </form>
           </motion.div>
 
+          {pro && <motion.div variants={fadeUp}><FounderCall compact /></motion.div>}
+          {pro && (
+            <motion.div variants={fadeUp}>
+              <Link href="/app/cofounder" className="flex items-center gap-3 rounded-[20px] bg-accent p-4 text-white transition-transform hover:-translate-y-0.5">
+                <Buddy character={ch} mood="happy" size={40} className="text-white" />
+                <span className="flex-1"><b className="block">Ask {buddy.name} anything</b><span className="text-xs text-white/80">Your AI co-founder remembers everything</span></span>
+              </Link>
+            </motion.div>
+          )}
           <motion.div variants={fadeUp} className="grid grid-cols-2 gap-3">
             <Link href="/app/friends" className="group rounded-[20px] bg-gradient-to-br from-pink-500 to-rose-600 p-4 text-white transition-transform hover:-translate-y-0.5">
               <Gift size={20} aria-hidden /><p className="mt-2 font-bold leading-tight">Invite friends</p><p className="text-xs text-white/80">+50 XP each</p>

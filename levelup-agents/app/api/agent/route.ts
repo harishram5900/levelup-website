@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { agentById } from "@/lib/agents";
 import { playbookById } from "@/lib/cofounder/playbooks";
+import { admin, userFrom } from "@/lib/server/billing";
 
 /**
  * Runs one co-founder agent with Claude when ANTHROPIC_API_KEY is set.
@@ -44,6 +45,11 @@ const SCHEMA = {
 
 export async function POST(req: Request) {
   if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ source: "unavailable", reason: "no_api_key" });
+  // AI-written plans are a Pro feature, checked on the server (free users get the guided plan).
+  const user = await userFrom(req);
+  if (!user) return NextResponse.json({ source: "unavailable", reason: "pro_only" });
+  const { data: prof } = (await admin()?.from("profiles").select("plan").eq("id", user.id).maybeSingle()) ?? { data: null };
+  if (prof?.plan !== "pro") return NextResponse.json({ source: "unavailable", reason: "pro_only" });
   const ip = (req.headers.get("x-forwarded-for") ?? "local").split(",")[0].trim();
   if (!allowed(ip)) return NextResponse.json({ source: "unavailable", reason: "rate_limited" }, { status: 429 });
 

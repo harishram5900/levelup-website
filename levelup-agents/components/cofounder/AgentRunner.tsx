@@ -17,7 +17,9 @@ import { AGENT_STYLE, AgentResultView } from "./AgentLayouts";
 
 // These agents put their questions on top and use the full width for results.
 const TOP_FORM: AgentId[] = ["customer", "brand", "pitch", "content", "launch", "sales"];
-import { isProAgent, usePlan } from "@/lib/cofounder/plan";
+import { FREE_ITEMS, isProAgent, usePlan } from "@/lib/cofounder/plan";
+import { deepDive, deepDiveTitles } from "@/lib/cofounder/proExtras";
+import { Lock } from "lucide-react";
 
 /** One agent's workspace: answer a few questions, get a document you can copy and use. */
 // Takes an id (not the agent object) so a server page can render it: icons are functions.
@@ -59,7 +61,8 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
   };
   const copy = async () => {
     if (!result) return;
-    const txt = `${agent.name} agent · ${profile.startup}\n\n` + result.sections.map((s) => `${s.title}\n${s.items.map((i) => `- ${i}`).join("\n")}`).join("\n\n");
+    const txt = `${agent.name} agent · ${profile.startup}\n\n` + result.sections.map((s) => `${s.title}\n${(plan.pro ? s.items : s.items.slice(0, FREE_ITEMS)).map((i) => `- ${i}`).join("\n")}`).join("\n\n")
+      + (plan.pro ? "\n\nPRO DEEP DIVE\n\n" + deepDive(agent.id, profile, answers).map((s) => `${s.title}\n${s.items.map((i) => `- ${i}`).join("\n")}`).join("\n\n") : "");
     try { await navigator.clipboard.writeText(txt); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { /* clipboard blocked */ }
   };
   const Icon = agent.icon;
@@ -119,7 +122,31 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
               </div>
               <button type="button" onClick={copy} className="btn-glass py-2 text-sm"><Copy size={14} aria-hidden /> {copied ? "Copied" : "Copy all"}</button>
             </div>
-            <AgentResultView agentId={agent.id} sections={result.sections} titles={agent.sections} startup={profile.startup} />
+            <AgentResultView agentId={agent.id} sections={plan.pro ? result.sections : result.sections.map((x) => ({ ...x, items: x.items.slice(0, FREE_ITEMS) }))} titles={agent.sections} startup={profile.startup} />
+            {plan.pro ? (
+              <section className="mt-6 rounded-2xl p-5 ring-1" style={{ background: "color-mix(in srgb, var(--ag) 8%, transparent)", borderColor: "var(--ag)" }}>
+                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ag)" }}><Crown size={14} aria-hidden /> Pro deep dive</p>
+                <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                  {deepDive(agent.id, profile, answers).map((x) => (
+                    <div key={x.title} className="rounded-2xl bg-bg-2/70 p-4 ring-1 ring-fg/[0.06]">
+                      <p className="font-semibold">{x.title}</p>
+                      <ul className="mt-2 space-y-2 text-sm">{x.items.map((it, k) => <li key={k} className="flex gap-2"><Check size={15} className="mt-0.5 shrink-0" style={{ color: "var(--ag)" }} aria-hidden />{it}</li>)}</ul>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : (
+              <section className="relative mt-6 overflow-hidden rounded-2xl p-5 ring-1 ring-amber/40">
+                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-amber"><Lock size={14} aria-hidden /> Pro deep dive · {deepDiveTitles(agent.id).length} advanced sections</p>
+                <p className="mt-1 text-sm text-muted">You're seeing the top {FREE_ITEMS} points of each section. Pro unlocks every point plus:</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {deepDiveTitles(agent.id).map((title) => (
+                    <div key={title} className="rounded-xl bg-fg/[0.04] p-3"><p className="font-semibold">{title}</p><div className="mt-2 space-y-1.5 blur-[3px]" aria-hidden><div className="h-2 w-11/12 rounded bg-fg/20" /><div className="h-2 w-9/12 rounded bg-fg/20" /><div className="h-2 w-10/12 rounded bg-fg/20" /></div></div>
+                  ))}
+                </div>
+                <Link href="/app/upgrade" className="btn-play mt-4"><Crown size={16} aria-hidden /> Unlock the full plan</Link>
+              </section>
+            )}
             {nextAgent && !(isProAgent(nextAgent.id) && !plan.pro) ? (
               <Link href={`/app/agents/${nextAgent.id}`} className="group mt-6 flex items-center justify-between gap-4 rounded-2xl p-5 ring-1 transition-colors" style={{ background: `color-mix(in srgb, ${AGENT_STYLE[nextAgent.id].color} 12%, transparent)`, borderColor: AGENT_STYLE[nextAgent.id].color }}>
                 <span><span className="kicker">Next quest · +{XP.agent} XP</span><span className="mt-1 block font-semibold">{nextAgent.name} agent: {nextAgent.stage}</span></span>

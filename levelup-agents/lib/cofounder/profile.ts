@@ -7,6 +7,7 @@ export type Profile = { founder: string; startup: string; idea: string; customer
 export type Section = { title: string; items: string[] };
 export type AgentResult = { sections: Section[]; source: "ai" | "guided"; at: number };
 export type Goal = { id: string; text: string; done: boolean };
+export type ChatMsg = { role: "user" | "assistant"; text: string; at: number; source?: "ai" | "guided" };
 export type SlideKind = "cover" | "content" | "closing";
 export type Slide = { id: string; kind: SlideKind; kicker: string; title: string; bullets: string[]; image?: string };
 export type DeckTheme = "blue" | "tangerine" | "paper";
@@ -27,6 +28,8 @@ export type Workspace = {
   prefs: Prefs;
   saved: string[]; // bookmarked opportunity ids
   team?: string | null; // name of the team you're on (for the Team Player badge)
+  chat?: ChatMsg[]; // AI co-founder conversation (synced to the account)
+  notes?: string[]; // things the founder (or the AI) pinned for the co-founder to remember
   updatedAt?: number; // for syncing with the account backend
 };
 

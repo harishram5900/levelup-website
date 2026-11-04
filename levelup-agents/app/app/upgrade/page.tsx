@@ -6,18 +6,23 @@ import { Suspense, useEffect, useState } from "react";
 import { openBillingPortal, startCheckout } from "@/lib/cofounder/billing";
 import { Buddy, characterById } from "@/components/cofounder/Pip";
 import { ProBadge } from "@/components/cofounder/ProGate";
+import { FounderCall } from "@/components/cofounder/FounderCall";
 import { paymentsEnabled, PRO_FEATURES, refreshPlan, usePlan } from "@/lib/cofounder/plan";
 import { useWorkspace } from "@/lib/cofounder/profile";
 import { useAuth } from "@/lib/supabase";
 
-const FREE = ["Startup HQ, XP, streaks and badges", "9 co-founder agents", "Playbooks from top founders", "Competitions, programs, grants and credits", "Weekly goals and recommendations"];
+const FREE = ["Startup HQ, XP, streaks, badges and leaderboards", "7 agents (top 3 points of each plan)", "Playbooks from top founders", "Competitions, programs, grants and credits", "Friends, teams and weekly goals"];
 const ROWS: [string, boolean, boolean][] = [
-  ["9 agents (Idea, Customer, Scout, Build, Brand, Pitch, Money, Launch, Content)", true, true],
+  ["7 agents: Idea, Customer, Scout, Build, Brand, Pitch, Money", true, true],
+  ["Full plans (every point) + Pro deep dive on every agent", false, true],
+  ["AI co-founder chat that remembers you", false, true],
+  ["1:1 call with the founder", false, true],
+  ["Launch Galaxy: Launch, Content and Investor agents", false, true],
   ["Startup HQ, quest map, XP, badges, tutorial", true, true],
   ["Playbooks and recommendations", true, true],
   ["Competitions, grants, programs and free credits", true, true],
   ["Pitch deck designer + PDF + present mode", false, true],
-  ["Offer, Sales and Investor agents", false, true],
+  ["Offer and Sales agents", false, true],
   ["Investor & VC list", false, true],
 ];
 
@@ -127,6 +132,7 @@ function Upgrade() {
 
       {paymentsEnabled && <Checkout pro={pro} signedIn={signedIn} />}
       {!pro && <PromoBox signedIn={signedIn} />}
+      {pro && <FounderCall />}
 
       {!paymentsEnabled && !pro && (
         <form onSubmit={join} className="glass flex flex-col gap-3 rounded-[24px] p-5 sm:flex-row sm:items-center">

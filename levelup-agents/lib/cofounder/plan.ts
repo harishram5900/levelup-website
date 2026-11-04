@@ -11,16 +11,22 @@ import { supabase, useAuth } from "../supabase";
  */
 export type Plan = "free" | "pro";
 
-export const PRO_AGENTS: AgentId[] = ["offer", "sales", "investor"];
+// Pro: the whole Launch Galaxy world plus Offer and Sales.
+export const PRO_AGENTS: AgentId[] = ["offer", "sales", "launch", "content", "investor"];
 export const isProAgent = (id: string) => (PRO_AGENTS as string[]).includes(id);
 
 export const PRO_FEATURES = [
-  { title: "Pitch deck designer", line: "4 layouts, custom colors and fonts, your logo and photos, present mode and PDF download" },
-  { title: "Offer agent", line: "Alex Hormozi's Value Equation turned into an offer people feel silly saying no to" },
-  { title: "Sales agent", line: "Outreach scripts, objection handling and a weekly sales plan" },
-  { title: "Investor agent", line: "Fundraising readiness, investor email and SAFE basics" },
+  { title: "AI co-founder chat with memory", line: "Ask anything, anytime. It remembers your startup, every plan, your goals and past chats" },
+  { title: "1:1 call with the founder", line: "Request a call with Harish, LevelUp's founder, to talk through your startup" },
+  { title: "Full plans + Pro deep dives", line: "Every point in every plan, plus advanced sections on all agents: kill criteria, scripts, scorecards, roadmaps" },
+  { title: "Launch Galaxy", line: "Launch, Content and Investor agents: go-to-market, audience building and fundraising" },
+  { title: "Offer & Sales agents", line: "Hormozi's Value Equation offer builder, outreach scripts and objection handling" },
+  { title: "Pitch deck designer", line: "4 layouts, custom colors and fonts, your logo and photos, present mode and PDF" },
   { title: "Investor & VC list", line: "Youth-friendly funds and investors in Opportunities" },
 ];
+
+/** Free plans show this many points per section; Pro shows everything. */
+export const FREE_ITEMS = 3;
 
 type State = { plan: Plan; ready: boolean; uid: string | null; bonus?: number };
 let state: State = { plan: "free", ready: false, uid: null };

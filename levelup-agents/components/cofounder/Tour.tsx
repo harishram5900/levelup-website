@@ -18,6 +18,7 @@ const STEPS: Step[] = [
   { target: "goals", title: "Weekly goals", body: "Set what you'll ship by Sunday and tick it off. Each goal done is +25 XP. Founders who set weekly goals move faster." },
   { target: "playbook", title: "Playbook of the day", body: "A framework from founders like Alex Hormozi, Bill Gates and Paul Graham, with one thing to do today. The source is on every card." },
   { target: "badges", title: "Trophy case", body: "16 badges to unlock. Locked ones tell you exactly how to earn them." },
+  { target: "nav-chat", fallback: "open-menu", title: "AI co-founder (Pro)", body: "Chat with me anytime. I remember your startup, every plan, your goals and our past chats, and answer like an experienced founder. Pro also gets a 1:1 call with LevelUp's founder." },
   { target: "nav-agents", fallback: "open-menu", title: "Your agents", body: "Every agent lives in the sidebar, grouped by world. Open any one anytime: you don't have to go in order." },
   { target: "nav-deck", fallback: "open-menu", title: "Pitch deck designer (Pro)", body: "Pick a layout, colors, font and logo, add your own photos, and I'll build a 10-slide deck from your answers. Present it full screen or download a PDF." },
   { target: "nav-playbooks", fallback: "open-menu", title: "Playbooks", body: "All the frameworks from top entrepreneurs and investors in one place." },
