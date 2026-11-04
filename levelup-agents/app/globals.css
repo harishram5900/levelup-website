@@ -158,3 +158,14 @@
 }
 /* Big numbers (XP, stats, level) stay bold and tabular. */
 .app-scope .font-display.leading-none { line-height: 1.05; }
+
+/* ---------- Landing page: Sky Blue / Cloudy White / Amber Red, always light ---------- */
+.landing-light {
+  --bg: 253 253 254; --bg-2: 255 255 255; --fg: 17 19 28; --muted: 82 88 106; --line: 17 19 28;
+  --violet: 0 153 255; --cyan: 56 189 255; --amber: 255 59 31; --good: 22 150 90;
+  --glass: 255 255 255; --glass-alpha: 0.9; --line-alpha: 0.09;
+  --shadow: 0 24px 50px -28px rgba(0, 60, 140, 0.35);
+  color-scheme: light; background: rgb(var(--bg)); color: rgb(var(--fg));
+}
+.landing-light .bg-cta, .landing-light .btn-play { color: #fff; }
+.landing-light .bg-cta:hover { background-color: rgb(255 80 50); }

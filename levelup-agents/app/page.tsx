@@ -1,6 +1,4 @@
-import { Hero } from "@/components/landing/Hero";
-import { Navbar } from "@/components/landing/Navbar";
-import { PlatformMarquee } from "@/components/landing/PlatformMarquee";
+import { SkyHero } from "@/components/landing/SkyHero";
 import { Pipeline } from "@/components/landing/Pipeline";
 import { AgentGrid } from "@/components/landing/AgentGrid";
 import { TryIdea } from "@/components/landing/TryIdea";
@@ -12,18 +10,13 @@ import { Waitlist } from "@/components/landing/Waitlist";
 import { Footer } from "@/components/landing/Footer";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
-import { CountUp } from "@/components/ui/CountUp";
-import { TRACTION } from "@/lib/traction";
 
 export default function Home() {
-  const realStats = TRACTION.filter((t) => t.value !== null);
   return (
-    <>
+    <div className="landing-light min-h-dvh">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-bg-2 focus:px-4 focus:py-2">Skip to content</a>
-      <Navbar />
+      <SkyHero />
       <main id="main">
-        <Hero />
-        <PlatformMarquee />
 
         <Section id="how">
           <Reveal><SectionHeading kicker="How it works" title={<>12 agents. <span className="text-gradient">One startup.</span></>} sub="Each agent handles one step of building a startup, in the order you need them, grouped into 4 worlds. You always know what to do next." /></Reveal>
@@ -50,21 +43,9 @@ export default function Home() {
           <Compare />
         </Section>
 
-        {realStats.length > 0 && (
-          <Section className="pt-0">
-            <div className="grid gap-6 sm:grid-cols-3">
-              {realStats.map((s) => (
-                <Reveal key={s.label} className="text-center">
-                  <CountUp to={s.value!} suffix={s.suffix} className="font-display text-6xl" />
-                  <p className="mt-2 text-muted">{s.label}</p>
-                </Reveal>
-              ))}
-            </div>
-          </Section>
-        )}
 
         <Section id="pricing" className="pt-0">
-          <Reveal><SectionHeading kicker="Pricing" title="Free for student founders" sub="Start free. Upgrade when you want AI that writes for your exact startup." /></Reveal>
+          <Reveal><SectionHeading kicker="Pricing" title="Free for student founders" sub="Start free. Go Pro when you're ready to price, sell, launch and raise." /></Reveal>
           <Pricing />
         </Section>
 
@@ -85,6 +66,6 @@ export default function Home() {
         </Section>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
