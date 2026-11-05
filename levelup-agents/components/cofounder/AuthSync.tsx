@@ -26,6 +26,7 @@ export function AuthSync() {
   useEffect(() => {
     const q = new URLSearchParams(location.search);
     if (!q.get("code") && !q.get("error_description")) return;
+    if (location.pathname.startsWith("/reset")) return; // the reset page explains expired links itself
     const t = setTimeout(async () => {
       const { data } = (await supabase()?.auth.getSession()) ?? { data: { session: null } };
       if (!data.session) location.replace("/signin?confirmed=1");

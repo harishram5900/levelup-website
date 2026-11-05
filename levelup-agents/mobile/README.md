@@ -144,10 +144,13 @@ These match the current app. Update them if you add analytics or ads.
 - User Content → Photos (only images the user adds to a pitch deck)
 - Purchases → Purchase History (only whether they have Pro)
 
+Data **not linked to the user**, used for **Analytics**: Usage Data → Product Interaction, Diagnostics → Performance Data and Crash Data. These are anonymous page views, page speed and crash reports.
+
 Everything else: **not collected**. Tracking: **No**.
 
 **Google Play Data safety:**
 - **Collected:** Email, Name, Other user-generated content, Photos, Purchase history.
+- **Collected, anonymous:** App interactions, Crash logs and Diagnostics. Purpose: Analytics. Not linked to identity.
   - Purpose: App functionality and Account management.
   - Not shared with third parties for their own use. Service providers (Supabase, Anthropic, Stripe) count as processing, not sharing.
 - **Encrypted in transit:** Yes.

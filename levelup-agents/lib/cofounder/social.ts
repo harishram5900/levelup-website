@@ -50,7 +50,7 @@ export async function blockUser(id: string) {
 }
 
 /** Masks offensive words in names other people chose (simple, conservative list). */
-const BAD = /\b(f+u+c+k\w*|sh[i1]t\w*|b[i1]tch\w*|c+u+n+t\w*|d[i1]ck\w*|puss(y|ies)|n[i1]gg\w*|f[a@]g\w*|wh[o0]re\w*|sl[u]t\w*|r[a@]pe\w*|porn\w*|sex\w*|nazi\w*|kys)\b/gi;
+const BAD = /\b(f+u+c+k\w*|sh[i1]t(s|ty|head)?|b[i1]tch(es|y)?|c+u+n+t+s?|d[i1]ck(s|head)?|puss(y|ies)|n[i1]gg(a|er)s?|f[a@]g(s|got|gots)?|wh[o0]re(s)?|slut(s|ty)?|rap(e|ed|es|ist)|porn\w*|sexy|nazis?|kys)\b/gi;
 export const cleanName = (s: string | null | undefined) => (s ?? "").replace(BAD, (w) => w[0] + "•".repeat(Math.max(1, w.length - 1)));
 
 export async function addFriend(code: string): Promise<string> {

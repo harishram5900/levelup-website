@@ -1,0 +1,73 @@
+name: Nightly database backup + restore test
+
+# Needs two GitHub repo secrets (Settings → Secrets and variables → Actions):
+#   SUPABASE_DB_URL     Supabase → Project Settings → Database → Connection string (URI, session pooler)
+#   BACKUP_PASSPHRASE   any long random string; you need it to decrypt a backup
+# Backups are encrypted, kept 30 days as workflow artifacts, and restored into a scratch database every run
+# to prove they actually work.
+
+on:
+  schedule:
+    - cron: "17 7 * * *" # daily, 07:17 UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      scratch:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: scratch
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - name: Check secrets
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$DB" ] || [ -z "$PASS" ]; then echo "::warning::Add SUPABASE_DB_URL and BACKUP_PASSPHRASE secrets to enable backups"; exit 0; fi
+          echo "ENABLED=1" >> "$GITHUB_ENV"
+
+      - name: Dump the public schema (app data)
+        if: env.ENABLED == '1'
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          docker run --rm --network host postgres:17 pg_dump "$DB" --schema=public --no-owner --no-privileges --format=custom > backup.dump
+          ls -lh backup.dump
+
+      - name: Test the restore in a scratch database
+        if: env.ENABLED == '1'
+        run: |
+          export PGPASSWORD=scratch
+          # Stubs for Supabase-managed pieces the app tables reference (auth.users, auth.uid()).
+          docker run --rm --network host -e PGPASSWORD postgres:17 psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "
+            create schema if not exists auth;
+            create table if not exists auth.users (id uuid primary key);
+            create or replace function auth.uid() returns uuid language sql stable as 'select null::uuid';
+            create role authenticated; create role anon; create role service_role;"
+          docker run --rm --network host -e PGPASSWORD -v "$PWD:/w" postgres:17 sh -c "pg_restore -l /w/backup.dump | grep -v 'FK CONSTRAINT' > /w/list.txt; pg_restore -h localhost -U postgres -d postgres --no-owner --use-list=/w/list.txt /w/backup.dump" || true
+          COUNT=$(docker run --rm --network host -e PGPASSWORD postgres:17 psql -h localhost -U postgres -tA -c "select count(*) from public.profiles")
+          WS=$(docker run --rm --network host -e PGPASSWORD postgres:17 psql -h localhost -U postgres -tA -c "select count(*) from public.workspaces")
+          echo "Restored profiles: $COUNT, workspaces: $WS"
+          [ -n "$COUNT" ] || { echo "::error::Restore failed: profiles table missing"; exit 1; }
+          echo "### Backup restored OK: $COUNT profiles, $WS workspaces" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Encrypt
+        if: env.ENABLED == '1'
+        env:
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$PASS" --symmetric --cipher-algo AES256 -o "levelup-$(date -u +%F).dump.gpg" backup.dump
+          rm backup.dump list.txt
+
+      - uses: actions/upload-artifact@v4
+        if: env.ENABLED == '1'
+        with:
+          name: db-backup
+          path: "*.dump.gpg"
+          retention-days: 30

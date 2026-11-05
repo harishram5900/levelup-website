@@ -163,7 +163,7 @@
 /* ---------- Landing page: Sky Blue / Cloudy White / Amber Red, always light ---------- */
 .landing-light {
   --bg: 253 253 254; --bg-2: 255 255 255; --fg: 17 19 28; --muted: 82 88 106; --line: 17 19 28;
-  --violet: 0 153 255; --cyan: 56 189 255; --amber: 255 59 31; --good: 22 150 90;
+  --violet: 0 153 255; --cyan: 56 189 255; --amber: 255 59 31; --good: 15 122 72;
   --glass: 255 255 255; --glass-alpha: 0.9; --line-alpha: 0.09;
   --shadow: 0 24px 50px -28px rgba(0, 60, 140, 0.35);
   color-scheme: light; background: rgb(var(--bg)); color: rgb(var(--fg));
@@ -185,3 +185,7 @@
 /* Feel like an app: no text-selection callouts or tap flashes on controls, no rubber-band on the page. */
 .native { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
 .native button, .native a { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+
+/* Readable accent text on dark backgrounds (WCAG AA): brand blues are too dark as text, so lighten them. */
+.dark .app-scope .text-violet, .dark .app-scope .btn-soft, .dark .app-scope .btn-icon:hover { color: color-mix(in srgb, rgb(var(--violet)) 50%, white); }
+.dark .app-scope .text-cyan { color: color-mix(in srgb, rgb(var(--cyan)) 60%, white); }

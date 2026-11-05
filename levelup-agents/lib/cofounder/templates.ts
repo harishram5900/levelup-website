@@ -228,7 +228,7 @@ function competitor(p: Profile, a: A, r?: Research): Section[] {
       "Copying competitors' features instead of solving the problem better.",
       found.length ? "Ratings and prices change. Re-run Scout every month and before every pitch." : "Re-run Scout with different niche words; the first search often misses competitors.",
     ] },
-    { title: "Your positioning line", items: [`For ${p.customer} who are tired of ${themes[0] ? themes[0].pain : alts[0] ? `relying on ${alts[0]}` : "the usual options"}, ${p.startup} ${p.idea.replace(/\.$/, "")}${diff ? `, and unlike others it ${diff.replace(/^we /i, "").replace(/\.$/, "")}` : ""}.`] },
+    { title: "Your positioning line", items: [`For ${p.customer} who are tired of ${themes[0] ? themes[0].pain : alts[0] ? `relying on ${alts[0]}` : "the usual options"}, ${does(p)}.${diff ? ` What makes it different: ${lower(diff.replace(/^we /i, "").replace(/\.$/, ""))}.` : ""}`] },
   ];
 }
 
@@ -282,6 +282,9 @@ function brand(p: Profile, a: A): Section[] {
     { title: "Look and feel", items: [color, t(a.admire) ? `Study what ${t(a.admire)} do well (simple logo, one signature color, consistent font), then make your own version.` : "Use one bold font for headlines and one simple font for text.", "Make a simple logo in Canva or Figma: your name in a good font is enough to start."] },
   ];
 }
+/** "Voca helps students…" whether the idea starts with a verb ("helps…", "lets…") or not ("an app that…"). */
+const does = (p: Profile) => { const i = p.idea.trim().replace(/\.$/, ""); return /^(lets|helps|gives|makes|turns|matches|connects|teaches|finds|builds|shows|tracks|creates|is|uses)\b/i.test(i) ? `${p.startup} ${i}` : `${p.startup} is ${/^(a|an|the)\b/i.test(i) ? "" : "a way to "}${i}`; };
+const lower = (s: string) => (/^[A-Z][a-z]/.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s);
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 function sales(p: Profile, a: A): Section[] {

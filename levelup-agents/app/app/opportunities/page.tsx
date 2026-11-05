@@ -14,8 +14,8 @@ import { ProBadge } from "@/components/cofounder/ProGate";
 import { usePlan } from "@/lib/cofounder/plan";
 
 const TYPE_TONE: Record<OppType, string> = {
-  Competition: "bg-amber/15 text-amber", Hackathon: "bg-cyan/15 text-cyan", Program: "bg-violet/15 text-violet", Fellowship: "bg-pink-500/15 text-pink-500",
-  Grant: "bg-good/15 text-good", Scholarship: "bg-orange-500/15 text-orange-500", Credits: "bg-sky-500/15 text-sky-500", Accelerator: "bg-fuchsia-500/15 text-fuchsia-500", Investor: "bg-emerald-500/15 text-emerald-500",
+  Competition: "bg-amber/15 text-amber", Hackathon: "bg-cyan/15 text-cyan", Program: "bg-violet/15 text-violet", Fellowship: "bg-pink-500/15 text-pink-600 dark:text-pink-300",
+  Grant: "bg-good/15 text-good", Scholarship: "bg-orange-500/15 text-orange-600 dark:text-orange-300", Credits: "bg-sky-500/15 text-sky-700 dark:text-sky-300", Accelerator: "bg-fuchsia-500/15 text-fuchsia-600 dark:text-fuchsia-300", Investor: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
 };
 
 export default function OpportunitiesPage() {
@@ -108,7 +108,7 @@ export default function OpportunitiesPage() {
           <button key={t} type="button" aria-pressed={type === t} onClick={() => setType(t)}
             className={cn("rounded-full px-3.5 py-1.5 text-sm font-semibold transition", type === t ? "bg-fg text-bg" : "bg-fg/[0.05] text-muted hover:text-fg")}>
             {t === "For you" && <Sparkles size={13} className="mr-1 inline" aria-hidden />}{t}
-            <span className="ml-1.5 text-xs opacity-60">{t === "All" ? OPPORTUNITIES.length : t === "Saved" ? ws.saved.length : t === "For you" ? "" : counts(t)}</span>
+            <span className="ml-1.5 text-xs">{t === "All" ? OPPORTUNITIES.length : t === "Saved" ? ws.saved.length : t === "For you" ? "" : counts(t)}</span>
           </button>
         ))}
       </div>

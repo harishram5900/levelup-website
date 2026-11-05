@@ -31,7 +31,15 @@ const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (
 const clip = (s: unknown, n: number) => String(s ?? "").replace(/\s+/g, " ").trim().slice(0, n);
 const decode = (s: string) => s.replace(/&amp;/g, "&").replace(/&#39;|&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 
+/** One retry on failure: public APIs (especially iTunes) sometimes drop a request. */
 async function get(url: string, opts: { json?: boolean; ms?: number; headers?: Record<string, string> } = {}): Promise<unknown> {
+  const first = await getOnce(url, opts);
+  if (first !== null) return first;
+  await new Promise((r) => setTimeout(r, 400));
+  return getOnce(url, opts);
+}
+
+async function getOnce(url: string, opts: { json?: boolean; ms?: number; headers?: Record<string, string> } = {}): Promise<unknown> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), opts.ms ?? 6000);
   try {

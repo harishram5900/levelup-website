@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
 import { isNative, openExternal, platform, scheduleReminders } from "@/lib/native";
+import { installGlobalErrorHandlers } from "@/lib/report";
 import { getWorkspace, today, useWorkspace } from "@/lib/cofounder/profile";
 import { gameStats } from "@/lib/cofounder/game";
 import { characterById } from "@/components/cofounder/Pip";
@@ -12,6 +13,8 @@ export function NativeBridge() {
   const router = useRouter();
   const { resolvedTheme } = useTheme();
   const { ws, ready } = useWorkspace();
+
+  useEffect(() => { installGlobalErrorHandlers(); }, []);
 
   // One-time setup.
   useEffect(() => {

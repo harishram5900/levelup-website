@@ -15,6 +15,7 @@ export default function Privacy() {
         <li><b>Your workspace:</b> your startup details, agent answers and results, goals, notes, AI co-founder chats, deck (including images you upload), character and color choices, XP and streak.</li>
         <li><b>Guests:</b> if you don&apos;t sign up, your workspace stays on your own device and never reaches our servers, except the text you send to an agent or a search (see below).</li>
         <li><b>Payments:</b> if you buy Pro on the web, Stripe processes your payment. We only receive whether you&apos;re subscribed, never your card details.</li>
+        <li><b>Anonymous usage and speed stats:</b> page views and how fast pages load (Vercel Web Analytics and Speed Insights). These use no cookies, aren&apos;t linked to you, and can&apos;t identify you.</li>
         <li><b>We don&apos;t collect:</b> your location, contacts, photos library (only images you choose to upload), advertising IDs, or tracking data across other apps and websites.</li>
       </ul>
       <h2>How it&apos;s used</h2>
@@ -24,6 +25,8 @@ export default function Privacy() {
         <li><b>Live research:</b> when Scout, Traction, Customer or Opportunities searches for you, the niche keywords you type (not your name or email) are sent to public sources such as the Apple App Store, Google Play, Hacker News, GitHub, Reddit and Devpost.</li>
         <li><b>Reminders:</b> the phone app can remind you to keep your streak. These reminders are scheduled on your phone; we don&apos;t run a tracking or push server. Turn them off anytime in your phone&apos;s settings.</li>
       </ul>
+      <h2>Cookies</h2>
+      <p>We don&apos;t use advertising or tracking cookies. We only store what the app needs to work on your device (your sign-in session, guest workspace and settings), so there&apos;s nothing to opt in to.</p>
       <h2>Leaderboards</h2>
       <p>Signed-in users appear on the &quot;Everyone&quot; leaderboard with only their first name, startup name and XP (never email or last name). You can hide yourself anytime on the Leaderboard page. Friends you invite or add can always see each other.</p>
       <h2>Kids and teens</h2>

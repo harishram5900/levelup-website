@@ -122,7 +122,7 @@ export function SkyHero() {
             From your first idea to your first customers: 12 AI agents and a co-founder that remembers everything help you build a real startup.
           </motion.p>
           <motion.div {...fade(0.72)} className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/signup" className="group inline-flex items-center gap-2 rounded-lg bg-[#FF3B1F] px-8 py-4 text-sm font-extrabold tracking-[0.08em] text-white shadow-[0_14px_30px_-12px_rgba(255,59,31,.8)] transition hover:-translate-y-0.5 hover:brightness-110">
+            <Link href="/signup" className="group inline-flex items-center gap-2 rounded-lg bg-[#D92D10] px-8 py-4 text-sm font-extrabold tracking-[0.08em] text-white shadow-[0_14px_30px_-12px_rgba(255,59,31,.8)] transition hover:-translate-y-0.5 hover:brightness-110">
               START BUILDING FREE <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden />
             </Link>
             <a href="#try" className="rounded-lg border border-white/70 bg-white/15 px-7 py-[15px] text-sm font-extrabold tracking-[0.08em] backdrop-blur transition hover:bg-white hover:text-[#0089F0]">CHECK MY IDEA</a>
@@ -137,7 +137,7 @@ export function SkyHero() {
       </div>
 
       {/* Ticker band */}
-      <div className="relative z-20 mt-20 -rotate-[1.5deg] overflow-hidden bg-[#FF3B1F] py-3 text-white shadow-[0_20px_40px_-25px_rgba(255,59,31,.9)] sm:mt-24" aria-label="LevelUp steps: idea, customers, build, brand, pitch, money, sales, launch, raise">
+      <div role="marquee" className="relative z-20 mt-20 -rotate-[1.5deg] overflow-hidden bg-[#D92D10] py-3 text-white shadow-[0_20px_40px_-25px_rgba(255,59,31,.9)] sm:mt-24" aria-label="LevelUp steps: idea, customers, build, brand, pitch, money, sales, launch, raise">
         <div className="ticker-track flex w-max" style={{ animation: "ticker 32s linear infinite" }} aria-hidden>
           {[0, 1].map((k) => (
             <div key={k} className="flex shrink-0 items-center">
@@ -152,11 +152,11 @@ export function SkyHero() {
         <div className="mx-auto flex max-w-[1320px] flex-col items-center justify-center gap-6 px-5 pb-6 pt-16 sm:flex-row sm:gap-20">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
-              <CountUp to={s.value!} suffix={s.suffix} className="font-['Anton'] text-[60px] leading-none text-[#0099FF]" />
+              <CountUp to={s.value!} suffix={s.suffix} className="font-['Anton'] text-[60px] leading-none text-[#0072CC]" />
               <p className="mt-2 text-[12px] font-extrabold uppercase tracking-[0.06em] text-muted">{s.label}</p>
             </div>
           ))}
-          <div className="text-center"><span className="font-['Anton'] text-[60px] leading-none text-[#0099FF]">12</span><p className="mt-2 text-[12px] font-extrabold uppercase tracking-[0.06em] text-muted">AI co-founder agents</p></div>
+          <div className="text-center"><span className="font-['Anton'] text-[60px] leading-none text-[#0072CC]">12</span><p className="mt-2 text-[12px] font-extrabold uppercase tracking-[0.06em] text-muted">AI co-founder agents</p></div>
         </div>
       )}
     </header>

@@ -26,7 +26,7 @@ export function Pricing() {
             return (
               <button key={p} role="radio" aria-checked={on} onClick={() => setYearly(p === "Yearly")} className={cn("relative z-10 rounded-full px-5 py-2 text-sm font-semibold transition-colors", on ? "text-white" : "text-muted")}>
                 {on && <motion.span layoutId="bill" transition={spring} className="absolute inset-0 -z-10 rounded-full bg-accent" />}
-                {p}{p === "Yearly" && <span className="ml-1.5 text-xs opacity-80">2 months free</span>}
+                {p}{p === "Yearly" && <span className="ml-1.5 text-xs">2 months free</span>}
               </button>
             );
           })}

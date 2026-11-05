@@ -8,12 +8,14 @@ import { Pricing } from "@/components/landing/Pricing";
 import { Faq } from "@/components/landing/Faq";
 import { Waitlist } from "@/components/landing/Waitlist";
 import { Footer } from "@/components/landing/Footer";
+import { StructuredData } from "@/components/landing/StructuredData";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
 export default function Home() {
   return (
     <div className="landing-light min-h-dvh">
+      <StructuredData />
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-bg-2 focus:px-4 focus:py-2">Skip to content</a>
       <SkyHero />
       <main id="main">
