@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronsLeft, Crown, Flame, Menu, Zap, X } from "lucide-react";
+import { Bot, ChevronDown, ChevronsLeft, Crown, Flame, LayoutDashboard, Menu, Sparkles, Trophy, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -100,11 +100,44 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
   );
 }
 
+/** Mobile bottom tab bar (the main navigation in the phone app). */
+const TABS = [
+  { href: "/app", label: "HQ", icon: LayoutDashboard, match: (p: string) => p === "/app" },
+  { href: "/app/agents", label: "Agents", icon: Sparkles, match: (p: string) => p.startsWith("/app/agents") },
+  { href: "/app/cofounder", label: "Co-founder", icon: Bot, match: (p: string) => p.startsWith("/app/cofounder") },
+  { href: "/app/opportunities", label: "Opportunities", icon: Trophy, match: (p: string) => p.startsWith("/app/opportunities") },
+];
+function TabBar({ path, onMore }: { path: string; onMore: () => void }) {
+  const moreActive = !TABS.some((t) => t.match(path));
+  return (
+    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-fg/[0.08] bg-bg/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
+      <ul className="mx-auto grid max-w-md grid-cols-5">
+        {TABS.map((t) => {
+          const on = t.match(path);
+          const Icon = t.icon;
+          return (
+            <li key={t.href}>
+              <Link href={t.href} aria-current={on ? "page" : undefined} className={cn("flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold transition active:scale-95", on ? "text-fg" : "text-muted")}>
+                <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", on && "bg-amber/20 text-amber")}><Icon size={19} aria-hidden /></span>{t.label}
+              </Link>
+            </li>
+          );
+        })}
+        <li>
+          <button type="button" onClick={onMore} data-tour="open-menu" aria-label="More: open the full menu" className={cn("flex min-h-[56px] w-full flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold transition active:scale-95", moreActive ? "text-fg" : "text-muted")}>
+            <span className={cn("grid h-7 w-12 place-items-center rounded-full", moreActive && "bg-amber/20 text-amber")}><Menu size={19} aria-hidden /></span>More
+          </button>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
 export function Shell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const path = usePathname();
-  const title = NAV.find((n) => (n.href === "/app" ? path === "/app" : path.startsWith(n.href)))?.label ?? "Dashboard";
+  const title = path === "/app/agents" ? "Agents" : NAV.find((n) => (n.href === "/app" ? path === "/app" : path.startsWith(n.href)))?.label ?? "Dashboard";
   const { ws } = useWorkspace();
 
   useEffect(() => {
@@ -132,7 +165,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {drawer && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawer(false)} className="fixed inset-0 z-40 bg-black/50 md:hidden" />
-            <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ duration: 0.3, ease }} className="fixed inset-y-0 left-0 z-50 w-[260px] border-r border-fg/[0.07] bg-bg p-3 md:hidden" aria-label="App menu">
+            <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ duration: 0.3, ease }} className="fixed inset-y-0 left-0 z-50 w-[280px] border-r border-fg/[0.07] bg-bg p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] md:hidden" aria-label="App menu">
               <div className="mb-6 flex items-center justify-between px-2 pt-2">
                 <span className="flex items-center gap-2.5"><LogoMark /><Wordmark /></span>
                 <button type="button" onClick={() => setDrawer(false)} aria-label="Close menu" className="grid h-9 w-9 place-items-center rounded-full hairline"><X size={16} aria-hidden /></button>
@@ -144,9 +177,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-fg/[0.07] bg-bg/70 px-4 py-3 backdrop-blur-xl sm:px-6">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-fg/[0.07] bg-bg/70 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl sm:px-6">
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => setDrawer(true)} data-tour="open-menu" aria-label="Open menu" className="grid h-9 w-9 place-items-center rounded-full hairline md:hidden"><Menu size={16} aria-hidden /></button>
             <h1 className="font-sans text-base font-semibold tracking-normal">{title}</h1>
           </div>
           <div className="flex items-center gap-2">
@@ -155,7 +187,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Account />
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="min-w-0 flex-1 p-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:p-6 md:pb-8 lg:p-8">{children}</main>
+        <TabBar path={path} onMore={() => setDrawer(true)} />
         <Celebrator />
         <Tour />
       </div>

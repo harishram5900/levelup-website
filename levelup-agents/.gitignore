@@ -7,3 +7,4 @@ data/waitlist.json
 .env*.local
 .env
 .env.production
+mobile/builds

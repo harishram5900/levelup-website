@@ -1,13 +1,13 @@
 "use client";
 import { motion } from "framer-motion";
-import { Crown, Globe2, Loader2, Medal, Users } from "lucide-react";
+import { Crown, Flag, Globe2, Loader2, Medal, MoreHorizontal, Users, X } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { Buddy, type CharacterId } from "@/components/cofounder/Pip";
 import { SignInGate } from "@/components/cofounder/SignInGate";
 import { LEVELS } from "@/lib/cofounder/game";
-import { leaderboard, mySocial, setOnLeaderboard, type Board, type BoardRow } from "@/lib/cofounder/social";
+import { blockUser, cleanName, leaderboard, mySocial, reportUser, setOnLeaderboard, type Board, type BoardRow } from "@/lib/cofounder/social";
 import { useAuth } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,8 @@ function Leaderboard() {
   const [rows, setRows] = useState<BoardRow[] | null>(null);
   const [onBoard, setOnBoard] = useState<boolean | null>(null);
   const [err, setErr] = useState("");
+  const [acting, setActing] = useState<BoardRow | null>(null);
+  const [note, setNote] = useState("");
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -85,8 +87,8 @@ function Leaderboard() {
                 <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 * place }} className="flex flex-col items-center text-center">
                   {place === 1 && <Crown className="mb-1 text-amber" size={22} aria-hidden />}
                   <Buddy character={ch(r.character)} mood={place === 1 ? "cheer" : "happy"} size={place === 1 ? 84 : 68} />
-                  <p className={cn("mt-1 max-w-full truncate font-semibold", r.is_me && "text-violet")}>{r.name}{r.is_me && " (you)"}</p>
-                  <p className="max-w-full truncate text-xs text-muted">{r.startup ?? "—"}</p>
+                  <p className={cn("mt-1 max-w-full truncate font-semibold", r.is_me && "text-violet")}>{cleanName(r.name)}{r.is_me && " (you)"}</p>
+                  <p className="flex max-w-full items-center gap-1 truncate text-xs text-muted">{cleanName(r.startup) || "—"}{!r.is_me && r.id && <button type="button" onClick={() => setActing(r)} aria-label={`Report or block ${cleanName(r.name)}`} className="rounded p-0.5 hover:text-fg"><MoreHorizontal size={13} aria-hidden /></button>}</p>
                   <div className={cn("mt-2 grid w-full place-items-center rounded-t-2xl bg-gradient-to-b text-[#1a1100]", h, tone)}>
                     <div><p className="text-3xl font-black leading-none">{place}</p><p className="text-xs font-bold">{r.total_xp} XP</p></div>
                   </div>
@@ -102,8 +104,9 @@ function Leaderboard() {
                 <li key={i} className={cn("flex items-center gap-3 px-4 py-3", r.is_me && "bg-violet/10")}>
                   <span className="w-7 text-center font-bold text-muted">{i + 4}</span>
                   <Buddy character={ch(r.character)} size={36} />
-                  <div className="min-w-0 flex-1"><p className="truncate font-semibold">{r.name}{r.is_me && <span className="text-violet"> (you)</span>}</p><p className="truncate text-xs text-muted">{r.startup ?? "Building something"} · Lv {lv.n} {lv.title}</p></div>
+                  <div className="min-w-0 flex-1"><p className="truncate font-semibold">{cleanName(r.name)}{r.is_me && <span className="text-violet"> (you)</span>}</p><p className="truncate text-xs text-muted">{cleanName(r.startup) || "Building something"} · Lv {lv.n} {lv.title}</p></div>
                   <span className="flex items-center gap-1 text-sm font-bold"><Medal size={14} className="text-amber" aria-hidden />{r.total_xp}</span>
+                  {!r.is_me && r.id && <button type="button" onClick={() => setActing(r)} aria-label={`Report or block ${cleanName(r.name)}`} className="btn-icon"><MoreHorizontal size={16} aria-hidden /></button>}
                 </li>
               );
             })}
@@ -111,7 +114,22 @@ function Leaderboard() {
           </ol>
         </>
       )}
-      <p className="text-center text-xs text-muted">Only first names, startup names and XP are shown. Anyone can hide from the Everyone board.</p>
+      {note && <p className="rounded-xl bg-good/10 px-4 py-2 text-center text-sm text-good" role="status">{note}</p>}
+      <p className="text-center text-xs text-muted">Only first names, startup names and XP are shown. Anyone can hide from the Everyone board. Tap ⋯ to report or block someone.</p>
+      {acting && (
+        <div className="fixed inset-0 z-50 grid place-items-end bg-black/50 p-4 sm:place-items-center" onClick={() => setActing(null)}>
+          <div role="dialog" aria-modal="true" aria-label="Report or block" className="glass w-full max-w-sm rounded-[24px] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between"><p className="font-semibold">{cleanName(acting.name)} · {cleanName(acting.startup) || "Founder"}</p><button type="button" className="btn-icon" onClick={() => setActing(null)} aria-label="Close"><X size={16} aria-hidden /></button></div>
+            <p className="mt-1 text-sm text-muted">Reports are reviewed by the LevelUp team. Blocking hides this person from your boards.</p>
+            <div className="mt-4 grid gap-2">
+              {["Offensive or inappropriate name", "Spam or fake account", "Harassment or bullying"].map((reason) => (
+                <button key={reason} type="button" className="btn-glass justify-start text-sm" onClick={async () => { try { await reportUser(acting.id!, reason); setNote("Thanks. We'll review this report."); } catch (e) { setNote((e as Error).message); } setActing(null); }}><Flag size={14} aria-hidden /> Report: {reason}</button>
+              ))}
+              <button type="button" className="btn-danger text-sm" onClick={async () => { try { await blockUser(acting.id!); setNote("Blocked. You won't see them on your boards."); load(); } catch (e) { setNote((e as Error).message); } setActing(null); }}>Block {cleanName(acting.name)}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

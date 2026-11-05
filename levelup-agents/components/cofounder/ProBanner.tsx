@@ -32,10 +32,10 @@ export function ProBanner() {
         </div>
         <div className="flex flex-col items-center gap-3 rounded-3xl bg-white/[0.06] p-5 text-center ring-1 ring-white/10 lg:w-64">
           <Buddy character={ws.prefs.character} mood="cheer" size={72} className="text-white" />
-          <p><span className="font-display text-4xl">$9</span><span className="text-white/60">/month</span></p>
+          <p className="web-only"><span className="font-display text-4xl">$9</span><span className="text-white/60">/month</span></p>
           <p className="-mt-2 text-xs text-white/60">Less than $0.30 a day</p>
           <Link href="/app/upgrade" className="btn-play w-full justify-center"><Crown size={16} aria-hidden /> Unlock Pro</Link>
-          <Link href="/app/upgrade#promo" className="text-xs text-white/60 hover:text-white">Have a promo code?</Link>
+          <Link href="/app/upgrade#promo" className="web-only text-xs text-white/60 hover:text-white">Have a promo code?</Link>
         </div>
       </div>
       <div className="relative mt-5 flex flex-wrap gap-2">{locked.map((a) => <span key={a.id} className="flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-xs"><Lock size={11} aria-hidden />{a.name}</span>)}<span className="flex items-center gap-1 rounded-full bg-good/20 px-2.5 py-1 text-xs text-good"><Check size={11} aria-hidden />Keep all your free progress</span></div>

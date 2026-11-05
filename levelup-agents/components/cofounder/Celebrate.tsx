@@ -6,6 +6,7 @@ import { BADGES, gameStats } from "@/lib/cofounder/game";
 import { today, useWorkspace } from "@/lib/cofounder/profile";
 import { usePlan } from "@/lib/cofounder/plan";
 import { Buddy } from "./Pip";
+import { haptic } from "@/lib/native";
 
 const COLORS = ["#105BFF", "#FE8500", "#4D8DFF", "#FFD08A", "#34D399"];
 
@@ -52,6 +53,7 @@ export function Celebrator() {
 
   useEffect(() => {
     if (!moment) return;
+    haptic("success");
     const t = setTimeout(() => setMoment(null), 4200);
     return () => clearTimeout(t);
   }, [moment]);
@@ -62,7 +64,7 @@ export function Celebrator() {
         <>
           {!reduce && <Confetti key={moment.title} />}
           <motion.div role="status" initial={{ opacity: 0, y: 40, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="fixed bottom-5 left-1/2 z-[90] flex w-[min(92vw,440px)] -translate-x-1/2 items-center gap-3 rounded-3xl bg-bg-2 p-4 pr-10 shadow-2xl ring-2 ring-amber/60">
+            className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] left-1/2 z-[90] flex md:bottom-5 w-[min(92vw,440px)] -translate-x-1/2 items-center gap-3 rounded-3xl bg-bg-2 p-4 pr-10 shadow-2xl ring-2 ring-amber/60">
             <Buddy character={ws.prefs.character} mood="cheer" size={64} />
             <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-widest text-amber">{moment.kind === "level" ? "Level up!" : "New badge"}</p>

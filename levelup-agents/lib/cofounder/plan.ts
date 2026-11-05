@@ -19,7 +19,7 @@ export const PRO_FEATURES = [
   { title: "AI co-founder chat with memory", line: "Ask anything, anytime. It remembers your startup, every plan, your goals and past chats" },
   { title: "1:1 call with the founder", line: "Request a call with Harish, LevelUp's founder, to talk through your startup" },
   { title: "Full plans + Pro deep dives", line: "Every point in every plan, plus advanced sections on all agents: kill criteria, scripts, scorecards, roadmaps" },
-  { title: "Launch Galaxy", line: "Launch, Content and Investor agents: go-to-market, audience building and fundraising" },
+  { title: "Launch Galaxy", line: "Traction, Content and Investor agents: live community research, launch posts, audience building and fundraising" },
   { title: "Money, Offer & Sales agents", line: "Pricing and break-even math, Hormozi's Value Equation offer builder, outreach scripts and objection handling" },
   { title: "Exclusive Pro looks", line: "Gold and Aurora dashboard themes and a Pro crown" },
   { title: "Pitch deck designer", line: "4 layouts, custom colors and fonts, your logo and photos, present mode and PDF" },

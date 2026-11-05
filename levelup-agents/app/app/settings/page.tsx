@@ -10,6 +10,7 @@ import { authEnabled, supabase, useAuth } from "@/lib/supabase";
 import { paymentsEnabled, usePlan } from "@/lib/cofounder/plan";
 import { openBillingPortal } from "@/lib/cofounder/billing";
 import { cn } from "@/lib/utils";
+import { Reminders } from "@/components/cofounder/Reminders";
 
 function Card({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) {
   return (
@@ -54,7 +55,7 @@ export default function SettingsPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="flex items-center gap-2 text-sm"><Cloud size={16} className="text-good" aria-hidden /> Signed in as <b>{user.email}</b> · {pro ? "Pro" : "Free plan"}</p>
             <div className="flex flex-wrap gap-2">
-              {pro && paymentsEnabled && <button type="button" onClick={() => openBillingPortal().catch((e) => setMsg((e as Error).message))} className="btn-soft text-sm">Manage billing</button>}
+              {pro && paymentsEnabled && <button type="button" onClick={() => openBillingPortal().catch((e) => setMsg((e as Error).message))} className="web-only btn-soft text-sm">Manage billing</button>}
               {!pro && <Link href="/app/upgrade" className="btn-glow text-sm">Upgrade to Pro</Link>}
               <button type="button" onClick={signOut} className="btn-glass text-sm"><LogOut size={15} aria-hidden /> Sign out</button>
             </div>
@@ -105,6 +106,14 @@ export default function SettingsPage() {
           </div>
         )}
         {msg && <p className="mt-3 text-sm" role="status">{msg}</p>}
+      </Card>
+      <Reminders />
+      <Card title="Help and legal">
+        <div className="flex flex-wrap gap-2 text-sm">
+          <Link href="/privacy" className="btn-glass py-2">Privacy policy</Link>
+          <Link href="/terms" className="btn-glass py-2">Terms</Link>
+          <Link href="/delete-account" className="btn-glass py-2">How account deletion works</Link>
+        </div>
       </Card>
     </div>
   );

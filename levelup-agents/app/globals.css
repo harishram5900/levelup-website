@@ -177,3 +177,11 @@
 @keyframes drift { from { transform: translateX(-12%); } to { transform: translateX(112vw); } }
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .cloud, .ticker-track { animation: none !important; } }
+
+/* Native app shell (Capacitor): html gets .native. Store rules: no web checkout or promo codes in the app. */
+.native-only { display: none !important; }
+.native .native-only { display: block !important; }
+.native .web-only { display: none !important; }
+/* Feel like an app: no text-selection callouts or tap flashes on controls, no rubber-band on the page. */
+.native { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+.native button, .native a { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }

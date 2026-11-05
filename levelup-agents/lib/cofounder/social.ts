@@ -4,7 +4,7 @@ import { supabase } from "../supabase";
 /** Friends, invites, leaderboard and teams. All calls go through Supabase row-level security / functions. */
 
 export type Board = "global" | "friends" | "team";
-export type BoardRow = { name: string; startup: string | null; character: string; total_xp: number; is_me: boolean };
+export type BoardRow = { id?: string; name: string; startup: string | null; character: string; total_xp: number; is_me: boolean };
 export type Member = { name: string; role: string | null; character: string; xp: number; is_me: boolean; is_owner: boolean };
 export type TeamGoal = { id: number; text: string; done: boolean };
 export type Team = {
@@ -39,6 +39,19 @@ export async function leaderboard(scope: Board): Promise<BoardRow[]> {
   if (error) throw clean(error);
   return (data ?? []) as BoardRow[];
 }
+
+export async function reportUser(id: string, reason: string) {
+  const { error } = await sb().from("reports").insert({ target_id: id, reason: reason.slice(0, 300) });
+  if (error && error.code !== "23505") throw clean(error); // 23505: already reported
+}
+export async function blockUser(id: string) {
+  const { error } = await sb().from("blocks").insert({ blocked_id: id });
+  if (error && error.code !== "23505") throw clean(error);
+}
+
+/** Masks offensive words in names other people chose (simple, conservative list). */
+const BAD = /\b(f+u+c+k\w*|sh[i1]t\w*|b[i1]tch\w*|c+u+n+t\w*|d[i1]ck\w*|puss(y|ies)|n[i1]gg\w*|f[a@]g\w*|wh[o0]re\w*|sl[u]t\w*|r[a@]pe\w*|porn\w*|sex\w*|nazi\w*|kys)\b/gi;
+export const cleanName = (s: string | null | undefined) => (s ?? "").replace(BAD, (w) => w[0] + "•".repeat(Math.max(1, w.length - 1)));
 
 export async function addFriend(code: string): Promise<string> {
   const { data, error } = await sb().rpc("add_friend", { code });

@@ -18,7 +18,7 @@ const ROWS: [string, boolean, boolean][] = [
   ["Full plans (every point) + Pro deep dive on every agent", false, true],
   ["AI co-founder chat that remembers you", false, true],
   ["1:1 call with the founder", false, true],
-  ["Launch Galaxy: Launch, Content and Investor agents", false, true],
+  ["Launch Galaxy: Traction, Content and Investor agents", false, true],
   ["Startup HQ, quest map, XP, badges, tutorial", true, true],
   ["Playbooks and recommendations", true, true],
   ["Competitions, grants, programs and free credits", true, true],
@@ -127,17 +127,21 @@ function Upgrade() {
             <ProBadge />
             <h2 className="mt-2 font-display text-6xl uppercase leading-none">LevelUp Pro</h2>
             <p className="mt-2 max-w-lg text-white/85">{pro ? "You're Pro. Everything is unlocked. Go build something big!" : `Everything you need to pitch, sell and raise. ${buddy.name} will be right there with you.`}</p>
-            {!pro && <p className="mt-3"><span className="font-display text-5xl">$9</span><span className="text-white/70"> /month</span> <span className="ml-2 text-sm text-white/60">less than $0.30 a day · cancel anytime</span></p>}
+            {!pro && <p className="web-only mt-3"><span className="font-display text-5xl">$9</span><span className="text-white/70"> /month</span> <span className="ml-2 text-sm text-white/60">less than $0.30 a day · cancel anytime</span></p>}
           </div>
         </div>
       </div>
 
+      {/* Inside the iOS/Android app, store rules require in-app purchase, so web checkout and promo codes are web-only. */}
+      {!pro && <p className="native-only glass rounded-[24px] p-5 text-sm"><b>Pro in the app is coming soon.</b> <span className="text-muted">Already Pro? Sign in with the same account and everything unlocks here too.</span></p>}
+      <div className="web-only space-y-6">
       {paymentsEnabled && <Checkout pro={pro} signedIn={signedIn} />}
       {!pro && <PromoBox signedIn={signedIn} />}
+      </div>
       {pro && <FounderCall />}
 
       {!paymentsEnabled && !pro && (
-        <form onSubmit={join} className="glass flex flex-col gap-3 rounded-[24px] p-5 sm:flex-row sm:items-center">
+        <form onSubmit={join} className="web-only glass flex flex-col gap-3 rounded-[24px] p-5 sm:flex-row sm:items-center">
           <div className="flex-1">
             <p className="font-semibold">Payments open soon</p>
             <p className="text-sm text-muted">Join the Pro waitlist and we'll email you when you can upgrade. Under 18? A parent or guardian will need to pay.</p>
