@@ -4,6 +4,7 @@ import { OPPORTUNITIES } from "./opportunities";
 import { PLAYBOOKS } from "./playbooks";
 import type { Workspace } from "./profile";
 import { recommend } from "./recommend";
+import { tractionSummary } from "./traction";
 
 /** Everything the co-founder remembers about this founder, as short facts (shown in the UI and sent to the AI). */
 export function memoryFacts(w: Workspace): { group: string; facts: string[] }[] {
@@ -32,6 +33,8 @@ export function memoryFacts(w: Workspace): { group: string; facts: string[] }[] 
   const extra: string[] = [];
   if (w.deck) extra.push(`Pitch deck: ${w.deck.slides.length} slides, ${w.deck.slides.reduce((n, s) => n + [s.title, ...s.bullets].filter(hasGap).length, 0)} blanks left to fill`);
   for (const id of w.saved) { const o = OPPORTUNITIES.find((x) => x.id === id); if (o) extra.push(`Saved opportunity: ${o.name} (${o.type})`); }
+  const t = tractionSummary(w);
+  if (t) extra.unshift(t);
   if (extra.length) groups.push({ group: "Progress", facts: extra });
   if (w.notes?.length) groups.push({ group: "Pinned notes", facts: w.notes });
   return groups;

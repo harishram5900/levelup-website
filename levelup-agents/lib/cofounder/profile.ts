@@ -8,6 +8,8 @@ export type Profile = { founder: string; startup: string; idea: string; customer
 export type Section = { title: string; items: string[] };
 export type AgentResult = { sections: Section[]; source: "ai" | "guided"; at: number; research?: Research };
 export type Goal = { id: string; text: string; done: boolean };
+/** One weekly traction check-in (week = Monday, YYYY-MM-DD). Numbers are what the founder reports. */
+export type CheckIn = { week: string; conversations: number; users: number; revenue: number; note?: string };
 export type ChatMsg = { role: "user" | "assistant"; text: string; at: number; source?: "ai" | "guided" };
 export type SlideKind = "cover" | "content" | "closing";
 export type Slide = { id: string; kind: SlideKind; kicker: string; title: string; bullets: string[]; image?: string };
@@ -31,6 +33,7 @@ export type Workspace = {
   team?: string | null; // name of the team you're on (for the Team Player badge)
   chat?: ChatMsg[]; // AI co-founder conversation (synced to the account)
   notes?: string[]; // things the founder (or the AI) pinned for the co-founder to remember
+  traction?: CheckIn[]; // weekly check-ins (users, revenue, conversations)
   updatedAt?: number; // for syncing with the account backend
 };
 

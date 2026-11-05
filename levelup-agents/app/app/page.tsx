@@ -17,6 +17,7 @@ import { playbookOfTheDay, recommend } from "@/lib/cofounder/recommend";
 import { fadeUp, stagger } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { isProAgent, usePlan } from "@/lib/cofounder/plan";
+import { XP_CHECKIN, latest, weekOf, weeklyGrowth } from "@/lib/cofounder/traction";
 import { ProBadge } from "@/components/cofounder/ProGate";
 
 const STAGES: { id: Stage; label: string; emoji: string }[] = [
@@ -180,189 +181,184 @@ export default function HQ() {
     setGoal("");
   };
 
+  const checkedIn = (ws.traction ?? []).some((c) => c.week === weekOf());
+  const showCheckin = !checkedIn && g.agentsDone > 0;
+  const hour = new Date().getHours();
+  const hello = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const lastT = latest(ws.traction);
+  const growth = weeklyGrowth(ws.traction);
+
   let qi = 0;
   return (
-    <motion.div variants={stagger(0.07)} initial="hidden" animate="show" className="mx-auto max-w-[1240px] space-y-6">
-      {/* HERO */}
-      <motion.section variants={fadeUp} data-tour="hero" className="relative overflow-hidden rounded-[32px] p-6 text-white sm:p-8" style={{ background: "radial-gradient(120% 140% at 100% 0%, rgb(var(--violet)) 0%, rgb(var(--violet) / .55) 35%, #0B1030 100%)" }}>
-        <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-amber/25 blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-cyan/25 blur-3xl" aria-hidden />
-        {[...Array(14)].map((_, k) => <span key={k} aria-hidden className="absolute h-1 w-1 rounded-full bg-white/50" style={{ left: `${(k * 37) % 100}%`, top: `${(k * 53) % 100}%`, opacity: 0.25 + (k % 4) * 0.15 }} />)}
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center">
-          <div className="flex min-w-0 flex-1 items-center gap-4 sm:gap-6">
-            <Buddy character={ch} mood={tip.mood} size={116} className="hidden text-white sm:block" />
-            <div className="min-w-0">
-              <p className="text-sm text-white/70">{p.founder ? `Hey ${p.founder} 👋` : "Welcome back 👋"}</p>
-              <h2 className="truncate font-display text-6xl uppercase leading-[0.9] sm:text-7xl">{p.startup} <span className="text-amber">HQ</span></h2>
-              <p className="mt-2 line-clamp-2 max-w-xl text-white/75">{p.startup} {p.idea.replace(/\.$/, "")} for {p.customer}.</p>
-              <div className="mt-4 rounded-2xl rounded-tl-sm bg-white/10 px-4 py-3 text-[15px] ring-1 ring-white/15 backdrop-blur"><span className="mr-1.5 font-semibold text-amber">{buddy.name}:</span>{tip.text}</div>
-            </div>
-          </div>
-          <div data-tour="level" className="flex items-center gap-5 rounded-3xl bg-white/[0.07] p-4 ring-1 ring-white/10 lg:w-[340px]">
-            <LevelRing level={g.level} pct={g.pctToNext} />
-            <div className="min-w-0">
-              <p className="font-display text-3xl uppercase leading-none">{g.title}</p>
-              <p className="mt-1 text-sm text-white/70">{g.next ? <>{g.toNext} XP to <b className="text-white">{g.next.title}</b></> : "Max level"}</p>
-              <p className="mt-3 flex items-center gap-1 text-2xl font-bold text-amber"><Zap size={20} aria-hidden /><CountUp to={g.xp} /> <span className="text-sm font-semibold text-white/60">XP</span></p>
-              <button type="button" onClick={() => setEditing(true)} className="mt-2 inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white"><Pencil size={12} aria-hidden /> Edit startup</button>
-            </div>
-          </div>
+    <motion.div variants={stagger(0.06)} initial="hidden" animate="show" className="mx-auto max-w-[1100px] space-y-5">
+      {/* HEADER: who you are, where you are */}
+      <motion.header variants={fadeUp} data-tour="hero" className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-sm text-muted">{hello}{p.founder ? `, ${p.founder}` : ""}</p>
+          <h2 className="mt-0.5 truncate text-3xl sm:text-4xl">{p.startup}</h2>
+          <button type="button" onClick={() => setEditing(true)} className="mt-1 inline-flex max-w-full items-center gap-1.5 text-left text-sm text-muted hover:text-fg"><span className="line-clamp-1">{p.idea.replace(/\.$/, "")}</span><Pencil size={12} className="shrink-0" aria-hidden /></button>
         </div>
-      </motion.section>
+        <Buddy character={ch} mood={tip.mood} size={64} className="shrink-0" />
+      </motion.header>
 
-      {/* STAT TILES */}
-      <motion.div variants={fadeUp} data-tour="stats" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[
-          { label: "Total XP", value: g.xp, icon: Zap, tone: "text-violet bg-violet/10" },
-          { label: "Day streak", value: g.streak, icon: Flame, tone: "text-amber bg-amber/10" },
-          { label: `Badges of ${BADGES.length}`, value: g.badges.length, icon: Award, tone: "text-good bg-good/10" },
-          { label: `Quests of ${quests.length}`, value: quests.filter((q) => q.done).length, icon: Trophy, tone: "text-cyan bg-cyan/10" },
-        ].map((s) => (
-          <motion.div key={s.label} whileHover={{ y: -3 }} className="glass flex items-center gap-3 rounded-[20px] p-4">
-            <span className={cn("grid h-12 w-12 shrink-0 place-items-center rounded-2xl", s.tone)}><s.icon size={22} aria-hidden /></span>
-            <div><p className="font-display text-4xl leading-none"><CountUp to={s.value} /></p><p className="text-xs text-muted">{s.label}</p></div>
-          </motion.div>
-        ))}
+      <motion.div variants={fadeUp} data-tour="level" className="glass flex items-center gap-4 rounded-[20px] px-4 py-3.5">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber/15 text-lg font-bold tabular-nums text-amber">{g.level}</span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-2"><p className="font-semibold">{g.title}</p><p className="text-xs tabular-nums text-muted">{g.next ? `${g.toNext} XP to ${g.next.title}` : "Max level"}</p></div>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-fg/10"><div className="h-full rounded-full bg-amber transition-all" style={{ width: `${g.pctToNext}%` }} /></div>
+        </div>
+        <span className="flex shrink-0 items-center gap-1 rounded-full bg-fg/[0.05] px-2.5 py-1 text-sm font-semibold tabular-nums" title="Day streak"><Flame size={14} className={g.streak ? "text-amber" : "text-muted"} aria-hidden />{g.streak}</span>
       </motion.div>
+
+      {/* NEXT STEP: one clear thing to do now */}
+      <motion.div variants={fadeUp} data-tour="today">
+        {showCheckin ? (
+          <Link href="/app/growth" className="group block rounded-[20px] bg-cta p-5 transition active:scale-[0.99]">
+            <p className="text-xs font-semibold opacity-70">Next step · 30 seconds · +{XP_CHECKIN} XP</p>
+            <p className="mt-1.5 text-xl font-bold">Log this week&apos;s numbers</p>
+            <p className="mt-1 text-sm opacity-80">Customer talks, users and revenue. {buddy.name} turns them into your growth rate and next moves.</p>
+            <span className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#1a1100] px-4 py-2 text-sm font-semibold text-white">Check in <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
+          </Link>
+        ) : current ? (
+          <Link href={current.href} className="group block rounded-[20px] bg-cta p-5 transition active:scale-[0.99]">
+            <p className="text-xs font-semibold opacity-70">Next step · about {current.boss ? 10 : 3} min · +{current.xp} XP</p>
+            <p className="mt-1.5 text-xl font-bold">{current.name}</p>
+            <p className="mt-1 text-sm opacity-80">{current.boss ? "Turn everything you've done into a 10-slide deck in your own design." : AGENTS.find((a) => a.id === current.id)?.line}</p>
+            <span className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#1a1100] px-4 py-2 text-sm font-semibold text-white">Start <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
+          </Link>
+        ) : (
+          <div className="glass rounded-[20px] p-5"><p className="text-lg font-bold">{pro ? "Every quest complete." : "Free quests complete."}</p><p className="mt-1 text-sm text-muted">{pro ? "Keep logging your numbers weekly and go win an opportunity." : "Pricing, sales, launch and fundraising are next."}</p>{!pro && <Link href="/app/upgrade" className="btn-play mt-4 text-sm"><Crown size={16} aria-hidden /> See LevelUp Pro</Link>}</div>
+        )}
+      </motion.div>
+
+      {/* ASK YOUR CO-FOUNDER */}
+      <motion.div variants={fadeUp}>
+        <Link href="/app/cofounder" className="glass flex items-center gap-3 rounded-[20px] px-4 py-3 transition hover:border-violet/40">
+          <Buddy character={ch} mood="happy" size={32} />
+          <span className="flex-1 text-[15px] text-muted">Ask {buddy.name} anything about {p.startup}…</span>
+          {!pro && <ProBadge />}
+          <ArrowRight size={16} className="text-muted" aria-hidden />
+        </Link>
+      </motion.div>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        {/* THIS WEEK: numbers */}
+        <motion.section variants={fadeUp} className="glass rounded-[20px] p-5">
+          <div className="flex items-center justify-between"><h3 className="text-lg">Your numbers</h3><Link href="/app/growth" className="flex items-center gap-1 text-sm font-semibold text-violet">{checkedIn ? "View" : "Check in"} <ArrowRight size={14} aria-hidden /></Link></div>
+          <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+            {[["Users", lastT ? lastT.users.toLocaleString("en-US") : "—"], ["Revenue/wk", lastT ? `$${lastT.revenue.toLocaleString("en-US")}` : "—"], ["Growth/wk", growth === null ? "—" : `${growth > 0 ? "+" : ""}${Math.round(growth * 100)}%`]].map(([k, v]) => (
+              <div key={k} className="rounded-xl bg-fg/[0.03] px-2 py-3"><p className="text-xl font-bold tabular-nums">{v}</p><p className="mt-0.5 text-[11px] text-muted">{k}</p></div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-muted">{lastT ? `Last check-in: week of ${new Date(`${lastT.week}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : "Log your first week to see your growth rate."}</p>
+        </motion.section>
+
+        {/* THIS WEEK: goals */}
+        <motion.section variants={fadeUp} id="goals" data-tour="goals" className="glass rounded-[20px] p-5">
+          <div className="flex items-center justify-between"><h3 className="text-lg">This week&apos;s goals</h3><span className="text-xs font-semibold text-muted">+{XP.goal} XP each</span></div>
+          <ul className="mt-3 space-y-1.5">
+            {ws.goals.length === 0 && <li className="py-1 text-sm text-muted">What will you ship by Sunday? Try &ldquo;Interview 5 customers.&rdquo;</li>}
+            {ws.goals.map((gl) => (
+              <motion.li layout key={gl.id} className="group flex items-center gap-3 rounded-xl px-1 py-1.5">
+                <button type="button" role="checkbox" aria-checked={gl.done} aria-label={`Mark "${gl.text}" ${gl.done ? "not done" : "done"}`} onClick={() => update((w) => ({ ...w, goals: w.goals.map((x) => (x.id === gl.id ? { ...x, done: !x.done } : x)) }))}
+                  className={cn("grid h-5 w-5 shrink-0 place-items-center rounded-md border transition", gl.done ? "border-good bg-good text-white" : "border-fg/30 hover:border-violet")}>{gl.done && <Check size={12} strokeWidth={3} aria-hidden />}</button>
+                <span className={cn("flex-1 text-[15px]", gl.done && "text-muted line-through")}>{gl.text}</span>
+                <button type="button" aria-label={`Remove "${gl.text}"`} onClick={() => update((w) => ({ ...w, goals: w.goals.filter((x) => x.id !== gl.id) }))} className="text-muted opacity-60 hover:text-red-500 hover:opacity-100"><Trash2 size={14} aria-hidden /></button>
+              </motion.li>
+            ))}
+          </ul>
+          <form onSubmit={addGoal} className="mt-3 flex gap-2">
+            <label htmlFor="goal" className="sr-only">New goal</label>
+            <input id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="Add a goal" maxLength={100} className="min-w-0 flex-1 rounded-xl hairline bg-bg px-3 py-2.5 text-sm outline-none focus:border-violet/60" />
+            <button type="submit" aria-label="Add goal" className="grid h-10 w-10 place-items-center rounded-xl bg-fg text-bg transition hover:opacity-90"><Plus size={16} aria-hidden /></button>
+          </form>
+        </motion.section>
+      </div>
 
       {!pro && <ProBanner />}
 
-      {/* CO-FOUNDER RECOMMENDS */}
-      <motion.section variants={fadeUp} data-tour="recs" className="glass rounded-[28px] p-5 sm:p-7">
-        <div className="mb-5 flex items-center gap-3">
-          <Buddy character={ch} mood="think" size={48} />
-          <div><h3 className="font-display text-4xl uppercase leading-none">{buddy.name} recommends</h3><p className="text-sm text-muted">What I'd do next if I were your co-founder</p></div>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {recs.map((r, k) => {
+      {/* RECOMMENDED: a clean list, not a wall of cards */}
+      <motion.section variants={fadeUp} data-tour="recs" className="glass overflow-hidden rounded-[20px]">
+        <div className="px-5 pb-2 pt-5"><h3 className="text-lg">{buddy.name} recommends</h3><p className="text-sm text-muted">What I&apos;d do next if I were your co-founder</p></div>
+        <ul className="divide-y divide-fg/[0.06]">
+          {recs.map((r) => {
             const inner = <>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-violet">{r.tag}</span>
-              <span className="mt-1.5 block font-semibold leading-snug">{r.title}</span>
-              <span className="mt-1.5 block flex-1 text-sm text-muted">{r.why}</span>
-              <span className={cn("mt-4 self-start", k === 0 ? "btn-play px-4 py-2 text-sm" : "btn-soft py-2 text-sm")}>{r.cta} {r.external ? <ExternalLink size={14} aria-hidden /> : <ArrowRight size={14} aria-hidden />}</span>
+              <span className="min-w-0 flex-1"><span className="text-xs font-semibold text-muted">{r.tag}</span><span className="mt-0.5 block font-semibold leading-snug">{r.title}</span><span className="mt-0.5 block text-sm text-muted">{r.why}</span></span>
+              {r.external ? <ExternalLink size={16} className="shrink-0 text-muted" aria-hidden /> : <ArrowRight size={16} className="shrink-0 text-muted" aria-hidden />}
             </>;
-            const cls = cn("flex flex-col rounded-2xl p-4 transition hover:-translate-y-0.5", k === 0 ? "bg-amber/10 ring-1 ring-amber/40" : "bg-fg/[0.04] ring-1 ring-fg/[0.06]");
-            return r.external
-              ? <a key={r.id} href={r.href} target="_blank" rel="noopener noreferrer" className={cls}>{inner}</a>
-              : <Link key={r.id} href={r.href} className={cls}>{inner}</Link>;
+            const cls = "flex items-center gap-4 px-5 py-3.5 transition hover:bg-fg/[0.03]";
+            return <li key={r.id}>{r.external ? <a href={r.href} target="_blank" rel="noopener noreferrer" className={cls}>{inner}</a> : <Link href={r.href} className={cls}>{inner}</Link>}</li>;
           })}
-        </div>
+        </ul>
       </motion.section>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-        {/* QUEST MAP */}
-        <motion.section variants={fadeUp} data-tour="quests" className="glass relative overflow-hidden rounded-[28px] p-5 sm:p-7">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <div><h3 className="font-display text-4xl uppercase leading-none">Quest map</h3><p className="text-sm text-muted">4 worlds, 12 agents, 1 boss</p></div>
-            <span className="rounded-full bg-fg/[0.06] px-3 py-1 text-sm font-semibold" style={{ fontVariantNumeric: "tabular-nums" }}>{quests.filter((q) => q.done).length}/{quests.length}</span>
-          </div>
-          {[0, 1, 2, 3, 4].map((wi) => {
-            const items = quests.filter((q) => q.world === wi);
-            const wDone = items.every((q) => q.done || q.locked);
-            return (
-              <div key={wi} className="mt-5 first:mt-0">
-                <div className={cn("mb-3 flex items-center justify-between rounded-xl px-3 py-2", wi === 4 ? "bg-amber/10" : "bg-fg/[0.04]")}>
-                  <span className="text-sm font-bold uppercase tracking-wider">{wi === 4 ? "👑 Final boss" : `World ${wi + 1}: ${WORLDS[wi].name}`}</span>
-                  <span className="text-xs text-muted">{wi === 4 ? (pro ? "Design your deck" : "Pro") : wDone ? "Cleared ⭐" : WORLDS[wi].line}</span>
-                </div>
-                <ol className="space-y-2">
-                  {items.map((q, k) => {
-                    const isCur = current?.id === q.id;
-                    const Icon = q.icon;
-                    const off = [0, 1, 2][k % 3];
-                    qi++;
-                    return (
-                      <li key={q.id} className={isCur ? "pt-5" : undefined} style={{ paddingLeft: `calc(${off} * min(4rem, 8vw))` }}>
-                        <Link href={q.locked ? "/app/upgrade" : q.href} className="group flex items-center gap-4 py-1">
-                          <span className="relative">
-                            {isCur && <span className="absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-amber px-2 py-0.5 text-xs font-bold text-[#1a1100] shadow">START<span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-amber" /></span>}
-                            <motion.span whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
-                              className={cn("grid place-items-center rounded-full border-b-[6px] transition-colors",
-                                q.boss ? "h-[84px] w-[84px]" : "h-[66px] w-[66px]",
-                                q.done ? "border-black/25 bg-good text-white" : isCur ? "pulse-ring border-black/25 bg-amber text-[#1a1100]" : "border-fg/15 bg-fg/[0.08] text-muted")}>
-                              {q.done ? <Check size={28} strokeWidth={3} aria-hidden /> : q.locked ? <Lock size={24} aria-hidden /> : q.boss ? <Crown size={32} aria-hidden /> : <Icon size={26} aria-hidden />}
-                            </motion.span>
-                            {q.done && <Star size={18} className="absolute -right-1 -top-1 fill-amber text-amber" aria-hidden />}
-                          </span>
-                          <span className="min-w-0">
-                            <span className="flex items-center gap-1.5 font-semibold group-hover:text-violet"><span className="text-xs text-muted">{qi}.</span>{q.name}{q.locked && <ProBadge />}</span>
-                            <span className="block text-sm leading-snug text-muted">{q.stage}</span>
-                            <span className={cn("mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold", q.done ? "bg-good/15 text-good" : "bg-violet/10 text-violet")}>{q.done ? `+${q.xp} XP earned` : q.locked ? "Unlock with Pro" : `+${q.xp} XP`}</span>
-                          </span>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
-            );
-          })}
-        </motion.section>
-
-        <div className="space-y-6">
-          <motion.div variants={fadeUp} data-tour="today">
-            {current ? (
-              <Link href={current.href} className="group relative block overflow-hidden rounded-[24px] bg-cta p-6 shadow-[0_8px_0_0_rgba(0,0,0,.25)] transition-transform hover:-translate-y-1 active:translate-y-1 active:shadow-none">
-                <Sparkles className="absolute right-5 top-5 opacity-40" size={28} aria-hidden />
-                <p className="text-xs font-bold uppercase tracking-widest opacity-70">Today's quest</p>
-                <p className="mt-2 font-display text-4xl uppercase leading-none">{current.name}</p>
-                <p className="mt-2 text-sm opacity-80">{current.boss ? "Turn everything you've done into a 10-slide deck in your own design." : AGENTS.find((a) => a.id === current.id)?.line}</p>
-                <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1100] px-4 py-2 text-sm font-semibold text-white">Play <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden /> <span className="text-amber">+{current.xp} XP</span></span>
-              </Link>
-            ) : (
-              <div className="glass rounded-[24px] p-6"><p className="font-display text-3xl uppercase">{pro ? "All quests complete 👑" : "Free quests complete 👑"}</p>{!pro && <Link href="/app/upgrade" className="btn-play mt-3 px-4 py-2 text-sm">Unlock Pro quests</Link>}<p className="mt-2 text-sm text-muted">Re-run agents as your startup changes, and keep your streak alive with weekly goals.</p></div>
-            )}
-          </motion.div>
-
-          <motion.div variants={fadeUp} id="goals" data-tour="goals" className="glass rounded-[24px] p-6">
-            <div className="flex items-center justify-between"><h3 className="font-display text-3xl uppercase">This week</h3><span className="text-xs font-bold text-violet">+{XP.goal} XP each</span></div>
-            <p className="mt-1 text-sm text-muted">What will you ship by Sunday?</p>
-            <ul className="mt-4 space-y-2">
-              {ws.goals.length === 0 && <li className="text-sm text-muted">No goals yet. Try "Interview 5 customers."</li>}
-              {ws.goals.map((gl) => (
-                <motion.li layout key={gl.id} className="flex items-center gap-3 rounded-xl bg-fg/[0.04] px-3 py-2.5">
-                  <button type="button" role="checkbox" aria-checked={gl.done} aria-label={`Mark "${gl.text}" ${gl.done ? "not done" : "done"}`} onClick={() => update((w) => ({ ...w, goals: w.goals.map((x) => (x.id === gl.id ? { ...x, done: !x.done } : x)) }))}
-                    className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-lg border-2 transition", gl.done ? "border-good bg-good text-white" : "border-fg/30 hover:border-violet")}>{gl.done && <Check size={14} strokeWidth={3} aria-hidden />}</button>
-                  <span className={cn("flex-1 text-sm", gl.done && "text-muted line-through")}>{gl.text}</span>
-                  <button type="button" aria-label={`Remove "${gl.text}"`} onClick={() => update((w) => ({ ...w, goals: w.goals.filter((x) => x.id !== gl.id) }))} className="text-muted hover:text-red-500"><Trash2 size={14} aria-hidden /></button>
-                </motion.li>
-              ))}
-            </ul>
-            <form onSubmit={addGoal} className="mt-3 flex gap-2">
-              <label htmlFor="goal" className="sr-only">New goal</label>
-              <input id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="Add a goal" maxLength={100} className="min-w-0 flex-1 rounded-xl hairline bg-bg-2/60 px-3 py-2 text-sm outline-none focus:border-violet/60" />
-              <button type="submit" aria-label="Add goal" className="grid h-9 w-9 place-items-center rounded-xl bg-accent text-white shadow-lg shadow-violet/30 transition hover:scale-105"><Plus size={16} aria-hidden /></button>
-            </form>
-          </motion.div>
-
-          {pro && <motion.div variants={fadeUp}><FounderCall compact /></motion.div>}
-          {pro && (
-            <motion.div variants={fadeUp}>
-              <Link href="/app/cofounder" className="flex items-center gap-3 rounded-[20px] bg-accent p-4 text-white transition-transform hover:-translate-y-0.5">
-                <Buddy character={ch} mood="happy" size={40} className="text-white" />
-                <span className="flex-1"><b className="block">Ask {buddy.name} anything</b><span className="text-xs text-white/80">Your AI co-founder remembers everything</span></span>
-              </Link>
-            </motion.div>
-          )}
-          <motion.div variants={fadeUp} className="grid grid-cols-2 gap-3">
-            <Link href="/app/friends" className="group rounded-[20px] bg-gradient-to-br from-pink-500 to-rose-600 p-4 text-white transition-transform hover:-translate-y-0.5">
-              <Gift size={20} aria-hidden /><p className="mt-2 font-bold leading-tight">Invite friends</p><p className="text-xs text-white/80">+50 XP each</p>
-            </Link>
-            <Link href="/app/leaderboard" className="group rounded-[20px] bg-gradient-to-br from-amber to-orange-600 p-4 text-[#1a1100] transition-transform hover:-translate-y-0.5">
-              <Medal size={20} aria-hidden /><p className="mt-2 font-bold leading-tight">Leaderboard</p><p className="text-xs opacity-75">See your rank</p>
-            </Link>
-          </motion.div>
-
-          <motion.div variants={fadeUp} data-tour="playbook">
-            <div className="mb-2 flex items-center justify-between px-1"><p className="kicker">Playbook of the day</p><Link href="/app/playbooks" className="flex items-center gap-1 text-xs font-semibold text-violet hover:underline"><BookOpen size={12} aria-hidden /> All playbooks</Link></div>
-            <PlaybookCard p={pb} className="glass" />
-          </motion.div>
+      {/* JOURNEY */}
+      <motion.section variants={fadeUp} data-tour="quests" className="glass relative overflow-hidden rounded-[28px] p-5 sm:p-7">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div><h3 className="text-lg">Your journey</h3><p className="text-sm text-muted">4 worlds, 12 agents, 1 boss</p></div>
+          <span className="rounded-full bg-fg/[0.06] px-3 py-1 text-sm font-semibold" style={{ fontVariantNumeric: "tabular-nums" }}>{quests.filter((q) => q.done).length}/{quests.length}</span>
         </div>
+        {[0, 1, 2, 3, 4].map((wi) => {
+          const items = quests.filter((q) => q.world === wi);
+          const wDone = items.every((q) => q.done || q.locked);
+          return (
+            <div key={wi} className="mt-5 first:mt-0">
+              <div className={cn("mb-3 flex items-center justify-between rounded-xl px-3 py-2", wi === 4 ? "bg-amber/10" : "bg-fg/[0.04]")}>
+                <span className="text-sm font-semibold">{wi === 4 ? "Final boss" : `World ${wi + 1} · ${WORLDS[wi].name}`}</span>
+                <span className="text-xs text-muted">{wi === 4 ? (pro ? "Design your deck" : "Pro") : wDone ? "Cleared" : WORLDS[wi].line}</span>
+              </div>
+              <ol className="space-y-2">
+                {items.map((q, k) => {
+                  const isCur = current?.id === q.id;
+                  const Icon = q.icon;
+                  const off = [0, 1, 2][k % 3];
+                  qi++;
+                  return (
+                    <li key={q.id} className={isCur ? "pt-5" : undefined} style={{ paddingLeft: `calc(${off} * min(4rem, 8vw))` }}>
+                      <Link href={q.locked ? "/app/upgrade" : q.href} className="group flex items-center gap-4 py-1">
+                        <span className="relative">
+                          {isCur && <span className="absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-amber px-2 py-0.5 text-xs font-bold text-[#1a1100] shadow">START<span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-amber" /></span>}
+                          <motion.span whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+                            className={cn("grid place-items-center rounded-full border-b-[6px] transition-colors",
+                              q.boss ? "h-[84px] w-[84px]" : "h-[66px] w-[66px]",
+                              q.done ? "border-black/25 bg-good text-white" : isCur ? "pulse-ring border-black/25 bg-amber text-[#1a1100]" : "border-fg/15 bg-fg/[0.08] text-muted")}>
+                            {q.done ? <Check size={28} strokeWidth={3} aria-hidden /> : q.locked ? <Lock size={24} aria-hidden /> : q.boss ? <Crown size={32} aria-hidden /> : <Icon size={26} aria-hidden />}
+                          </motion.span>
+                          {q.done && <Star size={18} className="absolute -right-1 -top-1 fill-amber text-amber" aria-hidden />}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="flex items-center gap-1.5 font-semibold group-hover:text-violet"><span className="text-xs text-muted">{qi}.</span>{q.name}{q.locked && <ProBadge />}</span>
+                          <span className="block text-sm leading-snug text-muted">{q.stage}</span>
+                          <span className={cn("mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold", q.done ? "bg-good/15 text-good" : "bg-violet/10 text-violet")}>{q.done ? `+${q.xp} XP earned` : q.locked ? "Unlock with Pro" : `+${q.xp} XP`}</span>
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          );
+        })}
+      </motion.section>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <motion.div variants={fadeUp} data-tour="playbook">
+          <div className="mb-2 flex items-center justify-between px-1"><p className="kicker">Playbook of the day</p><Link href="/app/playbooks" className="flex items-center gap-1 text-xs font-semibold text-violet hover:underline">All playbooks <ArrowRight size={12} aria-hidden /></Link></div>
+          <PlaybookCard p={pb} className="glass" />
+        </motion.div>
+        <motion.div variants={fadeUp} className="space-y-3">
+          {pro && <FounderCall compact />}
+          <div className="glass overflow-hidden rounded-[20px]">
+            <Link href="/app/friends" className="flex items-center gap-3 px-5 py-4 transition hover:bg-fg/[0.03]"><Gift size={18} className="text-amber" aria-hidden /><span className="flex-1"><b className="block text-[15px]">Invite friends</b><span className="text-sm text-muted">+50 XP for each friend who joins</span></span><ArrowRight size={16} className="text-muted" aria-hidden /></Link>
+            <Link href="/app/leaderboard" className="flex items-center gap-3 border-t border-fg/[0.06] px-5 py-4 transition hover:bg-fg/[0.03]"><Medal size={18} className="text-amber" aria-hidden /><span className="flex-1"><b className="block text-[15px]">Leaderboard</b><span className="text-sm text-muted">See where you rank</span></span><ArrowRight size={16} className="text-muted" aria-hidden /></Link>
+            <Link href="/app/opportunities" className="flex items-center gap-3 border-t border-fg/[0.06] px-5 py-4 transition hover:bg-fg/[0.03]"><Trophy size={18} className="text-amber" aria-hidden /><span className="flex-1"><b className="block text-[15px]">Opportunities</b><span className="text-sm text-muted">300+ competitions, grants and programs</span></span><ArrowRight size={16} className="text-muted" aria-hidden /></Link>
+          </div>
+        </motion.div>
       </div>
 
       {/* BADGES */}
       <motion.section variants={fadeUp} data-tour="badges" className="glass rounded-[28px] p-5 sm:p-7">
-        <div className="mb-5 flex items-center justify-between"><h3 className="font-display text-4xl uppercase leading-none">Trophy case</h3><span className="text-sm text-muted">{g.badges.length} of {BADGES.length} unlocked</span></div>
+        <div className="mb-5 flex items-center justify-between"><h3 className="text-lg">Trophy case</h3><span className="text-sm text-muted">{g.badges.length} of {BADGES.length} unlocked</span></div>
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
           {BADGES.map((b) => {
             const got = g.badges.includes(b.id);

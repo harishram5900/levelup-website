@@ -189,3 +189,34 @@
 /* Readable accent text on dark backgrounds (WCAG AA): brand blues are too dark as text, so lighten them. */
 .dark .app-scope .text-violet, .dark .app-scope .btn-soft, .dark .app-scope .btn-icon:hover { color: color-mix(in srgb, rgb(var(--violet)) 50%, white); }
 .dark .app-scope .text-cyan { color: color-mix(in srgb, rgb(var(--cyan)) 60%, white); }
+
+/* ================================================================
+   Design system v2 (app screens only): calm, premium, content-first.
+   Solid surfaces with hairlines instead of glass and glow, sentence-case
+   headings in one sans family, quiet labels, one action color (amber).
+   ================================================================ */
+.dark .app-scope { --bg: 11 12 16; --bg-2: 21 22 28; --muted: 148 153 170; --line-alpha: 0.08; }
+html:not(.dark) .app-scope { --bg: 247 247 249; --bg-2: 255 255 255; --line-alpha: 0.09; }
+.app-scope { background: rgb(var(--bg)); }
+body:has(.app-scope)::after { display: none; } /* no film grain in the app */
+
+.app-scope h1, .app-scope h2, .app-scope h3, .app-scope .font-display {
+  font-family: "Plus Jakarta Sans Variable", var(--font-geist-sans), system-ui, sans-serif;
+  text-transform: none; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1;
+}
+.app-scope .uppercase.font-display { text-transform: none; }
+
+.app-scope .glass {
+  background: rgb(var(--bg-2)); backdrop-filter: none; -webkit-backdrop-filter: none;
+  border: 1px solid rgb(var(--line) / var(--line-alpha)); box-shadow: none;
+}
+html:not(.dark) .app-scope .glass { box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04); }
+.app-scope .kicker { text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; color: rgb(var(--muted)); }
+
+.app-scope .rounded-\[32px\], .app-scope .rounded-\[28px\], .app-scope .rounded-\[24px\] { border-radius: 20px; }
+.app-scope .rounded-\[22px\], .app-scope .rounded-\[20px\] { border-radius: 16px; }
+
+.app-scope .btn-play { border-radius: 14px; box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 8px 20px -12px rgb(var(--amber) / .7); }
+.app-scope .btn-play:hover { transform: none; filter: brightness(1.05); box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 10px 24px -12px rgb(var(--amber) / .8); }
+.app-scope .btn-play:active { transform: scale(.98); }
+.app-scope .btn-glass { backdrop-filter: none; background: rgb(var(--fg) / .03); }

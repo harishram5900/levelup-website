@@ -172,26 +172,16 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
 
   return (
     <div className="mx-auto max-w-[1240px] space-y-6" style={{ ["--ag" as string]: st.color } as React.CSSProperties}>
-      {/* Agent header: each agent has its own color and layout */}
-      <header className="relative overflow-hidden rounded-[28px] p-6 text-white sm:p-7" style={{ background: `radial-gradient(110% 140% at 100% 0%, ${st.color} 0%, color-mix(in srgb, ${st.color} 45%, #0B0D14) 45%, #0B0D14 100%)` }}>
-        <Icon size={220} strokeWidth={1} className="pointer-events-none absolute -right-8 -top-10 text-white/[0.08]" aria-hidden />
-        <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur"><Icon size={26} aria-hidden /></span>
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">{WORLDS[agent.world].name} · {st.layout}</p>
-              <h2 className="font-display text-4xl leading-none">{agent.name} agent</h2>
-              <p className="mt-1 text-sm text-white/75">{agent.role}{result ? " · completed ✓" : ""}</p>
-            </div>
-          </div>
-          <div className="flex max-w-md items-end gap-3">
-            <Buddy character={ch} mood={loading ? "think" : result ? "cheer" : "happy"} size={64} className="text-white" />
-            <p className="mb-3 rounded-2xl rounded-bl-sm bg-white/12 px-4 py-2.5 text-sm ring-1 ring-white/20 backdrop-blur" style={{ background: "rgba(255,255,255,.12)" }}>
-              {loading ? (step || "Thinking about your startup…") : result ? "Quest complete! Tweak your answers and run again anytime." : agent.line}
-            </p>
-          </div>
+      {/* Agent header: calm surface; the agent's color lives only in its icon */}
+      <header className="flex items-center gap-4">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white" style={{ background: st.color }}><Icon size={22} aria-hidden /></span>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium text-muted">{WORLDS[agent.world].name} · {agent.role}{result ? " · completed" : ""}</p>
+          <h2 className="text-2xl sm:text-3xl">{agent.name} agent</h2>
         </div>
+        <Buddy character={ch} mood={loading ? "think" : result ? "cheer" : "happy"} size={48} className="shrink-0" />
       </header>
+      <p className="-mt-2 max-w-2xl text-[15px] text-muted">{loading ? (step || "Thinking about your startup…") : agent.line}</p>
 
       {top ? (
         <>{form}{results}{playbooks}</>

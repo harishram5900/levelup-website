@@ -1,6 +1,7 @@
 import { Banknote, Flame, UserPlus, UsersRound, Gem, Hammer, Handshake, Layers, Lightbulb, Megaphone, Palette, Presentation, Radar, Rocket, Target, TrendingUp, Users, Video, type LucideIcon } from "lucide-react";
 import { AGENTS } from "../agents";
 import type { Workspace } from "./profile";
+import { XP_CHECKIN, checkinStreak, milestones } from "./traction";
 
 export const XP = { agent: 100, goal: 25, deck: 150, day: 10 } as const;
 
@@ -35,6 +36,9 @@ export const BADGES: Badge[] = [
   { id: "on-fire", name: "On Fire", how: "Show up 3 days in a row", icon: Flame, earned: (_w, s) => s >= 3 },
   { id: "recruiter", name: "Recruiter", how: "Invite a friend who signs up", icon: UserPlus, earned: (_w, _s, b) => b >= 50 },
   { id: "team-player", name: "Team Player", how: "Create or join a team", icon: UsersRound, earned: (w) => !!w.team },
+  { id: "measured", name: "Measured", how: "Log 4 weekly check-ins in a row", icon: TrendingUp, earned: (w) => checkinStreak(w.traction) >= 4 },
+  { id: "first-dollar", name: "First Dollar", how: "Log your first revenue", icon: Banknote, earned: (w) => milestones(w.traction).some((m) => m.id === "dollar1" && m.done) },
+  { id: "ten-talks", name: "Mom Test Pro", how: "Log 10 customer conversations", icon: Users, earned: (w) => milestones(w.traction).some((m) => m.id === "talk10" && m.done) },
   { id: "all-in", name: "All In", how: "Finish all 12 agents", icon: Rocket, earned: (w) => AGENTS.every((a) => w.results[a.id]) },
 ];
 
@@ -54,7 +58,8 @@ export function gameStats(w: Workspace, todayStr: string, bonus = 0) {
   const agentsDone = AGENTS.filter((a) => w.results[a.id]).length;
   const goalsDone = w.goals.filter((g) => g.done).length;
   const streak = streakOf(w.days, todayStr);
-  const xp = agentsDone * XP.agent + goalsDone * XP.goal + (w.deck ? XP.deck : 0) + new Set(w.days).size * XP.day + bonus;
+  const checkins = new Set((w.traction ?? []).map((c) => c.week)).size;
+  const xp = agentsDone * XP.agent + goalsDone * XP.goal + (w.deck ? XP.deck : 0) + new Set(w.days).size * XP.day + checkins * XP_CHECKIN + bonus;
   let li = 0;
   LEVELS.forEach((l, i) => { if (xp >= l.at) li = i; });
   const cur = LEVELS[li];

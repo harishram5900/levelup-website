@@ -4,6 +4,7 @@ import { guided } from "./templates";
 import { getWorkspace, type AgentResult, type Profile } from "./profile";
 import { matchCommunities, matchDirectories } from "./channels";
 import { matchOpportunities, type OppType } from "./opportunities";
+import { tractionSummary } from "./traction";
 import { supabase } from "../supabase";
 
 async function authHeaders(): Promise<Record<string, string>> {
@@ -54,6 +55,8 @@ function teamContext(exclude: AgentId): string {
     parts.push(`${a.name} agent:\n${r.sections.slice(0, 4).map((s) => `  ${s.title}: ${s.items.slice(0, 2).join(" | ").slice(0, 300)}`).join("\n")}`);
   }
   if (w.notes?.length) parts.push(`Founder notes: ${w.notes.slice(-8).join(" | ")}`);
+  const t = tractionSummary(w);
+  if (t) parts.unshift(t);
   return parts.join("\n").slice(0, 6000);
 }
 

@@ -12,21 +12,19 @@ import { useWorkspace } from "@/lib/cofounder/profile";
 import { useAuth } from "@/lib/supabase";
 import { StorePurchase } from "@/components/cofounder/StorePurchase";
 
-const FREE = ["Startup HQ, XP, streaks, badges and leaderboards", "6 agents: Idea, Customer, Scout, Build, Brand, Pitch (starter plans)", "Playbooks from top founders", "Competitions, programs, grants and credits", "Friends, teams and weekly goals"];
+const FREE = ["Startup HQ, Growth tracker, XP, streaks and badges", "6 agents: Idea, Customer, Scout, Build, Brand, Pitch (starter plans)", "Playbooks from top founders", "Competitions, programs, grants and credits", "Friends, teams and weekly goals"];
 const ROWS: [string, boolean, boolean][] = [
-  ["6 agents: Idea, Customer, Scout, Build, Brand, Pitch", true, true],
-  ["Money agent: pricing, break-even math, funding plan", false, true],
-  ["Full plans (every point) + Pro deep dive on every agent", false, true],
-  ["AI co-founder chat that remembers you", false, true],
-  ["1:1 call with the founder", false, true],
-  ["Launch Galaxy: Traction, Content and Investor agents", false, true],
-  ["Startup HQ, quest map, XP, badges, tutorial", true, true],
-  ["Playbooks and recommendations", true, true],
-  ["Competitions, grants, programs and free credits", true, true],
-  ["Pitch deck designer + PDF + present mode", false, true],
-  ["Offer and Sales agents", false, true],
-  ["Exclusive Gold and Aurora themes", false, true],
-  ["Investor & VC list", false, true],
+  ["AI co-founder chat that remembers your startup, plans and numbers", false, true],
+  ["Money, Offer, Sales, Traction, Content and Investor agents", false, true],
+  ["Deep web research: competitors, grants and communities in your niche", false, true],
+  ["Every point in every plan + Pro deep dives", false, true],
+  ["Pitch deck designer with PDF and present mode", false, true],
+  ["Investor and VC list", false, true],
+  ["1:1 call with LevelUp's founder", false, true],
+  ["Idea, Customer, Scout, Build, Brand and Pitch agents", true, true],
+  ["Growth tracker, weekly goals, XP, streaks and badges", true, true],
+  ["300+ competitions, grants, programs and free credits", true, true],
+  ["Playbooks, friends, teams and leaderboards", true, true],
 ];
 
 export default function UpgradePage() {
@@ -121,16 +119,11 @@ function Upgrade() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <div className="relative overflow-hidden rounded-[32px] p-6 text-white sm:p-10" style={{ background: "radial-gradient(120% 140% at 100% 0%, rgb(var(--amber) / .9) 0%, rgb(var(--violet) / .7) 40%, #0B1030 100%)" }}>
-        <div className="relative flex flex-col items-center gap-6 sm:flex-row">
-          <Buddy character={ws.prefs.character} mood="cheer" size={120} className="text-white" />
-          <div className="text-center sm:text-left">
-            <ProBadge />
-            <h2 className="mt-2 font-display text-6xl uppercase leading-none">LevelUp Pro</h2>
-            <p className="mt-2 max-w-lg text-white/85">{pro ? "You're Pro. Everything is unlocked. Go build something big!" : `Everything you need to pitch, sell and raise. ${buddy.name} will be right there with you.`}</p>
-            {!pro && <p className="web-only mt-3"><span className="font-display text-5xl">$9</span><span className="text-white/70"> /month</span> <span className="ml-2 text-sm text-white/60">less than $0.30 a day · cancel anytime</span></p>}
-          </div>
-        </div>
+      <div className="pt-2 text-center">
+        <Buddy character={ws.prefs.character} mood="cheer" size={88} className="mx-auto" />
+        <h2 className="mt-3 text-3xl sm:text-4xl">{pro ? "You're on LevelUp Pro" : "Get the whole team"}</h2>
+        <p className="mx-auto mt-2 max-w-md text-muted">{pro ? "Everything is unlocked. Go build something big." : `Every agent, a co-founder who remembers your startup, deep research and the pitch deck designer. ${buddy.name} goes all the way with you.`}</p>
+        {!pro && <p className="web-only mt-4"><span className="text-4xl font-bold tabular-nums">$9</span><span className="text-muted"> / month</span><span className="mt-1 block text-sm text-muted">Less than $0.30 a day. Cancel anytime.</span></p>}
       </div>
 
       {/* Inside the iOS/Android app, store rules require in-app purchase, so web checkout and promo codes are web-only. */}

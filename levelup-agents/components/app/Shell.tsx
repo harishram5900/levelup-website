@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bot, ChevronDown, ChevronsLeft, Crown, Flame, LayoutDashboard, Menu, Sparkles, Trophy, Zap, X } from "lucide-react";
+import { Bot, ChevronDown, LineChart, ChevronsLeft, Crown, Flame, LayoutDashboard, Menu, Sparkles, Trophy, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -104,7 +104,7 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
 const TABS = [
   { href: "/app", label: "HQ", tour: "tab-hq", icon: LayoutDashboard, match: (p: string) => p === "/app" },
   { href: "/app/agents", label: "Agents", tour: "tab-agents", icon: Sparkles, match: (p: string) => p.startsWith("/app/agents") },
-  { href: "/app/cofounder", label: "Co-founder", tour: "tab-cofounder", icon: Bot, match: (p: string) => p.startsWith("/app/cofounder") },
+  { href: "/app/growth", label: "Growth", tour: "tab-growth", icon: LineChart, match: (p: string) => p.startsWith("/app/growth") },
   { href: "/app/opportunities", label: "Opportunities", tour: "tab-opps", icon: Trophy, match: (p: string) => p.startsWith("/app/opportunities") },
 ];
 function TabBar({ path, onMore }: { path: string; onMore: () => void }) {

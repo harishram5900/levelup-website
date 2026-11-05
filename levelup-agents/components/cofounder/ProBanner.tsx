@@ -21,24 +21,20 @@ export function ProBanner() {
     { icon: Layers, text: "Pitch deck designer + full plans with Pro deep dives" },
   ];
   return (
-    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative overflow-hidden rounded-[28px] p-6 text-white sm:p-7" style={{ background: "linear-gradient(120deg, #1a1100 0%, #3b2300 40%, #0B1030 100%)" }}>
-      <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-amber/30 blur-3xl" aria-hidden />
-      <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center">
-        <div className="flex-1">
-          <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-amber"><Crown size={14} aria-hidden /> LevelUp Pro</p>
-          <h3 className="mt-2 font-display text-3xl leading-tight">{freeDone >= 3 ? `You've outgrown Free, ${ws.profile?.founder || "founder"}.` : `Build ${startup} with the full team.`}</h3>
-          <p className="mt-1 text-white/75">{freeDone >= 3 ? `You've finished ${freeDone} free agents. The next steps (pricing, selling, launching, raising) are where startups win or lose.` : "Free gets you started. Pro gets you to customers, revenue and investors."}</p>
-          <ul className="mt-4 grid gap-2 sm:grid-cols-2">{perks.map((p) => <li key={p.text} className="flex items-start gap-2 text-sm"><p.icon size={16} className="mt-0.5 shrink-0 text-amber" aria-hidden />{p.text}</li>)}</ul>
-        </div>
-        <div className="flex flex-col items-center gap-3 rounded-3xl bg-white/[0.06] p-5 text-center ring-1 ring-white/10 lg:w-64">
-          <Buddy character={ws.prefs.character} mood="cheer" size={72} className="text-white" />
-          <p className="web-only"><span className="font-display text-4xl">$9</span><span className="text-white/60">/month</span></p>
-          <p className="-mt-2 text-xs text-white/60">Less than $0.30 a day</p>
-          <Link href="/app/upgrade" className="btn-play w-full justify-center"><Crown size={16} aria-hidden /> Unlock Pro</Link>
-          <Link href="/app/upgrade#promo" className="web-only text-xs text-white/60 hover:text-white">Have a promo code?</Link>
+    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-[20px] p-5">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber/15 text-amber"><Crown size={18} aria-hidden /></span>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold">{freeDone >= 3 ? `You've outgrown Free, ${ws.profile?.founder || "founder"}` : `Build ${startup} with the full team`}</p>
+          <p className="mt-0.5 text-sm text-muted">{freeDone >= 3 ? "Pricing, selling, launching and raising are where startups win or lose. Pro covers all of it." : "Free gets you started. Pro gets you to customers, revenue and investors."}</p>
         </div>
       </div>
-      <div className="relative mt-5 flex flex-wrap gap-2">{locked.map((a) => <span key={a.id} className="flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-xs"><Lock size={11} aria-hidden />{a.name}</span>)}<span className="flex items-center gap-1 rounded-full bg-good/20 px-2.5 py-1 text-xs text-good"><Check size={11} aria-hidden />Keep all your free progress</span></div>
+      <ul className="mt-4 space-y-2">{perks.map((p) => <li key={p.text} className="flex items-start gap-2.5 text-sm"><p.icon size={15} className="mt-0.5 shrink-0 text-amber" aria-hidden />{p.text}</li>)}</ul>
+      <div className="mt-4 flex items-center gap-3">
+        <Link href="/app/upgrade" className="btn-play flex-1 justify-center py-3 text-sm">See LevelUp Pro</Link>
+        <p className="web-only shrink-0 text-sm text-muted"><b className="text-fg">$9</b>/mo</p>
+      </div>
+      <p className="mt-2.5 flex items-center gap-1 text-xs text-muted"><Check size={12} className="text-good" aria-hidden /> You keep everything you&apos;ve built on Free</p>
     </motion.section>
   );
 }

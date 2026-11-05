@@ -11,10 +11,9 @@ type Step = { target?: string; fallback?: string; title: string; body: string };
 const STEPS: Step[] = [
   { title: "Welcome to your HQ!", body: "I'll show you around in about a minute. Use Next, or press the arrow keys. You can skip anytime and replay it from Settings." },
   { target: "hero", title: "Your Startup HQ", body: "This is home base: your startup, your level and your XP. Every agent you finish, goal you hit and day you show up earns XP." },
-  { target: "stats", title: "Your scoreboard", body: "Total XP, your daily streak (come back every day to keep it 🔥), badges unlocked and quests cleared." },
   { target: "recs", title: "My recommendations", body: "This is me being your co-founder: the next moves I'd make, based on where your startup is right now. They update as you go." },
   { target: "quests", title: "The quest map", body: "12 agents across 4 worlds, from Idea Island to Launch Galaxy. Each one asks a few questions and hands you a ready-to-use plan. The pitch deck is the final boss." },
-  { target: "today", title: "Today's quest", body: "Not sure what to do? Just hit Play. This always points to your next unfinished step." },
+  { target: "today", title: "Your next step", body: "Not sure what to do? Tap this. It always points to the one thing that moves your startup forward next." },
   { target: "goals", title: "Weekly goals", body: "Set what you'll ship by Sunday and tick it off. Each goal done is +25 XP. Founders who set weekly goals move faster." },
   { target: "playbook", title: "Playbook of the day", body: "A framework from founders like Alex Hormozi, Bill Gates and Paul Graham, with one thing to do today. The source is on every card." },
   { target: "badges", title: "Trophy case", body: "16 badges to unlock. Locked ones tell you exactly how to earn them." },
@@ -33,9 +32,9 @@ const STEPS: Step[] = [
 const MOBILE_STEPS: Step[] = [
   { title: "Welcome to your HQ!", body: "A 30-second tour. Tap Next, or skip anytime (replay it from Settings)." },
   { target: "hero", title: "Your Startup HQ", body: "Your startup, level and XP. Finishing agents, hitting goals and showing up daily all earn XP." },
-  { target: "today", title: "Today's quest", body: "Not sure what to do? Tap Play. It always points to your next step." },
+  { target: "today", title: "Your next step", body: "Not sure what to do? Tap this. It always points to the one thing that moves your startup forward next." },
   { target: "tab-agents", title: "Your 12 agents", body: "Idea, customers, competitors, pitch, money, launch and more. Each one asks a few questions and hands you a plan." },
-  { target: "tab-cofounder", title: "AI co-founder (Pro)", body: "Chat with me anytime. I remember your startup, your plans and our past chats." },
+  { target: "tab-growth", title: "Growth", body: "Once a week, log your real numbers: customer talks, users, revenue. I'll show your growth rate and what to do next." },
   { target: "tab-opps", title: "Opportunities", body: "300+ competitions, grants, hackathons and programs, ranked for your startup." },
   { target: "open-menu", title: "More", body: "Playbooks, leaderboards, friends, your team and settings. That's it. Let's build something!" },
 ];

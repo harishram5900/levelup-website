@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { AgentId } from "@/lib/agents";
 import type { Section } from "@/lib/cofounder/profile";
 import type { Research } from "@/lib/server/research";
+import { milestones } from "@/lib/cofounder/traction";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/lib/cofounder/profile";
 
@@ -28,7 +29,7 @@ const sec = (p: P, i: number): Section => p.s[i] ?? { title: p.titles[i] ?? "", 
 const strip = (t: string) => t.replace(/^[✓✗✔✘]\s*/, "");
 
 function Label({ children, icon: Icon }: { children: React.ReactNode; icon?: React.ElementType }) {
-  return <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--ag)" }}>{Icon && <Icon size={14} aria-hidden />}{children}</p>;
+  return <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-fg">{Icon && <Icon size={15} style={{ color: "var(--ag)" }} aria-hidden />}{children}</p>;
 }
 function Card({ className, children }: { className?: string; children: React.ReactNode }) {
   return <section className={cn("rounded-2xl bg-fg/[0.035] p-5 ring-1 ring-fg/[0.06]", className)}>{children}</section>;
@@ -67,17 +68,30 @@ const Empty = () => <p className="text-sm text-muted">Nothing here yet. Add more
 /* 1. Idea: scorecard */
 function IdeaLayout(p: P) {
   const [one, strong, risks, tests] = [0, 1, 2, 3].map((i) => sec(p, i));
-  const score = Math.round((strong.items.length / Math.max(1, strong.items.length + risks.items.length)) * 100);
+  // Real evidence from the founder's own logged numbers (Growth tab), not a made-up score.
+  const { ws } = useWorkspace();
+  const ms = milestones(ws.traction);
+  const done = (id: string) => ms.some((m) => m.id === id && m.done);
+  const evidence = [
+    { label: "Problem written down clearly", ok: strong.items.some((t) => /describe the problem clearly/i.test(t)) },
+    { label: "Talked to 10 potential customers", ok: done("talk10") },
+    { label: "Someone is using it", ok: done("user1") },
+    { label: "Someone has paid", ok: done("dollar1") },
+  ];
   return (
     <div className="space-y-4">
       <div className="relative overflow-hidden rounded-2xl p-6" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--ag) 22%, transparent), transparent)" }}>
         <Label>{one.title}</Label>
         <p className="text-2xl font-bold leading-snug sm:text-3xl">&ldquo;{one.items[0]}&rdquo;</p>
-        <div className="mt-5 flex items-center gap-3"><span className="text-sm text-muted">Idea strength</span><div className="h-2 flex-1 overflow-hidden rounded-full bg-fg/10"><div className="h-full rounded-full" style={{ width: `${score}%`, background: "var(--ag)" }} /></div><span className="text-sm font-bold">{score}%</span></div>
+        <div className="mt-5 border-t border-fg/10 pt-4">
+          <p className="mb-2 text-sm font-semibold">Evidence so far <span className="font-normal text-muted">· {evidence.filter((e) => e.ok).length} of {evidence.length}</span></p>
+          <ul className="grid gap-1.5 sm:grid-cols-2">{evidence.map((e) => <li key={e.label} className={cn("flex items-center gap-2 text-sm", !e.ok && "text-muted")}><span className={cn("grid h-4 w-4 shrink-0 place-items-center rounded-full border", e.ok ? "border-transparent bg-good text-white" : "border-fg/25")}>{e.ok && <Check size={10} strokeWidth={3} aria-hidden />}</span>{e.label}</li>)}</ul>
+          <p className="mt-2 text-xs text-muted">Log customer talks, users and revenue in <a href="/app/growth" className="underline">Growth</a>. Evidence beats opinions.</p>
+        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="border-l-4 border-good"><Label icon={ThumbsUp}>{strong.title}</Label>{strong.items.length ? <ul className="space-y-2">{strong.items.map((t, i) => <li key={i} className="flex gap-2 text-[15px]"><Check size={16} className="mt-1 shrink-0 text-good" aria-hidden /><Rich text={t} /></li>)}</ul> : <Empty />}</Card>
-        <Card className="border-l-4 border-red-500"><Label icon={AlertTriangle}>{risks.title}</Label>{risks.items.length ? <ul className="space-y-2">{risks.items.map((t, i) => <li key={i} className="flex gap-2 text-[15px]"><AlertTriangle size={15} className="mt-1 shrink-0 text-red-500" aria-hidden /><Rich text={t} /></li>)}</ul> : <Empty />}</Card>
+        <Card><Label icon={ThumbsUp}>{strong.title}</Label>{strong.items.length ? <ul className="space-y-2">{strong.items.map((t, i) => <li key={i} className="flex gap-2 text-[15px]"><Check size={16} className="mt-1 shrink-0 text-good" aria-hidden /><Rich text={t} /></li>)}</ul> : <Empty />}</Card>
+        <Card><Label icon={AlertTriangle}>{risks.title}</Label>{risks.items.length ? <ul className="space-y-2">{risks.items.map((t, i) => <li key={i} className="flex gap-2 text-[15px]"><AlertTriangle size={15} className="mt-1 shrink-0 text-red-500" aria-hidden /><Rich text={t} /></li>)}</ul> : <Empty />}</Card>
       </div>
       <Card><Label icon={Target}>{tests.title}</Label>
         <ol className="relative ml-3 space-y-5 border-l-2 border-dashed border-fg/15 pl-6">

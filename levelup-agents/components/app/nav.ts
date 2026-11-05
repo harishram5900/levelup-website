@@ -1,4 +1,4 @@
-import { BookOpen, Bot, Crown, Gift, Layers, LayoutDashboard, Medal, Settings, Trophy, UsersRound, type LucideIcon } from "lucide-react";
+import { BookOpen, Bot, Crown, Gift, Layers, LayoutDashboard, LineChart, Medal, Settings, Trophy, UsersRound, type LucideIcon } from "lucide-react";
 import { isProAgent } from "@/lib/cofounder/plan";
 import { AGENTS } from "@/lib/agents";
 
@@ -10,6 +10,7 @@ const agentItem = (a: (typeof AGENTS)[number], group: string) => ({ href: `/app/
 /** Free agents first, then every Pro feature grouped in one highlighted section. */
 export const NAV: NavItem[] = [
   { href: "/app", label: "Startup HQ", icon: LayoutDashboard, tour: "nav-hq" },
+  { href: "/app/growth", label: "Growth", icon: LineChart, tour: "nav-growth" },
   ...AGENTS.filter((a) => !isProAgent(a.id)).map((a) => agentItem(a, "Your agents")),
   { href: "/app/cofounder", label: "AI co-founder", icon: Bot, group: PRO_GROUP, tour: "nav-chat", pro: true },
   ...AGENTS.filter((a) => isProAgent(a.id)).map((a) => agentItem(a, PRO_GROUP)),
