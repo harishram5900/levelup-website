@@ -21,6 +21,7 @@ import { FREE_ITEMS, isProAgent, usePlan } from "@/lib/cofounder/plan";
 import { deepDive, deepDiveTitles } from "@/lib/cofounder/proExtras";
 import { Lock } from "lucide-react";
 import { haptic } from "@/lib/native";
+import { xpToast } from "./XpToast";
 
 /** One agent's workspace: answer a few questions, get a document you can copy and use. */
 // Takes an id (not the agent object) so a server page can render it: icons are functions.
@@ -61,6 +62,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
     update((w) => ({ ...w, results: { ...w.results, [agent.id]: r }, answers: { ...w.answers, [agent.id]: answers } }));
     setLoading(false);
     haptic("success");
+    if (!result) xpToast(XP.agent);
     // On phones the result is below the form: bring it into view.
     if (window.innerWidth < 1280) requestAnimationFrame(() => document.getElementById("agent-results")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };

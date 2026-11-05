@@ -14,8 +14,8 @@ import { ProBadge } from "@/components/cofounder/ProGate";
 import { usePlan } from "@/lib/cofounder/plan";
 
 const TYPE_TONE: Record<OppType, string> = {
-  Competition: "bg-amber/15 text-amber", Hackathon: "bg-cyan/15 text-cyan", Program: "bg-violet/15 text-violet", Fellowship: "bg-pink-500/15 text-pink-600 dark:text-pink-300",
-  Grant: "bg-good/15 text-good", Scholarship: "bg-orange-500/15 text-orange-600 dark:text-orange-300", Credits: "bg-sky-500/15 text-sky-700 dark:text-sky-300", Accelerator: "bg-fuchsia-500/15 text-fuchsia-600 dark:text-fuchsia-300", Investor: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  Competition: "bg-amber/15 text-amber", Hackathon: "bg-blue-500/10 text-blue-700 dark:text-sky-300", Program: "bg-violet/15 text-violet", Fellowship: "bg-pink-500/15 text-pink-700 dark:text-pink-300",
+  Grant: "bg-good/15 text-good", Scholarship: "bg-orange-500/10 text-orange-800 dark:text-orange-300", Credits: "bg-sky-500/15 text-sky-700 dark:text-sky-300", Accelerator: "bg-fuchsia-500/15 text-fuchsia-700 dark:text-fuchsia-300", Investor: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
 };
 
 export default function OpportunitiesPage() {

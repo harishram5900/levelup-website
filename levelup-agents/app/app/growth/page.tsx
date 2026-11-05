@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useWorkspace, type CheckIn } from "@/lib/cofounder/profile";
 import { METRIC_LABEL, XP_CHECKIN, checkinStreak, insights, latest, milestones, primaryMetric, sorted, totalConversations, weekOf, weeklyGrowth, type Metric } from "@/lib/cofounder/traction";
 import { haptic } from "@/lib/native";
+import { xpToast } from "@/components/cofounder/XpToast";
 import { cn } from "@/lib/utils";
 
 const fmt = (m: Metric, v: number) => (m === "revenue" ? `$${v.toLocaleString("en-US")}` : v.toLocaleString("en-US"));
@@ -42,6 +43,7 @@ export default function GrowthPage() {
     const entry: CheckIn = { week, conversations: num(form.conversations), users: num(form.users), revenue: num(form.revenue), note: form.note.trim().slice(0, 200) || undefined };
     update((w) => ({ ...w, traction: [...(w.traction ?? []).filter((c) => c.week !== week), entry].slice(-104) }));
     setSaved(true); haptic("success");
+    if (!current) xpToast(XP_CHECKIN);
     setTimeout(() => setSaved(false), 2500);
   };
   const remove = (wk: string) => update((w) => ({ ...w, traction: (w.traction ?? []).filter((c) => c.week !== wk) }));

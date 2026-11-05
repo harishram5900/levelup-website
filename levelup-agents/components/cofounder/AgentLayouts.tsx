@@ -80,9 +80,9 @@ function IdeaLayout(p: P) {
   ];
   return (
     <div className="space-y-4">
-      <div className="relative overflow-hidden rounded-2xl p-6" style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--ag) 22%, transparent), transparent)" }}>
+      <div className="relative overflow-hidden rounded-2xl border border-fg/15 bg-bg-2 p-6">
         <Label>{one.title}</Label>
-        <p className="text-2xl font-bold leading-snug sm:text-3xl">&ldquo;{one.items[0]}&rdquo;</p>
+        <p className="serif text-[30px] leading-[1.08] sm:text-[36px]">&ldquo;{one.items[0]}&rdquo;</p>
         <div className="mt-5 border-t border-fg/10 pt-4">
           <p className="mb-2 text-sm font-semibold">Evidence so far <span className="font-normal text-muted">· {evidence.filter((e) => e.ok).length} of {evidence.length}</span></p>
           <ul className="grid gap-1.5 sm:grid-cols-2">{evidence.map((e) => <li key={e.label} className={cn("flex items-center gap-2 text-sm", !e.ok && "text-muted")}><span className={cn("grid h-4 w-4 shrink-0 place-items-center rounded-full border", e.ok ? "border-transparent bg-good text-white" : "border-fg/25")}>{e.ok && <Check size={10} strokeWidth={3} aria-hidden />}</span>{e.label}</li>)}</ul>
@@ -121,7 +121,7 @@ function CustomerLayout(p: P) {
         </div>
         <Card><Label icon={MapPin}>{where.title}</Label><ul className="space-y-2">{where.items.map((t, i) => <li key={i} className="flex gap-2 text-sm"><MapPin size={14} className="mt-0.5 shrink-0" style={{ color: "var(--ag)" }} aria-hidden /><Rich text={t} /></li>)}</ul></Card>
         <section className="rounded-2xl bg-[#FFF7D6] p-5 text-[#3b2f00] shadow-sm" style={{ backgroundImage: "repeating-linear-gradient(transparent, transparent 27px, rgba(0,0,0,.07) 28px)" }}>
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest">{notes.title}</p>
+          <p className="mb-2 text-[12.5px] font-medium">{notes.title}</p>
           <ul className="space-y-[6px] text-sm leading-[22px]">{notes.items.map((t, i) => <li key={i}>☐ <Rich text={t} /></li>)}</ul>
         </section>
       </div>
@@ -137,9 +137,9 @@ function CompetitorLayout(p: P) {
   const cards = found.length > 0;
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl p-6 text-white" style={{ background: "linear-gradient(120deg, var(--ag), #7f1d1d)" }}>
-        <p className="text-xs font-bold uppercase tracking-widest text-white/70">{line.title}</p>
-        <p className="mt-2 text-xl font-bold leading-snug sm:text-2xl">{line.items[0]}</p>
+      <div className="rounded-2xl bg-fg p-6 text-bg">
+        <p className="text-[12.5px] font-medium opacity-70">{line.title}</p>
+        <p className="serif mt-2 text-[27px] leading-[1.1] sm:text-[32px]">{line.items[0]}</p>
       </div>
       {cards && (
         <div>
@@ -205,10 +205,10 @@ function OfferLayout(p: P) {
         <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">{lever(2)}<span className="text-center text-2xl font-black text-muted">×</span>{lever(3)}</div>
         <p className="mt-3 text-center text-xs text-muted">Value = (Dream outcome × Likelihood) ÷ (Time delay × Effort) · Alex Hormozi, $100M Offers</p>
       </Card>
-      <div className="relative overflow-hidden rounded-3xl p-6 text-white shadow-xl" style={{ background: "linear-gradient(135deg, var(--ag), #3b0764)" }}>
+      <div className="relative overflow-hidden rounded-2xl bg-fg p-6 text-bg">
         <span className="absolute right-4 top-4 rounded-full bg-white/20 px-3 py-1 text-xs font-bold">THE OFFER</span>
         <p className="max-w-xl pr-16 text-xl font-bold leading-snug sm:text-2xl">{offer.items[0]}</p>
-        {offer.items.slice(1).map((t, i) => <p key={i} className="mt-2 text-sm text-white/80"><Rich text={t} /></p>)}
+        {offer.items.slice(1).map((t, i) => <p key={i} className="mt-2 text-sm opacity-80"><Rich text={t} /></p>)}
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <div><Label icon={Gift}>{bonus.title}</Label><div className="space-y-2">{bonus.items.map((t, i) => <div key={i} className="flex gap-3 rounded-xl border-2 border-dashed p-3 text-sm" style={{ borderColor: "color-mix(in srgb, var(--ag) 50%, transparent)" }}><Gift size={16} className="mt-0.5 shrink-0" style={{ color: "var(--ag)" }} aria-hidden /><Rich text={t} /></div>)}</div></div>
@@ -275,12 +275,12 @@ function PitchLayout(p: P) {
   const [open, setOpen] = useState<number | null>(null);
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl px-6 py-8 text-center" style={{ background: "radial-gradient(80% 120% at 50% 0%, color-mix(in srgb, var(--ag) 30%, transparent), transparent)" }}>
+      <div className="rounded-2xl border border-fg/15 bg-bg-2 px-6 py-8 text-center">
         <Label>{one.title}</Label>
-        <p className="mx-auto max-w-2xl text-2xl font-extrabold leading-tight sm:text-3xl">{one.items[0]}</p>
+        <p className="serif mx-auto max-w-2xl text-[30px] leading-[1.08] sm:text-[36px]">{one.items[0]}</p>
       </div>
-      <div className="rounded-2xl bg-[#0B0D14] p-6 text-white ring-1 ring-white/10">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2"><p className="text-xs font-bold uppercase tracking-widest text-white/60">{pitch.title} · teleprompter</p><span className="rounded-full bg-white/10 px-3 py-1 text-xs">{words} words · ~{Math.round(words / 2.5)}s</span></div>
+      <div className="rounded-2xl bg-fg p-6 text-bg">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2"><p className="text-[12.5px] font-medium opacity-60">{pitch.title} · teleprompter</p><span className="rounded-full bg-white/10 px-3 py-1 text-xs">{words} words · ~{Math.round(words / 2.5)}s</span></div>
         <p className="text-lg leading-relaxed sm:text-xl">{pitch.items[0]}</p>
         <div className="mt-3"><CopyBtn text={pitch.items[0] ?? ""} label="Copy pitch" /></div>
       </div>
@@ -308,10 +308,10 @@ function MoneyLayout(p: P) {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-        <div className="rounded-2xl p-6 text-white" style={{ background: "linear-gradient(135deg, var(--ag), #14532d)" }}>
-          <p className="text-xs font-bold uppercase tracking-widest text-white/70">{be.title}</p>
-          {n ? <><p className="mt-2 text-6xl font-black leading-none">{n}</p><p className="mt-1 text-white/80">paying customers to break even</p></> : <p className="mt-3 text-white/85">Add a price and monthly costs to see your number.</p>}
-          {be.items.slice(n ? 0 : 0).map((t, i) => <p key={i} className="mt-3 text-sm text-white/75"><Rich text={t} /></p>)}
+        <div className="rounded-2xl bg-fg p-6 text-bg">
+          <p className="text-[12.5px] font-medium opacity-70">{be.title}</p>
+          {n ? <><p className="mt-2 text-6xl font-black leading-none">{n}</p><p className="mt-1 opacity-80">paying customers to break even</p></> : <p className="mt-3 opacity-85">Add a price and monthly costs to see your number.</p>}
+          {be.items.slice(n ? 0 : 0).map((t, i) => <p key={i} className="mt-3 text-sm opacity-75"><Rich text={t} /></p>)}
         </div>
         <Card><Label>{price.title}</Label><div className="space-y-2">{price.items.map((t, i) => <div key={i} className="flex gap-3 rounded-xl bg-bg-2 p-3 text-sm ring-1 ring-fg/[0.06]"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-sm font-black text-white" style={{ background: "var(--ag)" }}>$</span><Rich text={t} /></div>)}</div></Card>
       </div>
@@ -359,7 +359,7 @@ function LaunchLayout(p: P) {
   return (
     <div className="space-y-4">
       <div><Label icon={CalendarDays}>{weeks.title}</Label>
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">{weeks.items.map((t, i) => { const [w, r] = split(t); return <div key={i} className="rounded-2xl p-4 ring-1 ring-fg/[0.08]" style={{ background: `color-mix(in srgb, var(--ag) ${8 + i * 6}%, transparent)` }}><div className="flex items-center justify-between gap-1"><p className="text-xs font-black uppercase tracking-wider" style={{ color: "var(--ag)" }}>{w || `Week ${i + 1}`}</p><AddGoal text={t} /></div><p className="mt-1 text-sm"><Rich text={r} /></p></div>; })}</div>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">{weeks.items.map((t, i) => { const [w, r] = split(t); return <div key={i} className="rounded-2xl p-4 ring-1 ring-fg/[0.08]" style={{ background: `color-mix(in srgb, var(--ag) ${8 + i * 6}%, transparent)` }}><div className="flex items-center justify-between gap-1"><p className="text-[12.5px] font-semibold" style={{ color: "var(--ag)" }}>{w || `Week ${i + 1}`}</p><AddGoal text={t} /></div><p className="mt-1 text-sm"><Rich text={r} /></p></div>; })}</div>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card><Label icon={Users}>{where.title}</Label><ul className="space-y-2.5">{where.items.map((t, i) => { const [n, r] = split(t); return <li key={i} className="rounded-xl bg-bg-2 px-3 py-2.5 text-sm ring-1 ring-fg/[0.06]">{n && <p className="font-semibold">{n}</p>}<p className={n ? "mt-0.5 text-muted" : ""}><Rich text={r} /></p></li>; })}</ul></Card>
@@ -368,13 +368,13 @@ function LaunchLayout(p: P) {
       <div><Label icon={MessageSquare}>{drafts.title}</Label>
         <div className="grid gap-3 md:grid-cols-2">{drafts.items.map((t, i) => { const [n, r] = split(t); return (
           <div key={i} className="flex flex-col rounded-2xl bg-bg-2 p-4 ring-1 ring-fg/10">
-            <div className="mb-2 flex items-center justify-between gap-2"><p className="text-xs font-black uppercase tracking-wider" style={{ color: "var(--ag)" }}>{n || `Post ${i + 1}`}</p><CopyBtn text={r.replace(/^"|"$/g, "")} label="Copy post" /></div>
+            <div className="mb-2 flex items-center justify-between gap-2"><p className="text-[12.5px] font-semibold" style={{ color: "var(--ag)" }}>{n || `Post ${i + 1}`}</p><CopyBtn text={r.replace(/^"|"$/g, "")} label="Copy post" /></div>
             <p className="whitespace-pre-line text-sm leading-relaxed"><Rich text={r} /></p>
           </div>); })}</div>
       </div>
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-        <div className="rounded-2xl bg-[#0B0D14] p-5 text-white">
-          <div className="flex items-center justify-between"><p className="text-xs font-bold uppercase tracking-widest text-white/60">{check.title}</p><span className="text-sm font-bold" style={{ color: "var(--ag)" }}>{pct}% ready</span></div>
+        <div className="rounded-2xl bg-fg p-5 text-bg">
+          <div className="flex items-center justify-between"><p className="text-[12.5px] font-medium opacity-60">{check.title}</p><span className="text-sm font-bold" style={{ color: "var(--ag)" }}>{pct}% ready</span></div>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: "var(--ag)" }} /></div>
           <ul className="mt-4 space-y-2">{check.items.map((t, i) => { const on = done.includes(i); return (
             <li key={i}><button type="button" role="checkbox" aria-checked={on} onClick={() => setDone(on ? done.filter((x) => x !== i) : [...done, i])} className="flex w-full gap-2.5 text-left text-sm"><span className={cn("mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border", on ? "border-transparent text-white" : "border-white/30")} style={on ? { background: "var(--ag)" } : undefined}>{on && <Check size={12} aria-hidden />}</span><span className={on ? "text-white/50 line-through" : ""}>{t}</span></button></li>
@@ -392,7 +392,7 @@ function ContentLayout(p: P) {
   const tones = ["#8B5CF6", "#EC4899", "#0EA5E9", "#F59E0B"];
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{pillars.items.map((t, i) => { const [k, ...r] = t.split(":"); return <div key={i} className="rounded-2xl p-4 text-white" style={{ background: tones[i % 4] }}><p className="text-xs font-bold uppercase tracking-wider text-white/75">Pillar {i + 1}</p><p className="mt-1 font-bold">{r.length ? k : t}</p>{r.length > 0 && <p className="mt-1 text-sm text-white/85">{r.join(":").trim()}</p>}</div>; })}</div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{pillars.items.map((t, i) => { const [k, ...r] = t.split(":"); return <div key={i} className="rounded-2xl p-4 text-white" style={{ background: tones[i % 4] }}><p className="text-xs font-bold uppercase tracking-wider opacity-75">Pillar {i + 1}</p><p className="mt-1 font-bold">{r.length ? k : t}</p>{r.length > 0 && <p className="mt-1 text-sm opacity-85">{r.join(":").trim()}</p>}</div>; })}</div>
       <div><Label>{posts.title}</Label>
         <div className="flex gap-3 overflow-x-auto pb-2">{posts.items.map((t, i) => (
           <div key={i} className="relative flex aspect-[9/16] w-36 shrink-0 flex-col justify-end overflow-hidden rounded-2xl p-3 text-white" style={{ background: `linear-gradient(180deg, ${tones[i % 4]}55, #0B0D14 75%)` }}>
@@ -425,7 +425,7 @@ function InvestorLayout(p: P) {
         {subject && <p className="border-b border-fg/[0.06] px-4 py-2 text-sm"><span className="text-muted">Subject </span>{subject.replace(/^subject:\s*/i, "")}</p>}
         <div className="space-y-3 px-4 py-4 text-sm leading-relaxed">{body.map((t, i) => <p key={i} className={i === body.length - 1 && body.length > 1 ? "text-xs text-muted" : ""}>{t.replace(/^"|"$/g, "")}</p>)}</div>
       </div>
-      <section className="rounded-2xl border-2 border-amber/40 bg-amber/[0.07] p-5"><p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber"><Scale size={14} aria-hidden />{legal.title}</p><ul className="space-y-2">{legal.items.map((t, i) => <li key={i} className="flex gap-2 text-sm"><AlertTriangle size={14} className="mt-0.5 shrink-0 text-amber" aria-hidden /><Rich text={t} /></li>)}</ul></section>
+      <section className="rounded-2xl border-2 border-amber/40 bg-amber/[0.07] p-5"><p className="mb-3 flex items-center gap-2 text-[12.5px] font-medium text-amber"><Scale size={14} aria-hidden />{legal.title}</p><ul className="space-y-2">{legal.items.map((t, i) => <li key={i} className="flex gap-2 text-sm"><AlertTriangle size={14} className="mt-0.5 shrink-0 text-amber" aria-hidden /><Rich text={t} /></li>)}</ul></section>
     </div>
   );
 }

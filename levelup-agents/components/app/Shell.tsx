@@ -13,6 +13,7 @@ import { Celebrator } from "@/components/cofounder/Celebrate";
 import { gameStats } from "@/lib/cofounder/game";
 import { today, useWorkspace } from "@/lib/cofounder/profile";
 import { Tour } from "@/components/cofounder/Tour";
+import { XpToast } from "@/components/cofounder/XpToast";
 import { Buddy } from "@/components/cofounder/Pip";
 import { authEnabled, useAuth } from "@/lib/supabase";
 import { ProBadge } from "@/components/cofounder/ProGate";
@@ -118,14 +119,14 @@ function TabBar({ path, onMore }: { path: string; onMore: () => void }) {
           return (
             <li key={t.href}>
               <Link href={t.href} data-tour={t.tour} aria-current={on ? "page" : undefined} className={cn("flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold transition active:scale-95", on ? "text-fg" : "text-muted")}>
-                <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", on && "bg-amber/20 text-amber")}><Icon size={19} aria-hidden /></span>{t.label}
+                <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", on && "bg-fg text-bg")}><Icon size={19} aria-hidden /></span>{t.label}
               </Link>
             </li>
           );
         })}
         <li>
           <button type="button" onClick={onMore} data-tour="open-menu" aria-label="More: open the full menu" className={cn("flex min-h-[56px] w-full flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold transition active:scale-95", moreActive ? "text-fg" : "text-muted")}>
-            <span className={cn("grid h-7 w-12 place-items-center rounded-full", moreActive && "bg-amber/20 text-amber")}><Menu size={19} aria-hidden /></span>More
+            <span className={cn("grid h-7 w-12 place-items-center rounded-full", moreActive && "bg-fg text-bg")}><Menu size={19} aria-hidden /></span>More
           </button>
         </li>
       </ul>
@@ -179,7 +180,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-fg/[0.07] bg-bg/70 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur-xl sm:px-6">
           <div className="flex items-center gap-3">
-            <h1 className="font-sans text-base font-semibold tracking-normal">{title}</h1>
+            <h1 className="ui-title">{title}</h1>
           </div>
           <div className="flex items-center gap-2">
             <Stats />
@@ -191,6 +192,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {/* No tab bar until the founder has set up their startup (first launch is a focused flow). */}
         {ws.profile && <TabBar path={path} onMore={() => setDrawer(true)} />}
         <Celebrator />
+        <XpToast />
         <Tour />
       </div>
     </div>

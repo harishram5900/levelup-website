@@ -8,6 +8,8 @@ import { FounderCall } from "@/components/cofounder/FounderCall";
 import { ProBanner } from "@/components/cofounder/ProBanner";
 import { Buddy, BuddySays, CHARACTERS, characterById, type Mood } from "@/components/cofounder/Pip";
 import { authEnabled, useAuth } from "@/lib/supabase";
+import { haptic } from "@/lib/native";
+import { xpToast } from "@/components/cofounder/XpToast";
 import { CharacterPicker, PalettePicker } from "@/components/cofounder/Pickers";
 import { CountUp } from "@/components/ui/CountUp";
 import { AGENTS, WORLDS } from "@/lib/agents";
@@ -191,86 +193,92 @@ export default function HQ() {
   let qi = 0;
   return (
     <motion.div variants={stagger(0.06)} initial="hidden" animate="show" className="mx-auto max-w-[1100px] space-y-5">
-      {/* HEADER: who you are, where you are */}
-      <motion.header variants={fadeUp} data-tour="hero" className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-sm text-muted">{hello}{p.founder ? `, ${p.founder}` : ""}</p>
-          <h2 className="mt-0.5 truncate text-3xl sm:text-4xl">{p.startup}</h2>
-          <button type="button" onClick={() => setEditing(true)} className="mt-1 inline-flex max-w-full items-center gap-1.5 text-left text-sm text-muted hover:text-fg"><span className="line-clamp-1">{p.idea.replace(/\.$/, "")}</span><Pencil size={12} className="shrink-0" aria-hidden /></button>
+      {/* HEADER: a notebook page for your startup */}
+      <motion.header variants={fadeUp} data-tour="hero">
+        <div className="flex items-center justify-between text-[13px] text-muted">
+          <span>{new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span>
+          <span><b className="font-semibold text-fg">Level {g.level}</b> · {g.streak > 0 ? `${g.streak}-day streak` : "start a streak today"}</span>
         </div>
-        <Buddy character={ch} mood={tip.mood} size={64} className="shrink-0" />
+        <div className="mt-5 flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm text-muted">{hello}{p.founder ? `, ${p.founder}` : ""}</p>
+            <h2 className="serif mt-1 truncate text-[56px] leading-[0.95]">{p.startup}</h2>
+          </div>
+          <Buddy character={ch} mood={tip.mood} size={60} className="mb-1 shrink-0" />
+        </div>
+        <button type="button" onClick={() => setEditing(true)} className="mt-2 inline-flex max-w-full items-start gap-1.5 text-left text-[15px] leading-snug text-muted hover:text-fg"><span className="line-clamp-2">{p.startup} {p.idea.replace(/\.$/, "")}.</span><Pencil size={12} className="mt-1 shrink-0" aria-hidden /></button>
+        <div data-tour="level" className="mt-4 flex items-center gap-3 text-[13px] text-muted">
+          <span className="font-medium text-fg">{g.title}</span>
+          <div className="h-[2px] flex-1 bg-fg/15"><div className="h-full bg-fg transition-all duration-700" style={{ width: `${g.pctToNext}%` }} /></div>
+          <span className="tabular-nums">{g.next ? `${g.toNext} XP to ${g.next.title}` : "Max level"}</span>
+        </div>
       </motion.header>
 
-      <motion.div variants={fadeUp} data-tour="level" className="glass flex items-center gap-4 rounded-[20px] px-4 py-3.5">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber/15 text-lg font-bold tabular-nums text-amber">{g.level}</span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-baseline justify-between gap-2"><p className="font-semibold">{g.title}</p><p className="text-xs tabular-nums text-muted">{g.next ? `${g.toNext} XP to ${g.next.title}` : "Max level"}</p></div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-fg/10"><div className="h-full rounded-full bg-amber transition-all" style={{ width: `${g.pctToNext}%` }} /></div>
-        </div>
-        <span className="flex shrink-0 items-center gap-1 rounded-full bg-fg/[0.05] px-2.5 py-1 text-sm font-semibold tabular-nums" title="Day streak"><Flame size={14} className={g.streak ? "text-amber" : "text-muted"} aria-hidden />{g.streak}</span>
-      </motion.div>
-
-      {/* NEXT STEP: one clear thing to do now */}
+      {/* NEXT STEP: one clear, ink-black card with your co-founder */}
       <motion.div variants={fadeUp} data-tour="today">
-        {showCheckin ? (
-          <Link href="/app/growth" className="group block rounded-[20px] bg-cta p-5 transition active:scale-[0.99]">
-            <p className="text-xs font-semibold opacity-70">Next step · 30 seconds · +{XP_CHECKIN} XP</p>
-            <p className="mt-1.5 text-xl font-bold">Log this week&apos;s numbers</p>
-            <p className="mt-1 text-sm opacity-80">Customer talks, users and revenue. {buddy.name} turns them into your growth rate and next moves.</p>
-            <span className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#1a1100] px-4 py-2 text-sm font-semibold text-white">Check in <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
-          </Link>
-        ) : current ? (
-          <Link href={current.href} className="group block rounded-[20px] bg-cta p-5 transition active:scale-[0.99]">
-            <p className="text-xs font-semibold opacity-70">Next step · about {current.boss ? 10 : 3} min · +{current.xp} XP</p>
-            <p className="mt-1.5 text-xl font-bold">{current.name}</p>
-            <p className="mt-1 text-sm opacity-80">{current.boss ? "Turn everything you've done into a 10-slide deck in your own design." : AGENTS.find((a) => a.id === current.id)?.line}</p>
-            <span className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#1a1100] px-4 py-2 text-sm font-semibold text-white">Start <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
-          </Link>
-        ) : (
-          <div className="glass rounded-[20px] p-5"><p className="text-lg font-bold">{pro ? "Every quest complete." : "Free quests complete."}</p><p className="mt-1 text-sm text-muted">{pro ? "Keep logging your numbers weekly and go win an opportunity." : "Pricing, sales, launch and fundraising are next."}</p>{!pro && <Link href="/app/upgrade" className="btn-play mt-4 text-sm"><Crown size={16} aria-hidden /> See LevelUp Pro</Link>}</div>
-        )}
+        {(() => {
+          const card = showCheckin
+            ? { href: "/app/growth", meta: `Next step · 30 seconds · +${XP_CHECKIN} XP`, title: "Log this week's numbers", body: `Customer talks, users and revenue. ${buddy.name} turns them into your growth rate.`, cta: "Check in" }
+            : current
+              ? { href: current.href, meta: `Next step · about ${current.boss ? 10 : 3} min · +${current.xp} XP`, title: current.name, body: current.boss ? "Turn everything you've done into a 10-slide deck in your own design." : AGENTS.find((a) => a.id === current.id)?.line ?? "", cta: "Start" }
+              : null;
+          if (!card) return (
+            <div className="rounded-[18px] border border-fg/15 p-5"><p className="serif text-3xl">{pro ? "Every quest complete" : "Free quests complete"}</p><p className="mt-1 text-sm text-muted">{pro ? "Keep logging your numbers weekly and go win an opportunity." : "Pricing, sales, launch and fundraising are next."}</p>{!pro && <Link href="/app/upgrade" className="btn-play mt-4 text-sm">See LevelUp Pro</Link>}</div>
+          );
+          return (
+            <Link href={card.href} className="group relative block overflow-hidden rounded-[20px] bg-cta p-5 pr-28 transition active:scale-[0.99]">
+              <p className="text-[11.5px] font-medium uppercase tracking-[0.06em] opacity-60">{card.meta}</p>
+              <p className="serif mt-2 text-[32px] leading-[1.02]">{card.title}</p>
+              <p className="mt-2 line-clamp-2 text-sm leading-relaxed opacity-75">{card.body}</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-bg px-4 py-2 text-sm font-semibold text-fg">{card.cta} <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
+              <Buddy character={ch} mood="happy" size={104} className="absolute -bottom-3 -right-2 transition-transform group-hover:-translate-y-1" />
+            </Link>
+          );
+        })()}
       </motion.div>
 
       {/* ASK YOUR CO-FOUNDER */}
       <motion.div variants={fadeUp}>
-        <Link href="/app/cofounder" className="glass flex items-center gap-3 rounded-[20px] px-4 py-3 transition hover:border-violet/40">
-          <Buddy character={ch} mood="happy" size={32} />
+        <Link href="/app/cofounder" className="flex items-center gap-3 rounded-full border border-fg/15 px-4 py-3 transition hover:border-fg/35">
+          <Buddy character={ch} mood="happy" size={28} />
           <span className="flex-1 text-[15px] text-muted">Ask {buddy.name} anything about {p.startup}…</span>
-          {!pro && <ProBadge />}
+          {!pro && <span className="rounded-full bg-fg/[0.07] px-2 py-0.5 text-[11px] font-semibold">Pro</span>}
           <ArrowRight size={16} className="text-muted" aria-hidden />
         </Link>
       </motion.div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        {/* THIS WEEK: numbers */}
-        <motion.section variants={fadeUp} className="glass rounded-[20px] p-5">
-          <div className="flex items-center justify-between"><h3 className="text-lg">Your numbers</h3><Link href="/app/growth" className="flex items-center gap-1 text-sm font-semibold text-violet">{checkedIn ? "View" : "Check in"} <ArrowRight size={14} aria-hidden /></Link></div>
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-            {[["Users", lastT ? lastT.users.toLocaleString("en-US") : "—"], ["Revenue/wk", lastT ? `$${lastT.revenue.toLocaleString("en-US")}` : "—"], ["Growth/wk", growth === null ? "—" : `${growth > 0 ? "+" : ""}${Math.round(growth * 100)}%`]].map(([k, v]) => (
-              <div key={k} className="rounded-xl bg-fg/[0.03] px-2 py-3"><p className="text-xl font-bold tabular-nums">{v}</p><p className="mt-0.5 text-[11px] text-muted">{k}</p></div>
+      <div className="grid gap-x-8 lg:grid-cols-2">
+        {/* YOUR NUMBERS: big serif figures, ruled like a notebook */}
+        <motion.section variants={fadeUp} className="border-t border-fg/15 pt-4">
+          <div className="flex items-center justify-between text-[13px]"><b className="font-semibold">Your numbers</b><Link href="/app/growth" className="flex items-center gap-1 text-muted hover:text-fg">{checkedIn && lastT ? `Week of ${new Date(`${lastT.week}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : "Check in"} <ArrowRight size={13} aria-hidden /></Link></div>
+          <Link href="/app/growth" className="mt-3 grid grid-cols-3">
+            {([["users", lastT ? lastT.users.toLocaleString("en-US") : "0", false], ["this week", lastT ? `$${lastT.revenue.toLocaleString("en-US")}` : "$0", false], ["growth / week", growth === null ? "—" : `${growth > 0 ? "+" : ""}${Math.round(growth * 100)}%`, growth !== null && growth > 0]] as [string, string, boolean][]).map(([k, v, up]) => (
+              <div key={k}><p className={cn("serif text-[44px] leading-none tabular-nums", up && "text-good")}>{v}</p><p className="mt-1 text-xs text-muted">{k}</p></div>
             ))}
-          </div>
-          <p className="mt-3 text-xs text-muted">{lastT ? `Last check-in: week of ${new Date(`${lastT.week}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : "Log your first week to see your growth rate."}</p>
+          </Link>
+          {!lastT && <p className="mt-3 text-sm text-muted">Log your first week to see your growth rate.</p>}
         </motion.section>
 
-        {/* THIS WEEK: goals */}
-        <motion.section variants={fadeUp} id="goals" data-tour="goals" className="glass rounded-[20px] p-5">
-          <div className="flex items-center justify-between"><h3 className="text-lg">This week&apos;s goals</h3><span className="text-xs font-semibold text-muted">+{XP.goal} XP each</span></div>
-          <ul className="mt-3 space-y-1.5">
-            {ws.goals.length === 0 && <li className="py-1 text-sm text-muted">What will you ship by Sunday? Try &ldquo;Interview 5 customers.&rdquo;</li>}
+        {/* THIS WEEK: goals as a ruled checklist */}
+        <motion.section variants={fadeUp} id="goals" data-tour="goals" className="mt-6 border-t border-fg/15 pt-4 lg:mt-0">
+          <div className="flex items-center justify-between text-[13px]"><b className="font-semibold">This week</b><span className="text-muted">+{XP.goal} XP each</span></div>
+          <ul className="mt-1">
+            {ws.goals.length === 0 && <li className="border-b border-fg/10 py-3 text-[15px] text-muted">What will you ship by Sunday? Try &ldquo;Interview 5 customers.&rdquo;</li>}
             {ws.goals.map((gl) => (
-              <motion.li layout key={gl.id} className="group flex items-center gap-3 rounded-xl px-1 py-1.5">
-                <button type="button" role="checkbox" aria-checked={gl.done} aria-label={`Mark "${gl.text}" ${gl.done ? "not done" : "done"}`} onClick={() => update((w) => ({ ...w, goals: w.goals.map((x) => (x.id === gl.id ? { ...x, done: !x.done } : x)) }))}
-                  className={cn("grid h-5 w-5 shrink-0 place-items-center rounded-md border transition", gl.done ? "border-good bg-good text-white" : "border-fg/30 hover:border-violet")}>{gl.done && <Check size={12} strokeWidth={3} aria-hidden />}</button>
-                <span className={cn("flex-1 text-[15px]", gl.done && "text-muted line-through")}>{gl.text}</span>
-                <button type="button" aria-label={`Remove "${gl.text}"`} onClick={() => update((w) => ({ ...w, goals: w.goals.filter((x) => x.id !== gl.id) }))} className="text-muted opacity-60 hover:text-red-500 hover:opacity-100"><Trash2 size={14} aria-hidden /></button>
+              <motion.li layout key={gl.id} className="group flex items-center gap-3 border-b border-fg/10 py-3">
+                <button type="button" role="checkbox" aria-checked={gl.done} aria-label={`Mark "${gl.text}" ${gl.done ? "not done" : "done"}`}
+                  onClick={() => { if (!gl.done) { haptic("success"); xpToast(XP.goal); } update((w) => ({ ...w, goals: w.goals.map((x) => (x.id === gl.id ? { ...x, done: !x.done } : x)) })); }}
+                  className={cn("grid h-[18px] w-[18px] shrink-0 place-items-center rounded-[5px] border-[1.5px] transition", gl.done ? "pop border-fg bg-fg text-bg" : "border-fg/60 hover:border-fg")}>{gl.done && <Check size={11} strokeWidth={3} aria-hidden />}</button>
+                <span className={cn("flex-1 text-[15px] transition-colors", gl.done && "text-muted line-through")}>{gl.text}</span>
+                <button type="button" aria-label={`Remove "${gl.text}"`} onClick={() => update((w) => ({ ...w, goals: w.goals.filter((x) => x.id !== gl.id) }))} className="text-muted opacity-40 transition hover:text-red-600 hover:opacity-100 focus:opacity-100"><Trash2 size={14} aria-hidden /></button>
               </motion.li>
             ))}
           </ul>
-          <form onSubmit={addGoal} className="mt-3 flex gap-2">
+          <form onSubmit={addGoal} className="flex items-center gap-3 border-b border-fg/10 py-2.5">
+            <Plus size={16} className="shrink-0 text-muted" aria-hidden />
             <label htmlFor="goal" className="sr-only">New goal</label>
-            <input id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="Add a goal" maxLength={100} className="min-w-0 flex-1 rounded-xl hairline bg-bg px-3 py-2.5 text-sm outline-none focus:border-violet/60" />
-            <button type="submit" aria-label="Add goal" className="grid h-10 w-10 place-items-center rounded-xl bg-fg text-bg transition hover:opacity-90"><Plus size={16} aria-hidden /></button>
+            <input id="goal" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="Add a goal" maxLength={100} className="min-w-0 flex-1 !bg-transparent py-1 text-[15px] outline-none placeholder:text-muted" />
+            {goal.trim() && <button type="submit" className="text-sm font-semibold">Add</button>}
           </form>
         </motion.section>
       </div>
@@ -278,15 +286,15 @@ export default function HQ() {
       {!pro && <ProBanner />}
 
       {/* RECOMMENDED: a clean list, not a wall of cards */}
-      <motion.section variants={fadeUp} data-tour="recs" className="glass overflow-hidden rounded-[20px]">
-        <div className="px-5 pb-2 pt-5"><h3 className="text-lg">{buddy.name} recommends</h3><p className="text-sm text-muted">What I&apos;d do next if I were your co-founder</p></div>
-        <ul className="divide-y divide-fg/[0.06]">
+      <motion.section variants={fadeUp} data-tour="recs" className="border-t border-fg/15 pt-4">
+        <div className="pb-1"><h3 className="text-lg">{buddy.name} recommends</h3><p className="text-sm text-muted">What I&apos;d do next if I were your co-founder</p></div>
+        <ul className="divide-y divide-fg/10">
           {recs.map((r) => {
             const inner = <>
               <span className="min-w-0 flex-1"><span className="text-xs font-semibold text-muted">{r.tag}</span><span className="mt-0.5 block font-semibold leading-snug">{r.title}</span><span className="mt-0.5 block text-sm text-muted">{r.why}</span></span>
               {r.external ? <ExternalLink size={16} className="shrink-0 text-muted" aria-hidden /> : <ArrowRight size={16} className="shrink-0 text-muted" aria-hidden />}
             </>;
-            const cls = "flex items-center gap-4 px-5 py-3.5 transition hover:bg-fg/[0.03]";
+            const cls = "flex items-center gap-4 py-3.5 transition hover:opacity-70";
             return <li key={r.id}>{r.external ? <a href={r.href} target="_blank" rel="noopener noreferrer" className={cls}>{inner}</a> : <Link href={r.href} className={cls}>{inner}</Link>}</li>;
           })}
         </ul>
@@ -303,7 +311,7 @@ export default function HQ() {
           const wDone = items.every((q) => q.done || q.locked);
           return (
             <div key={wi} className="mt-5 first:mt-0">
-              <div className={cn("mb-3 flex items-center justify-between rounded-xl px-3 py-2", wi === 4 ? "bg-amber/10" : "bg-fg/[0.04]")}>
+              <div className="mb-3 flex items-baseline justify-between border-b border-fg/10 pb-2">
                 <span className="text-sm font-semibold">{wi === 4 ? "Final boss" : `World ${wi + 1} · ${WORLDS[wi].name}`}</span>
                 <span className="text-xs text-muted">{wi === 4 ? (pro ? "Design your deck" : "Pro") : wDone ? "Cleared" : WORLDS[wi].line}</span>
               </div>
@@ -317,14 +325,14 @@ export default function HQ() {
                     <li key={q.id} className={isCur ? "pt-5" : undefined} style={{ paddingLeft: `calc(${off} * min(4rem, 8vw))` }}>
                       <Link href={q.locked ? "/app/upgrade" : q.href} className="group flex items-center gap-4 py-1">
                         <span className="relative">
-                          {isCur && <span className="absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-amber px-2 py-0.5 text-xs font-bold text-[#1a1100] shadow">START<span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-amber" /></span>}
+                          {isCur && <span className="absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-fg px-2.5 py-0.5 text-[11px] font-semibold text-bg">START<span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-amber" /></span>}
                           <motion.span whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
-                            className={cn("grid place-items-center rounded-full border-b-[6px] transition-colors",
-                              q.boss ? "h-[84px] w-[84px]" : "h-[66px] w-[66px]",
-                              q.done ? "border-black/25 bg-good text-white" : isCur ? "pulse-ring border-black/25 bg-amber text-[#1a1100]" : "border-fg/15 bg-fg/[0.08] text-muted")}>
-                            {q.done ? <Check size={28} strokeWidth={3} aria-hidden /> : q.locked ? <Lock size={24} aria-hidden /> : q.boss ? <Crown size={32} aria-hidden /> : <Icon size={26} aria-hidden />}
+                            className={cn("grid place-items-center rounded-full transition-colors",
+                              q.boss ? "h-[64px] w-[64px]" : "h-[52px] w-[52px]",
+                              q.done ? "bg-fg text-bg" : isCur ? "pulse-ring border-2 border-fg bg-bg-2 text-fg" : "border border-fg/20 text-muted")}>
+                            {q.done ? <Check size={22} strokeWidth={2.5} aria-hidden /> : q.locked ? <Lock size={18} aria-hidden /> : q.boss ? <Crown size={24} aria-hidden /> : <Icon size={20} aria-hidden />}
                           </motion.span>
-                          {q.done && <Star size={18} className="absolute -right-1 -top-1 fill-amber text-amber" aria-hidden />}
+                          
                         </span>
                         <span className="min-w-0">
                           <span className="flex items-center gap-1.5 font-semibold group-hover:text-violet"><span className="text-xs text-muted">{qi}.</span>{q.name}{q.locked && <ProBadge />}</span>
@@ -364,8 +372,8 @@ export default function HQ() {
             const got = g.badges.includes(b.id);
             const Icon = b.icon;
             return (
-              <li key={b.id} className={cn("flex flex-col items-center rounded-2xl p-3 text-center transition", got ? "bg-amber/10 ring-1 ring-amber/40" : "bg-fg/[0.03]")}>
-                <motion.span whileHover={got ? { rotate: [0, -10, 10, 0] } : undefined} className={cn("relative grid h-14 w-14 place-items-center rounded-full", got ? "bg-gradient-to-br from-[#FFD08A] to-[rgb(var(--amber))] text-[#1a1100] shadow-lg shadow-amber/30" : "bg-fg/[0.07] text-muted")}>
+              <li key={b.id} className={cn("flex flex-col items-center rounded-2xl p-3 text-center transition", got ? "border border-fg/15" : "border border-dashed border-fg/15")}>
+                <motion.span whileHover={got ? { rotate: [0, -10, 10, 0] } : undefined} className={cn("relative grid h-14 w-14 place-items-center rounded-full", got ? "bg-fg text-bg" : "bg-fg/[0.07] text-muted")}>
                   <Icon size={24} aria-hidden />
                   {!got && <Lock size={14} className="absolute -bottom-0.5 -right-0.5 rounded-full bg-bg-2 p-0.5" aria-hidden />}
                 </motion.span>

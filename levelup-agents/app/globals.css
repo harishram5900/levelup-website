@@ -1,6 +1,8 @@
 @import "@fontsource/bebas-neue/latin-400.css";
 @import "@fontsource/anton/latin-400.css";
 @import "@fontsource-variable/plus-jakarta-sans/index.css";
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource-variable/inter-tight/index.css";
 
 @tailwind base;
 @tailwind components;
@@ -220,3 +222,70 @@ html:not(.dark) .app-scope .glass { box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04)
 .app-scope .btn-play:hover { transform: none; filter: brightness(1.05); box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 10px 24px -12px rgb(var(--amber) / .8); }
 .app-scope .btn-play:active { transform: scale(.98); }
 .app-scope .btn-glass { backdrop-filter: none; background: rgb(var(--fg) / .03); }
+
+
+/* ================================================================
+   NOTEBOOK design system (app screens). Warm paper, ink, one serif.
+   Calm and premium; the fun comes from the characters, small satisfying
+   interactions and celebrations, not from glow or color everywhere.
+   ================================================================ */
+html:not(.dark) .app-scope, .app-scope {
+  --bg: 243 239 230;   /* paper #F3EFE6 */
+  --bg-2: 251 248 242; /* card paper */
+  --fg: 26 24 20;      /* ink #1A1814 */
+  --muted: 100 94 83;
+  --line: 26 24 20; --line-alpha: 0.12;
+  --good: 31 107 74;   /* ink green #1F6B4A */
+  --amber: 154 78 10;  /* warm XP/streak accent, deep enough to read on paper (AA) */
+  --ink: 26 24 20; --paper: 243 239 230;
+  font-family: "Inter Tight Variable", system-ui, sans-serif !important;
+  color: rgb(var(--fg)); background: rgb(var(--bg));
+}
+html.dark .app-scope {
+  --bg: 21 19 16; --bg-2: 30 28 24; --fg: 240 235 225; --muted: 163 156 142;
+  --line: 240 235 225; --line-alpha: 0.11; --good: 104 196 150; --amber: 240 160 70;
+  --ink: 240 235 225; --paper: 21 19 16;
+}
+.app-scope :is(h1, h2, h3, .font-display) {
+  font-family: "Instrument Serif", Georgia, serif !important; font-weight: 400 !important;
+  letter-spacing: -0.01em; line-height: 1.04; text-transform: none !important;
+}
+.app-scope .serif { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+.app-scope h2.text-3xl, .app-scope h2.text-2xl { font-size: 2.4rem !important; }
+.app-scope h3.text-lg { font-size: 1.55rem !important; line-height: 1.1; }
+.app-scope .font-display.text-5xl, .app-scope h2.text-5xl { font-size: 2.75rem !important; }
+.app-scope .font-display.text-4xl, .app-scope h2.text-4xl { font-size: 2.4rem !important; }
+.app-scope .font-display.text-3xl { font-size: 1.9rem !important; }
+.app-scope .font-display.text-2xl { font-size: 1.5rem !important; }
+
+/* Surfaces: paper cards with a hairline, no shadow, no blur */
+.app-scope .glass { background: rgb(var(--bg-2)) !important; border: 1px solid rgb(var(--line) / var(--line-alpha)) !important; box-shadow: none !important; backdrop-filter: none !important; }
+.app-scope .hairline { border-color: rgb(var(--line) / .16); }
+.app-scope .kicker { font-size: 12.5px; font-weight: 500; letter-spacing: 0.01em; color: rgb(var(--muted)); text-transform: none; }
+
+/* Buttons: ink pills */
+.app-scope .btn-play { background: rgb(var(--ink)); color: rgb(var(--paper)); border-radius: 999px; box-shadow: none; padding: .85rem 1.4rem; }
+.app-scope .btn-play:hover { filter: none; opacity: .9; box-shadow: none; transform: none; }
+.app-scope .btn-play:active { transform: scale(.97); }
+.app-scope .btn-glass { background: transparent; border: 1px solid rgb(var(--line) / .2); color: rgb(var(--fg)); border-radius: 999px; backdrop-filter: none; }
+.app-scope .btn-glass:hover { background: rgb(var(--fg) / .04); border-color: rgb(var(--line) / .35); }
+.app-scope .btn-soft { background: rgb(var(--fg) / .06); color: rgb(var(--fg)) !important; border-radius: 999px; }
+.app-scope .btn-soft:hover { background: rgb(var(--fg) / .1); }
+.app-scope .btn-icon { background: transparent; border-color: rgb(var(--line) / .16); }
+.app-scope .bg-cta { background: rgb(var(--ink)); color: rgb(var(--paper)); }
+.app-scope .bg-cta:hover { background: rgb(var(--ink)); opacity: .94; }
+.app-scope .text-violet, .dark .app-scope .text-violet { color: rgb(var(--good)) !important; }
+.app-scope .text-gradient { background: none; -webkit-text-fill-color: currentColor; color: rgb(var(--fg)); }
+.app-scope .bg-accent { background-image: none; background: rgb(var(--ink)); }
+
+/* Inputs read like a notebook: paper fill, ink focus */
+.app-scope input, .app-scope textarea, .app-scope select { background-color: rgb(var(--bg)) ; }
+.app-scope input:focus, .app-scope textarea:focus { border-color: rgb(var(--fg) / .5) !important; }
+.app-scope :focus-visible { outline-color: rgb(var(--fg)); }
+
+/* One action, one reaction: a satisfying check */
+@keyframes lu-pop { 0% { transform: scale(.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.app-scope .pop { animation: lu-pop .32s cubic-bezier(.2,.9,.3,1.3); }
+
+/* Top bar title stays in the UI sans */
+.app-scope h1.ui-title { font-family: "Inter Tight Variable", system-ui, sans-serif !important; font-weight: 600 !important; letter-spacing: -0.01em; font-size: 15px; }
