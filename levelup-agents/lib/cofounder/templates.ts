@@ -4,6 +4,9 @@
  */
 import type { AgentId } from "../agents";
 import type { Profile, Section } from "./profile";
+import type { Research } from "../server/research";
+import { matchCommunities, matchDirectories } from "./channels";
+import { matchOpportunities, type OppType } from "./opportunities";
 
 type A = Record<string, string>;
 const t = (s?: string, fallback = "") => (s ?? "").trim() || fallback;
@@ -31,8 +34,10 @@ function idea(p: Profile, a: A): Section[] {
   ];
 }
 
-function customer(p: Profile, a: A): Section[] {
+function customer(p: Profile, a: A, r?: Research): Section[] {
   const where = list(a.where);
+  const liveSubs = (r?.communities ?? []).slice(0, 4);
+  const threads = (r?.discussions ?? []).slice(0, 4);
   return [
     { title: "Interview questions", items: [
       `Tell me about the last time you dealt with ${t(p.idea, "this problem")}.`,
@@ -45,6 +50,9 @@ function customer(p: Profile, a: A): Section[] {
     ] },
     { title: "Where to find your first 10", items: [
       ...(where.length ? where.map((w) => `${w}: post a short, honest message asking for 15 minutes of feedback.`) : ["List three places your customers already gather, online and offline."]),
+      ...liveSubs.map((c) => `${c.name}${c.meta ? ` (${c.meta})` : ""}: ask members about their experience with the problem (not your product). ${c.url}`),
+      ...matchCommunities(`${p.idea} ${p.customer} ${t(a.where)}`, 5).filter((c) => !liveSubs.some((l) => l.name.toLowerCase() === c.name.toLowerCase())).map((c) => `${c.name}: ${c.angle} ${c.url}`),
+      ...threads.map((d) => `People already discussing this: "${clip(d.name, 90)}" (${d.source}). Read the replies for exact customer words, and message the people who posted. ${d.url}`),
       "Ask every person you interview: 'Who else should I talk to?' One customer usually leads to two more.",
       "Your own network first: classmates, clubs, teachers, family friends.",
     ] },
@@ -94,6 +102,7 @@ function pitch(p: Profile, a: A): Section[] {
       "10. Ask: what you want and what it unlocks",
     ] },
     { title: "Questions judges will ask", items: ["Why you? What do you know that others don't?", "How will you get your first 100 users?", "Who pays, and how much?", "What happens if a big company copies you?", "What will you do with the prize or investment?"] },
+    { title: "Where to pitch it", items: matched(p, ["Competition", "Hackathon", "Program"], 6).map(oppLine) },
   ];
 }
 
@@ -111,7 +120,8 @@ function money(p: Profile, a: A): Section[] {
       ? [`Monthly costs $${costs} ÷ price $${price} = ${breakeven} paying customer${breakeven === 1 ? "" : "s"} to cover costs.`, `At 4% of free users upgrading (a common freemium rate), that's about ${Math.ceil(breakeven / 0.04)} free users.`]
       : ["Add a price and your monthly costs above to see how many customers you need to break even."] },
     { title: "Funding you can get", items: [
-      "Student pitch competitions (prize money, mentors, and credibility). See the Opportunities page.",
+      ...matched(p, ["Grant", "Competition", "Fellowship"], 5).map(oppLine),
+      "Free credits so you spend less: " + matched(p, ["Credits"], 4).map((o) => o.name).join(", ") + ". Find them all on the Opportunities page.",
       "Paul Graham's test: are you default alive? If revenue grows at today's rate with today's costs, do you reach profit before money runs out?",
       "Pre-sales: let early customers pay before you build. It's free money and proof of demand.",
       "Small grants for young founders and local business programs.",
@@ -121,39 +131,104 @@ function money(p: Profile, a: A): Section[] {
   ];
 }
 
-function launch(p: Profile, a: A): Section[] {
+const oppLine = (o: { name: string; type: string; perk: string; url: string; ages: string[] }) => `${o.name} (${o.type}, ${o.ages.join("/")}): ${o.perk}. ${o.url}`;
+const matched = (p: Profile, types: OppType[], n: number) => matchOpportunities({ text: `${p.idea} ${p.customer} ${p.startup}`, stage: p.stage, types, limit: n });
+const clip = (x: string, n: number) => (x.length > n ? `${x.slice(0, n - 1).trim()}…` : x);
+const nameOf = (x: string) => x.replace(/:/g, " –");
+const THEMES: { key: string; pain: string; re: RegExp; gap: string }[] = [
+  { key: "pricing and subscriptions", pain: "surprise charges and subscriptions they can't cancel", re: /price|pricey|expensive|subscription|paywall|charged|cancel|refund|trial|money|pay\b|scam/i, gap: "Simple, honest pricing: a real free tier, no surprise charges, and one-tap cancel. Say it loudly on your landing page." },
+  { key: "bugs and crashes", pain: "apps that crash and glitch", re: /crash|bug|glitch|freez|broken|doesn.t work|not working|error|won.t load|keeps closing/i, gap: "Reliability: a small product that always works beats a big one that crashes. Test every release on a real phone." },
+  { key: "ads", pain: "ads everywhere", re: /\bads?\b|advert/i, gap: "No ads (or very few). Make that part of your pitch." },
+  { key: "generic or low-quality content", pain: "generic, one-size-fits-all content", re: /generic|inaccurate|wrong|useless|repetitive|boring|same thing|slop|low quality|shallow/i, gap: "Depth and personalization: make every session feel made for the user, not copy-pasted." },
+  { key: "confusing design", pain: "confusing, cluttered apps", re: /confus|hard to use|complicated|interface|navigation|cluttered|too many/i, gap: "Dead-simple onboarding: first result in under 2 minutes with zero setup." },
+  { key: "bad support", pain: "being ignored by support", re: /support|customer service|no response|no reply|ignored/i, gap: "Personal support: as a small startup you can reply to every user yourself, within hours." },
+  { key: "account and login problems", pain: "login and sync problems", re: /login|log in|sign in|account|password|restore|sync/i, gap: "Frictionless accounts: let people try before signing up, and make restore and sync just work." },
+  { key: "missing features", pain: "apps missing what they actually need", re: /wish|missing|need(s)? (a|to)|would be (nice|great)|please add|no option/i, gap: "Build the feature users keep asking competitors for. Read the reviews and list the exact requests." },
+];
+function themesOf(r?: Research) {
+  const cs = r?.complaints ?? [];
+  return THEMES.map((t) => ({ ...t, n: cs.filter((c) => t.re.test(c.text)).length })).filter((t) => t.n > 0).sort((x, y) => y.n - x.n);
+}
+
+function launch(p: Profile, a: A, r?: Research): Section[] {
   const channels = list(a.channels);
   const goal = t(a.goal, "your first 100 users");
-  const ch = channels.length ? channels : ["TikTok", "Instagram", "your school network"];
+  const link = t(a.link, "[your link]");
+  const niche = t(a.niche, p.customer);
+  const text = `${p.idea} ${p.customer} ${niche}`;
+  const live = (r?.communities ?? []).slice(0, 6);
+  const curated = matchCommunities(text, 8).filter((c) => !live.some((l) => l.name.toLowerCase() === c.name.toLowerCase()));
+  const threads = (r?.discussions ?? []).slice(0, 4);
+  const dirs = matchDirectories(text, 8);
+  const ch = channels.length ? channels : ["TikTok", "Instagram"];
+  const g = parseInt(goal.replace(/[^0-9]/g, ""), 10) || 100;
   return [
-    { title: "Launch checklist", items: ["A simple landing page with one clear button.", "A way to collect emails or sign-ups.", "A 30-second demo video.", `A list of 50 people and communities to tell (${ch.slice(0, 3).join(", ")}).`, "One sentence that explains what you do."] },
-    { title: "4-week plan", items: [
-      `Week 1: post your founder story on ${ch[0]}. Why you started ${p.startup}.`,
-      `Week 2: share 3 short demos showing the problem and the fix.`,
-      `Week 3: personally message 30 people from ${ch[1] ?? ch[0]} and ask them to try it.`,
-      `Week 4: share results and what you learned, then ask users to invite a friend. Goal: ${goal}.`,
+    { title: "Where your customers are", items: [
+      ...live.map((c) => `${c.name}${c.meta ? ` (${c.meta})` : ""}: ${c.detail ? clip(c.detail, 120) : "an active community for your niche"}. Read the rules, help first, then share. ${c.url}`),
+      ...curated.map((c) => `${c.name}: ${c.angle} ${c.url}`),
+      ...threads.map((d) => `Join this conversation (${d.source}${d.meta ? `, ${d.meta}` : ""}): "${clip(d.name, 90)}". Reply with a genuinely helpful answer; mention ${p.startup} only if it fits. ${d.url}`),
+      `Offline: school clubs, teachers and group chats where ${p.customer} already are. Ask one person in each to share your post.`,
     ] },
-    { title: "Content ideas", items: [`"I'm ${t(p.founder, "a student")} and I'm building ${p.startup} because…"`, `"POV: you're one of the ${p.customer} who…"`, '"Day 1 vs. day 30" progress videos', '"3 mistakes I made building my first startup"'] },
-    { title: "Numbers to track", items: ["Sign-ups per week", "How many come back a second time", "Where sign-ups came from", `Progress toward your goal: ${goal}`] },
+    { title: "Launch sites for you", items: dirs.map((d) => `${d.name} (best for ${d.best.toLowerCase()}): ${d.how} ${d.url}`) },
+    { title: "Ready-to-post drafts", items: [
+      `Reddit (story + ask for feedback): "Title: I'm ${t(p.founder, "a student")} and I built ${p.startup} because ${p.customer} kept struggling with this. Honest feedback?" Body: 3 short paragraphs: the moment you noticed the problem, what you built (${p.idea.replace(/\.$/, "")}), and one specific question. Put ${link} at the end only if the rules allow.`,
+      `Show HN / Product Hunt tagline: "${p.startup} – ${p.idea.replace(/\.$/, "")}". First comment: "Hi! I'm ${t(p.founder, "the founder")}. I built ${p.startup} for ${p.customer} after [your story]. It's free to try at ${link}. I'd love brutal feedback on [one thing]."`,
+      `TikTok / Reels script (20s): Hook (0-2s): "POV: you're ${p.customer} and [the problem]." Middle: show the problem, then ${p.startup} solving it on screen. End: "It's free, link in bio." Post it on ${ch[0]} first.`,
+      `LinkedIn: "Today I'm launching ${p.startup}. [One-line story.] It ${p.idea.replace(/\.$/, "")} for ${p.customer}. If you know someone who needs this, I'd be grateful for a share: ${link}"`,
+      `DM to friends: "Hey! I just launched ${p.startup} (${p.idea.replace(/\.$/, "")}). Could you try it for 2 minutes and tell me one thing that confused you? ${link}"`,
+      `Email to people who signed up early: "Subject: It's live. You're one of the first." Thank them, give one clear button to ${link}, and ask them to reply with feedback.`,
+    ] },
+    { title: "4-week traction plan", items: [
+      `Week 1: Prepare. Make a list of 50 people to message, join ${live[0]?.name ?? curated[0]?.name ?? "3 communities"} and 2 others and comment helpfully every day (no links yet). Line up 10 friends who will try it on launch day.`,
+      `Week 2: Launch. Post the drafts above on ${ch.slice(0, 2).join(" and ")}, submit to ${dirs.slice(0, 3).map((d) => d.name).join(", ")}, and DM all 50 people by hand. Reply to every comment within an hour.`,
+      `Week 3: Do things that don't scale. Personally onboard the first 20 users on a quick call or chat. Post one short video a day showing a real use. Target: ${Math.ceil(g * 0.5)} sign-ups.`,
+      `Week 4: Double down. Look at which channel brought the most sign-ups and post there 3x more. Ask every happy user to invite one friend. Goal: ${goal}.`,
+    ] },
+    { title: "Launch checklist", items: ["A landing page with one clear promise and one button.", "Sign-up works on a phone (test it yourself).", "A 30-second demo video and 4 screenshots.", `A list of 50 people and ${live.length + curated.length} communities to tell.`, "A way to see where sign-ups came from (UTM links or ask \"how did you hear about us?\").", "Read every community's rules before posting."] },
+    { title: "Numbers to track", items: ["Sign-ups per day, by source", "% who come back a second time", "Replies and comments per post", `Progress toward your goal: ${goal}`] },
   ];
 }
 
-
-function competitor(p: Profile, a: A): Section[] {
+function competitor(p: Profile, a: A, r?: Research): Section[] {
   const alts = list(a.alternatives);
   const diff = t(a.different);
+  const found = (r?.competitors ?? []).slice(0, 12);
+  const themes = themesOf(r);
+  const top = found.filter((f) => f.reviews).sort((x, y) => (y.reviews ?? 0) - (x.reviews ?? 0))[0];
+  const map = [
+    ...found.map((f) => `${nameOf(f.name)}: ${[f.source, f.rating ? `${f.rating}★${f.reviews ? ` from ${f.reviews.toLocaleString("en-US")} ratings` : ""}` : "", f.source === "Web research" ? "" : f.price, f.meta].filter(Boolean).join(" · ")}.${f.detail ? ` ${clip(f.detail, 140)}` : ""} ${f.url}`),
+    ...alts.filter((x) => !found.some((f) => f.name.toLowerCase().includes(x.toLowerCase()))).map((x) => `${nameOf(x)}: you named this one. Write down its price, who it's for, and the #1 complaint in its reviews.`),
+    "Doing nothing: your biggest competitor is often people just living with the problem. Know why they'd bother to switch.",
+  ];
+  if (!found.length && !alts.length) map.unshift(`No live results came back for "${t(a.niche, p.idea)}". Try a shorter niche (2-4 words, like "budget app for teens") and run Scout again.`);
+  const complaints = (r?.complaints ?? []).slice(0, 8).map((c) => `"${clip(c.text, 200)}" (${c.stars}★ review of ${nameOf(c.app)}) ${c.url ?? ""}`.trim());
   return [
-    { title: "Your competition map", items: [
-      ...(alts.length ? alts.map((x) => `${x}: write down what it costs, who uses it, and the #1 complaint about it (check its reviews).`) : ["List every way people solve this today, including apps, people they pay, and doing it themselves."]),
-      "Doing nothing: your biggest competitor is often people just living with the problem. Know why they'd bother to switch.",
+    { title: "Your competition map", items: map },
+    { title: "What their users complain about", items: complaints.length ? [
+      ...(themes.length ? [`Across ${r!.complaints.length} recent 1-2★ reviews, the top themes are: ${themes.slice(0, 3).map((x) => `${x.key} (${x.n})`).join(", ")}.`] : []),
+      ...complaints,
+    ] : [
+      "No public low-star reviews were found for this niche yet. Read the 1-3★ reviews of each competitor above yourself and copy the exact words people use.",
+      "Search \"[competitor] review\" and \"[competitor] alternative\" on Reddit and YouTube. Every repeated complaint is a feature you can win on.",
+    ] },
+    { title: "Gaps you can own", items: themes.length ? themes.slice(0, 5).map((x) => `${cap(x.key)} (${x.n} complaint${x.n === 1 ? "" : "s"}): ${x.gap}`) : [
+      `Serve one specific slice of ${p.customer} better than anyone. Generic apps leave specific groups underserved.`,
+      "Speed to first result: time how long each competitor takes to deliver value, and beat it by 10x.",
+      "Price: if every competitor is a subscription, try a one-time price or a generous free tier (or the opposite).",
     ] },
     { title: "How you win", items: [
-      diff ? `Your edge: ${diff}. Make this the first thing people notice.` : "Write one thing you do better than every alternative. If you can't, narrow your customer until you can.",
-      `Own a niche first: be the best option for one specific slice of ${p.customer} before going broad.`,
-      "Compete on what big players can't copy quickly: speed, a community, or caring about a group they ignore.",
+      diff ? `Your edge: ${diff}. Make this the first thing people notice on your site and in every post.` : "Write one thing you do better than every alternative. If you can't, narrow your customer until you can.",
+      top ? `The biggest player here is ${nameOf(top.name)} (${top.reviews!.toLocaleString("en-US")} ratings). Don't fight them head-on: win the users their reviews say they're failing.` : `Own a niche first: be the best option for one specific slice of ${p.customer} before going broad.`,
+      "Compete on what big players can't copy quickly: speed, a community, personal support, or caring about a group they ignore.",
+      "List yourself as an alternative to each competitor on AlternativeTo and SaaSHub so people searching for them find you.",
     ] },
-    { title: "Watch out for", items: ["A bigger company adding your feature for free. Your answer: focus and speed.", "Assuming nobody else exists. Judges always ask, and \"no competitors\" sounds like you didn't look.", "Copying competitors' features instead of solving the problem better."] },
-    { title: "Your positioning line", items: [`For ${p.customer} who are tired of ${alts[0] ? `relying on ${alts[0]}` : "the usual options"}, ${p.startup} ${p.idea.replace(/\.$/, "")}${diff ? `, and unlike others it ${diff.replace(/^we /i, "").replace(/\.$/, "")}` : ""}.`] },
+    { title: "Watch out for", items: [
+      "A bigger company adding your feature for free. Your answer: focus and speed.",
+      "Saying \"we have no competitors\". Judges always ask, and it sounds like you didn't look. Show this map instead.",
+      "Copying competitors' features instead of solving the problem better.",
+      found.length ? "Ratings and prices change. Re-run Scout every month and before every pitch." : "Re-run Scout with different niche words; the first search often misses competitors.",
+    ] },
+    { title: "Your positioning line", items: [`For ${p.customer} who are tired of ${themes[0] ? themes[0].pain : alts[0] ? `relying on ${alts[0]}` : "the usual options"}, ${p.startup} ${p.idea.replace(/\.$/, "")}${diff ? `, and unlike others it ${diff.replace(/^we /i, "").replace(/\.$/, "")}` : ""}.`] },
   ];
 }
 
@@ -263,14 +338,17 @@ function investor(p: Profile, a: A): Section[] {
       notYet ? "You said you're not raising yet. Good: free money first (competitions, grants, fellowships) keeps 100% of your company." : `You're raising ${raising}. Know exactly what milestone it gets you to.`,
       t(a.useOf) ? `Use of funds: ${t(a.useOf)}. Tie it to a measurable milestone.` : "Write what the money buys and what it proves (e.g. launch + 1,000 users).",
     ] },
-    { title: "Who to approach", items: ["Non-dilutive first: pitch competitions, grants and fellowships in Opportunities (filter by \"Grant\" and \"Competition\").", "Youth-friendly programs and funds: see Opportunities, filtered by \"Investor\" and \"Fellowship\". Check each one's age rules.", "Angels you're connected to: teachers, alumni, local founders. A warm intro beats a cold email.", "Accelerators like Y Combinator or Techstars when you have traction."] },
+    { title: "Who to approach", items: [
+      ...matched(p, ["Grant", "Fellowship", "Competition"], 4).map((o) => `Non-dilutive first: ${oppLine(o)}`),
+      ...matched(p, ["Accelerator", "Investor"], 5).map((o) => `${o.type}: ${oppLine(o)} Check their age and company rules first.`),
+      "Non-dilutive first: pitch competitions, grants and fellowships in Opportunities (filter by \"Grant\" and \"Competition\").", "Youth-friendly programs and funds: see Opportunities, filtered by \"Investor\" and \"Fellowship\". Check each one's age rules.", "Angels you're connected to: teachers, alumni, local founders. A warm intro beats a cold email.", "Accelerators like Y Combinator or Techstars when you have traction."] },
     { title: "Cold email to investors", items: [`Subject: ${p.startup}: ${t(a.proof, "early traction")} (student founder)`, `"Hi {name}, I'm ${t(p.founder, "[name]")}, founder of ${p.startup}. We ${p.idea.replace(/\.$/, "")} for ${p.customer}. ${t(a.proof) ? `So far: ${t(a.proof)}.` : "[Your strongest real number.]"} ${notYet ? "We're not raising yet, but I'd value 15 minutes of advice." : `We're raising ${raising} to ${t(a.useOf, "[milestone]")}.`} Deck attached. Thanks!"`, "Keep it under 120 words. Send your deck as a PDF or link."] },
     { title: "Before you sign anything", items: ["If you're under 18, a parent or guardian must be involved, and many funds only invest in founders 18+ or in a registered company.", "A SAFE (Simple Agreement for Future Equity, created by Y Combinator) gives investors future shares. Understand the valuation cap and discount.", "Never sign without a lawyer reviewing it. Many offer free help for student founders.", "Give away as little equity as possible early. Every percent is hard to get back."] },
   ];
 }
 
-const GUIDES: Record<AgentId, (p: Profile, a: A) => Section[]> = { idea, customer, competitor, offer, build, brand, pitch, money, sales, launch, content, investor };
+const GUIDES: Record<AgentId, (p: Profile, a: A, r?: Research) => Section[]> = { idea, customer, competitor, offer, build, brand, pitch, money, sales, launch, content, investor };
 
-export function guided(id: AgentId, p: Profile, answers: A): Section[] {
-  return GUIDES[id](p, answers);
+export function guided(id: AgentId, p: Profile, answers: A, research?: Research): Section[] {
+  return GUIDES[id](p, answers, research);
 }

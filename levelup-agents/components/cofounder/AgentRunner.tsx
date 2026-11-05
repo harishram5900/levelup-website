@@ -16,7 +16,7 @@ import { ProGate } from "./ProGate";
 import { AGENT_STYLE, AgentResultView } from "./AgentLayouts";
 
 // These agents put their questions on top and use the full width for results.
-const TOP_FORM: AgentId[] = ["customer", "brand", "pitch", "content", "launch", "sales"];
+const TOP_FORM: AgentId[] = ["competitor", "customer", "brand", "pitch", "content", "launch", "sales"];
 import { FREE_ITEMS, isProAgent, usePlan } from "@/lib/cofounder/plan";
 import { deepDive, deepDiveTitles } from "@/lib/cofounder/proExtras";
 import { Lock } from "lucide-react";
@@ -28,6 +28,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
   const { ws, ready, update } = useWorkspace();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState("");
   const [copied, setCopied] = useState(false);
   const result = ws.results[agent.id];
   const nextAgent = AGENTS[AGENTS.findIndex((a) => a.id === agent.id) + 1];
@@ -55,7 +56,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
   const run = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const r = await runAgent(agent.id, profile, answers);
+    const r = await runAgent(agent.id, profile, answers, setStep);
     update((w) => ({ ...w, results: { ...w.results, [agent.id]: r }, answers: { ...w.answers, [agent.id]: answers } }));
     setLoading(false);
   };
@@ -109,7 +110,8 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
           <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid h-full min-h-[360px] place-items-center text-center">
             <div>
               <Buddy character={ch} mood={loading ? "think" : "happy"} size={110} className="mx-auto mb-4" />
-              <p className="font-display text-3xl">{loading ? `${buddy.name} is thinking` : `Your ${st.layout.toLowerCase()} appears here`}</p>
+              <p className="font-display text-3xl">{loading ? `${buddy.name} is on it` : `Your ${st.layout.toLowerCase()} appears here`}</p>
+              {loading && step && <p className="mx-auto mt-2 max-w-md animate-pulse text-sm font-semibold" style={{ color: "var(--ag)" }}>{step}</p>}
               <p className="mx-auto mt-2 max-w-md text-muted">You'll get: {agent.sections.join(" · ")}</p>
             </div>
           </motion.div>
@@ -122,7 +124,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
               </div>
               <button type="button" onClick={copy} className="btn-glass py-2 text-sm"><Copy size={14} aria-hidden /> {copied ? "Copied" : "Copy all"}</button>
             </div>
-            <AgentResultView agentId={agent.id} sections={plan.pro ? result.sections : result.sections.map((x) => ({ ...x, items: x.items.slice(0, FREE_ITEMS) }))} titles={agent.sections} startup={profile.startup} />
+            <AgentResultView agentId={agent.id} sections={plan.pro ? result.sections : result.sections.map((x) => ({ ...x, items: x.items.slice(0, FREE_ITEMS) }))} titles={agent.sections} startup={profile.startup} research={result.research} ai={result.source === "ai"} />
             {plan.pro ? (
               <section className="mt-6 rounded-2xl p-5 ring-1" style={{ background: "color-mix(in srgb, var(--ag) 8%, transparent)", borderColor: "var(--ag)" }}>
                 <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em]" style={{ color: "var(--ag)" }}><Crown size={14} aria-hidden /> Pro deep dive</p>
@@ -181,7 +183,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
           <div className="flex max-w-md items-end gap-3">
             <Buddy character={ch} mood={loading ? "think" : result ? "cheer" : "happy"} size={64} className="text-white" />
             <p className="mb-3 rounded-2xl rounded-bl-sm bg-white/12 px-4 py-2.5 text-sm ring-1 ring-white/20 backdrop-blur" style={{ background: "rgba(255,255,255,.12)" }}>
-              {loading ? "Thinking about your startup…" : result ? "Quest complete! Tweak your answers and run again anytime." : agent.line}
+              {loading ? (step || "Thinking about your startup…") : result ? "Quest complete! Tweak your answers and run again anytime." : agent.line}
             </p>
           </div>
         </div>

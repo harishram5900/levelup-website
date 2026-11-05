@@ -1,11 +1,12 @@
 "use client";
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import type { AgentId } from "../agents";
+import type { Research } from "../server/research";
 
 export type Stage = "idea" | "building" | "launched";
 export type Profile = { founder: string; startup: string; idea: string; customer: string; stage: Stage };
 export type Section = { title: string; items: string[] };
-export type AgentResult = { sections: Section[]; source: "ai" | "guided"; at: number };
+export type AgentResult = { sections: Section[]; source: "ai" | "guided"; at: number; research?: Research };
 export type Goal = { id: string; text: string; done: boolean };
 export type ChatMsg = { role: "user" | "assistant"; text: string; at: number; source?: "ai" | "guided" };
 export type SlideKind = "cover" | "content" | "closing";

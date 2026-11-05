@@ -29,7 +29,7 @@ export const BADGES: Badge[] = [
   { id: "shipper", name: "Shipper", how: "Finish the Build agent", icon: Hammer, earned: (w) => !!w.results.build },
   { id: "storyteller", name: "Storyteller", how: "Finish the Pitch agent", icon: Presentation, earned: (w) => !!w.results.pitch },
   { id: "money-brain", name: "Money Brain", how: "Finish the Money agent", icon: Banknote, earned: (w) => !!w.results.money },
-  { id: "launcher", name: "Liftoff", how: "Finish the Launch agent", icon: Megaphone, earned: (w) => !!w.results.launch },
+  { id: "launcher", name: "Liftoff", how: "Finish the Traction agent", icon: Megaphone, earned: (w) => !!w.results.launch },
   { id: "deck-master", name: "Deck Master", how: "Build your pitch deck", icon: Layers, earned: (w) => !!w.deck },
   { id: "goal-getter", name: "Goal Getter", how: "Complete 3 weekly goals", icon: Target, earned: (w) => w.goals.filter((g) => g.done).length >= 3 },
   { id: "on-fire", name: "On Fire", how: "Show up 3 days in a row", icon: Flame, earned: (_w, s) => s >= 3 },
