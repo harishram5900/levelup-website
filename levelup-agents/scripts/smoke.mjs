@@ -73,10 +73,10 @@ console.log("\nFlows (iPhone 13)");
   ok(!webOnlyVisible, "native app hides web checkout, prices and promo codes");
 
   for (const p of ["/robots.txt", "/sitemap.xml", "/manifest.webmanifest", "/opengraph-image.png", "/favicon.ico"]) {
-    const r = await page.request.get(BASE + p); ok(r.status() === 200, `${p} → ${r.status()}`);
+    const r = await page.goto(BASE + p); ok(r?.status() === 200, `${p} → ${r?.status()}`);
   }
-  const h = await page.request.get(`${BASE}/health`);
-  ok([200, 503].includes(h.status()) && (await h.json()).checks?.app === "ok", `/health → ${h.status()}`);
+  const h = await page.goto(`${BASE}/health`);
+  ok([200, 503].includes(h?.status() ?? 0) && JSON.parse(await page.locator("body").innerText()).checks?.app === "ok", `/health → ${h?.status()}`);
   await ctx.close();
 }
 
