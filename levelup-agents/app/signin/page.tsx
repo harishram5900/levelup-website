@@ -15,6 +15,7 @@ export default function SignIn() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
+  useEffect(() => { if (new URLSearchParams(location.search).get("confirmed")) setMsg("Your email is confirmed! Sign in to continue."); }, []);
   const [unconfirmed, setUnconfirmed] = useState(false);
   const resend = async () => {
     const sb = supabase(); if (!sb) return;

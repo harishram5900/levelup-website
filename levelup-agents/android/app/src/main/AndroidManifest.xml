@@ -20,6 +20,20 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- App Links: levelupinnovations.tech links (email confirmation, password reset, invites) open in the app. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="www.levelupinnovations.tech" />
+                <data android:host="levelupinnovations.tech" />
+                <data android:pathPrefix="/app" />
+                <data android:pathPrefix="/reset" />
+                <data android:pathPrefix="/signin" />
+                <data android:pathPrefix="/signup" />
+            </intent-filter>
         </activity>
 
         <provider

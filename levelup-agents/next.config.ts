@@ -36,6 +36,12 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // This app lives in a subfolder of a repo that has its own lockfile; pin the root here.
   outputFileTracingRoot: path.join(__dirname),
+  async rewrites() {
+    return [
+      { source: "/.well-known/assetlinks.json", destination: "/wk/assetlinks" },
+      { source: "/.well-known/apple-app-site-association", destination: "/wk/aasa" },
+    ];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

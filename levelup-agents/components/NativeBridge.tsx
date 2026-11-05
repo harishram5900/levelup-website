@@ -28,7 +28,15 @@ export function NativeBridge() {
           else App.minimizeApp();
         });
         const resume = await App.addListener("resume", () => remind(false));
-        cleanups.push(() => { back.remove(); resume.remove(); });
+        // App Links / Universal Links: a tapped levelupinnovations.tech link (email confirmation,
+        // password reset, invite) opens here. Load it fully so Supabase can finish signing in.
+        const open = await App.addListener("appUrlOpen", ({ url }) => {
+          try {
+            const u = new URL(url);
+            if (/(^|\.)levelupinnovations\.tech$/.test(u.hostname)) window.location.href = `${u.pathname}${u.search}${u.hash}`;
+          } catch { /* ignore */ }
+        });
+        cleanups.push(() => { back.remove(); resume.remove(); open.remove(); });
       } catch { /* ignore */ }
       try {
         const { LocalNotifications } = await import("@capacitor/local-notifications");

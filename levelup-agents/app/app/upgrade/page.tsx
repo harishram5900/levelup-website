@@ -10,6 +10,7 @@ import { FounderCall } from "@/components/cofounder/FounderCall";
 import { paymentsEnabled, PRO_FEATURES, refreshPlan, usePlan } from "@/lib/cofounder/plan";
 import { useWorkspace } from "@/lib/cofounder/profile";
 import { useAuth } from "@/lib/supabase";
+import { StorePurchase } from "@/components/cofounder/StorePurchase";
 
 const FREE = ["Startup HQ, XP, streaks, badges and leaderboards", "6 agents: Idea, Customer, Scout, Build, Brand, Pitch (starter plans)", "Playbooks from top founders", "Competitions, programs, grants and credits", "Friends, teams and weekly goals"];
 const ROWS: [string, boolean, boolean][] = [
@@ -133,7 +134,7 @@ function Upgrade() {
       </div>
 
       {/* Inside the iOS/Android app, store rules require in-app purchase, so web checkout and promo codes are web-only. */}
-      {!pro && <p className="native-only glass rounded-[24px] p-5 text-sm"><b>Pro in the app is coming soon.</b> <span className="text-muted">Already Pro? Sign in with the same account and everything unlocks here too.</span></p>}
+      <div className="native-only"><StorePurchase uid={user?.id ?? null} pro={pro} /></div>
       <div className="web-only space-y-6">
       {paymentsEnabled && <Checkout pro={pro} signedIn={signedIn} />}
       {!pro && <PromoBox signedIn={signedIn} />}

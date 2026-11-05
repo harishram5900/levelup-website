@@ -102,10 +102,10 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
 
 /** Mobile bottom tab bar (the main navigation in the phone app). */
 const TABS = [
-  { href: "/app", label: "HQ", icon: LayoutDashboard, match: (p: string) => p === "/app" },
-  { href: "/app/agents", label: "Agents", icon: Sparkles, match: (p: string) => p.startsWith("/app/agents") },
-  { href: "/app/cofounder", label: "Co-founder", icon: Bot, match: (p: string) => p.startsWith("/app/cofounder") },
-  { href: "/app/opportunities", label: "Opportunities", icon: Trophy, match: (p: string) => p.startsWith("/app/opportunities") },
+  { href: "/app", label: "HQ", tour: "tab-hq", icon: LayoutDashboard, match: (p: string) => p === "/app" },
+  { href: "/app/agents", label: "Agents", tour: "tab-agents", icon: Sparkles, match: (p: string) => p.startsWith("/app/agents") },
+  { href: "/app/cofounder", label: "Co-founder", tour: "tab-cofounder", icon: Bot, match: (p: string) => p.startsWith("/app/cofounder") },
+  { href: "/app/opportunities", label: "Opportunities", tour: "tab-opps", icon: Trophy, match: (p: string) => p.startsWith("/app/opportunities") },
 ];
 function TabBar({ path, onMore }: { path: string; onMore: () => void }) {
   const moreActive = !TABS.some((t) => t.match(path));
@@ -117,7 +117,7 @@ function TabBar({ path, onMore }: { path: string; onMore: () => void }) {
           const Icon = t.icon;
           return (
             <li key={t.href}>
-              <Link href={t.href} aria-current={on ? "page" : undefined} className={cn("flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold transition active:scale-95", on ? "text-fg" : "text-muted")}>
+              <Link href={t.href} data-tour={t.tour} aria-current={on ? "page" : undefined} className={cn("flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold transition active:scale-95", on ? "text-fg" : "text-muted")}>
                 <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", on && "bg-amber/20 text-amber")}><Icon size={19} aria-hidden /></span>{t.label}
               </Link>
             </li>
@@ -187,8 +187,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <Account />
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:p-6 md:pb-8 lg:p-8">{children}</main>
-        <TabBar path={path} onMore={() => setDrawer(true)} />
+        <main className={cn("min-w-0 flex-1 p-4 sm:p-6 md:pb-8 lg:p-8", ws.profile && "pb-[calc(6rem+env(safe-area-inset-bottom))]")}>{children}</main>
+        {/* No tab bar until the founder has set up their startup (first launch is a focused flow). */}
+        {ws.profile && <TabBar path={path} onMore={() => setDrawer(true)} />}
         <Celebrator />
         <Tour />
       </div>

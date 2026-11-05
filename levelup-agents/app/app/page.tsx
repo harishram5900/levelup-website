@@ -6,7 +6,8 @@ import { useState } from "react";
 import { PlaybookCard } from "@/components/cofounder/PlaybookCard";
 import { FounderCall } from "@/components/cofounder/FounderCall";
 import { ProBanner } from "@/components/cofounder/ProBanner";
-import { Buddy, BuddySays, characterById, type Mood } from "@/components/cofounder/Pip";
+import { Buddy, BuddySays, CHARACTERS, characterById, type Mood } from "@/components/cofounder/Pip";
+import { authEnabled, useAuth } from "@/lib/supabase";
 import { CharacterPicker, PalettePicker } from "@/components/cofounder/Pickers";
 import { CountUp } from "@/components/ui/CountUp";
 import { AGENTS, WORLDS } from "@/lib/agents";
@@ -30,6 +31,8 @@ function Setup({ initial, onSave, onCancel }: { initial?: Profile | null; onSave
   const { ws, update } = useWorkspace();
   const [p, setP] = useState<Profile>(initial ?? { founder: "", startup: "", idea: "", customer: "", stage: "idea" });
   const [step, setStep] = useState(0);
+  const [welcome, setWelcome] = useState(!initial);
+  const { user } = useAuth();
   const ch = ws.prefs.character;
   const buddy = characterById(ch);
   const input = "w-full rounded-2xl hairline bg-bg-2/60 px-5 py-4 text-lg outline-none transition-colors focus:border-violet/60";
@@ -67,8 +70,9 @@ function Setup({ initial, onSave, onCancel }: { initial?: Profile | null; onSave
     update((w) => ({ ...w, prefs: { ...w.prefs, picked: true } }));
     onSave({ founder: p.founder.trim(), startup: p.startup.trim(), idea: p.idea.trim(), customer: p.customer.trim(), stage: p.stage });
   };
+  if (welcome) return <Welcome signedIn={!!user} onStart={() => setWelcome(false)} />;
   return (
-    <form onSubmit={submit} className={cn("glass mx-auto space-y-6 overflow-hidden rounded-[28px] p-6 sm:p-8", step + first === 0 ? "max-w-4xl" : "max-w-2xl")}>
+    <form onSubmit={submit} className={cn("glass mx-auto space-y-6 overflow-x-clip rounded-[28px] p-6 sm:p-8", step + first === 0 ? "max-w-4xl" : "max-w-2xl")}>
       <div className="flex items-center justify-between gap-3">
         <p className="kicker">{initial ? "Edit your startup" : "Startup HQ setup"} · Step {step + 1} of {total}</p>
         {!initial && step + first === 1 && <button type="button" onClick={() => { setP(EXAMPLE); setStep(3 - first); }} className="text-xs font-semibold text-violet hover:underline">Just exploring? Use an example</button>}
@@ -76,7 +80,8 @@ function Setup({ initial, onSave, onCancel }: { initial?: Profile | null; onSave
       <div className="flex gap-1.5" aria-hidden>{Array.from({ length: total }).map((_, k) => <span key={k} className={cn("h-1.5 flex-1 rounded-full transition-colors", k <= step ? "bg-accent" : "bg-fg/10")} />)}</div>
       <BuddySays character={ch} mood={last ? "cheer" : step === 0 ? "wave" : "happy"} size={84}>{cur.say}</BuddySays>
       <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>{cur.body}</motion.div>
-      <div className="flex gap-3">
+      {/* On phones the buttons stay pinned to the bottom of the screen so they're always reachable. */}
+      <div className="sticky bottom-0 z-10 -mx-6 -mb-6 flex gap-3 rounded-b-[28px] border-t border-fg/[0.06] bg-bg/90 px-6 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 backdrop-blur-xl sm:static sm:m-0 sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
         {step > 0 && <button type="button" onClick={() => setStep(step - 1)} aria-label="Back" className="btn-glass w-14 rounded-2xl"><ArrowLeft size={18} aria-hidden /></button>}
         <button type="submit" disabled={!cur.ok} className="btn-play flex-1 text-lg">
           {last ? (initial ? "Save" : "Enter my HQ!") : "Next"} <ArrowRight size={18} aria-hidden />
@@ -84,6 +89,43 @@ function Setup({ initial, onSave, onCancel }: { initial?: Profile | null; onSave
         {onCancel && <button type="button" onClick={onCancel} className="btn-glass rounded-2xl px-5">Cancel</button>}
       </div>
     </form>
+  );
+}
+
+/* ---------- First launch: what LevelUp is, then start or sign in ---------- */
+function Welcome({ signedIn, onStart }: { signedIn: boolean; onStart: () => void }) {
+  const points = [
+    { icon: Sparkles, t: "12 AI agents", d: "Idea, customers, competitors, pitch, money, launch and more" },
+    { icon: Trophy, t: "300+ opportunities", d: "Competitions, grants, hackathons and programs, matched to you" },
+    { icon: Flame, t: "Level up daily", d: "Quests, XP, streaks and badges keep you moving" },
+  ];
+  return (
+    <div className="mx-auto flex min-h-[calc(100dvh-7rem)] max-w-md flex-col justify-between gap-5 pb-[env(safe-area-inset-bottom)] md:min-h-0 md:py-10">
+      <div className="text-center">
+        <div className="relative mx-auto flex h-28 items-end justify-center">
+          {CHARACTERS.map((c, i) => (
+            <motion.div key={c.id} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.08, type: "spring", stiffness: 260, damping: 18 }} className={cn("-mx-2", i === 2 ? "z-10" : "")}>
+              <Buddy character={c.id} mood={i === 2 ? "wave" : "happy"} size={i === 2 ? 96 : 66} />
+            </motion.div>
+          ))}
+        </div>
+        <motion.h2 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mt-4 font-display text-[44px] uppercase leading-[0.95]">Build a real startup with <span className="text-amber">AI co-founders</span></motion.h2>
+        <p className="mt-3 text-muted">From your first idea to your first customers. Free for student founders.</p>
+      </div>
+      <ul className="space-y-2.5">
+        {points.map((x, i) => (
+          <motion.li key={x.t} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 + i * 0.1 }} className="glass flex items-center gap-3.5 rounded-2xl p-3.5">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber/15 text-amber"><x.icon size={20} aria-hidden /></span>
+            <span><span className="block font-semibold">{x.t}</span><span className="text-sm text-muted">{x.d}</span></span>
+          </motion.li>
+        ))}
+      </ul>
+      <div className="space-y-3">
+        <button type="button" onClick={onStart} className="btn-play w-full text-lg">Get started <ArrowRight size={18} aria-hidden /></button>
+        {authEnabled && !signedIn && <Link href="/signin" className="btn-glass w-full">I already have an account</Link>}
+        <p className="text-center text-xs text-muted">By continuing you agree to the <Link href="/terms" className="underline">Terms</Link> and <Link href="/privacy" className="underline">Privacy Policy</Link>.</p>
+      </div>
+    </div>
   );
 }
 

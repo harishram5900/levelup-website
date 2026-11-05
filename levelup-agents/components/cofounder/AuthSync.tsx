@@ -21,6 +21,19 @@ export function AuthSync() {
   // Pro-only themes fall back to Royal if the founder isn't (or is no longer) Pro.
   useEffect(() => { if (ready && planReady) applyPalette(paletteById(ws.prefs.palette).pro && !pro ? "royal" : ws.prefs.palette); }, [ready, planReady, pro, ws.prefs.palette]);
 
+  // Email confirmation link opened somewhere that can't finish the sign-in (e.g. a browser instead of
+  // the app, so the PKCE verifier is missing). The email IS confirmed, so send them to sign in.
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    if (!q.get("code") && !q.get("error_description")) return;
+    const t = setTimeout(async () => {
+      const { data } = (await supabase()?.auth.getSession()) ?? { data: { session: null } };
+      if (!data.session) location.replace("/signin?confirmed=1");
+      else history.replaceState(null, "", location.pathname);
+    }, 2500);
+    return () => clearTimeout(t);
+  }, []);
+
   // On sign-in: pull the saved workspace, or upload this device's progress if the account is new.
   useEffect(() => {
     const sb = supabase();

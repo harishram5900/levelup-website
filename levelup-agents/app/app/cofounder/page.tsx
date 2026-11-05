@@ -93,7 +93,7 @@ export default function CofounderChat() {
 
   return (
     <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <section className="glass flex h-[calc(100dvh-140px)] min-h-[520px] flex-col overflow-hidden rounded-[28px]">
+      <section className="glass flex h-[calc(100dvh-172px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] min-h-[380px] flex-col overflow-hidden rounded-[28px] md:h-[calc(100dvh-140px)] md:min-h-[520px]">
         <header className="flex items-center gap-3 border-b border-fg/[0.07] px-5 py-3">
           <Buddy character={ws.prefs.character} mood={busy ? "think" : "happy"} size={44} />
           <div className="min-w-0 flex-1"><p className="font-semibold">{buddy.name} · your AI co-founder</p><p className="truncate text-xs text-muted">Knows {ws.profile.startup}, {Object.keys(ws.results).length} plans, {ws.goals.length} goals{ws.notes?.length ? `, ${ws.notes.length} notes` : ""}</p></div>

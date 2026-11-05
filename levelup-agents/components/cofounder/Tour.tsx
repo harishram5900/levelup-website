@@ -29,6 +29,17 @@ const STEPS: Step[] = [
   { target: "top-stats", title: "Always on top", body: "Your level, XP and streak follow you on every page. That's it. Let's build something!" },
 ];
 
+/** Shorter tour for phones: the tab bar is the map. */
+const MOBILE_STEPS: Step[] = [
+  { title: "Welcome to your HQ!", body: "A 30-second tour. Tap Next, or skip anytime (replay it from Settings)." },
+  { target: "hero", title: "Your Startup HQ", body: "Your startup, level and XP. Finishing agents, hitting goals and showing up daily all earn XP." },
+  { target: "today", title: "Today's quest", body: "Not sure what to do? Tap Play. It always points to your next step." },
+  { target: "tab-agents", title: "Your 12 agents", body: "Idea, customers, competitors, pitch, money, launch and more. Each one asks a few questions and hands you a plan." },
+  { target: "tab-cofounder", title: "AI co-founder (Pro)", body: "Chat with me anytime. I remember your startup, your plans and our past chats." },
+  { target: "tab-opps", title: "Opportunities", body: "300+ competitions, grants, hackathons and programs, ranked for your startup." },
+  { target: "open-menu", title: "More", body: "Playbooks, leaderboards, friends, your team and settings. That's it. Let's build something!" },
+];
+
 function visibleRect(sel?: string) {
   if (!sel) return null;
   const els = Array.from(document.querySelectorAll<HTMLElement>(`[data-tour="${sel}"]`));
@@ -42,9 +53,10 @@ export function Tour() {
   const path = usePathname();
   const router = useRouter();
   const [i, setI] = useState(0);
+  const [S] = useState(() => (typeof window !== "undefined" && window.innerWidth < 768 ? MOBILE_STEPS : STEPS));
   const [rect, setRect] = useState<DOMRect | null>(null);
   const active = ready && !!ws.profile && !ws.prefs.tourDone && path === "/app";
-  const step = STEPS[i];
+  const step = S[i];
   const buddy = characterById(ws.prefs.character);
 
   const finish = useCallback(() => { update((w) => ({ ...w, prefs: { ...w.prefs, tourDone: true } })); setI(0); }, [update]);
@@ -71,7 +83,7 @@ export function Tour() {
     if (!active) return;
     const k = (e: KeyboardEvent) => {
       if (e.key === "Escape") finish();
-      if (e.key === "ArrowRight") setI((x) => Math.min(STEPS.length - 1, x + 1));
+      if (e.key === "ArrowRight") setI((x) => Math.min(S.length - 1, x + 1));
       if (e.key === "ArrowLeft") setI((x) => Math.max(0, x - 1));
     };
     addEventListener("keydown", k);
@@ -80,7 +92,7 @@ export function Tour() {
 
   if (!active || !step) return null;
   const pad = 8;
-  const last = i === STEPS.length - 1;
+  const last = i === S.length - 1;
   const mobile = typeof window !== "undefined" && innerWidth < 640;
   // Place the card below the target, or above it if there's no room, clamped to the screen.
   let cardStyle: React.CSSProperties = { left: "50%", top: "50%", transform: "translate(-50%, -50%)" };
@@ -89,30 +101,33 @@ export function Tour() {
     const left = Math.min(Math.max(16, rect.left), innerWidth - 400);
     cardStyle = below ? { left, top: Math.min(rect.bottom + 16, innerHeight - 280) } : { left, top: Math.max(16, rect.top - 16 - 250) };
     if (rect.height > innerHeight * 0.6) cardStyle = { left: Math.min(Math.max(16, rect.right - 400), innerWidth - 400), top: innerHeight - 290 };
-  } else if (mobile) cardStyle = { left: 12, right: 12, bottom: 12 };
+  } else if (mobile) {
+    // Phones: card at the bottom, unless the highlighted thing is in the bottom half (like the tab bar).
+    cardStyle = rect && rect.top > innerHeight / 2 ? { left: 12, right: 12, top: "calc(12px + env(safe-area-inset-top))" } : { left: 12, right: 12, bottom: "calc(12px + env(safe-area-inset-bottom))" };
+  }
 
   return (
-    <div className="fixed inset-0 z-[95]" role="dialog" aria-modal="true" aria-label={`Tutorial step ${i + 1} of ${STEPS.length}: ${step.title}`}>
+    <div className="fixed inset-0 z-[95]" role="dialog" aria-modal="true" aria-label={`Tutorial step ${i + 1} of ${S.length}: ${step.title}`}>
       {/* dim everything except the spotlight */}
       {rect ? (
         <motion.div className="pointer-events-none absolute rounded-2xl ring-2 ring-amber" initial={false}
           animate={{ left: rect.left - pad, top: rect.top - pad, width: rect.width + pad * 2, height: rect.height + pad * 2 }} transition={{ type: "spring", stiffness: 260, damping: 30 }}
           style={{ boxShadow: "0 0 0 9999px rgba(5,6,12,.72)" }} />
       ) : <div className="absolute inset-0 bg-[rgba(5,6,12,.72)]" />}
-      <div className="absolute inset-0" onClick={() => setI((x) => Math.min(STEPS.length - 1, x + 1))} aria-hidden />
+      <div className="absolute inset-0" onClick={() => setI((x) => Math.min(S.length - 1, x + 1))} aria-hidden />
       <AnimatePresence mode="wait">
         <motion.div key={i} initial={{ opacity: 0, y: 10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
           className="absolute w-auto rounded-3xl bg-bg-2 p-5 shadow-2xl ring-1 ring-fg/10 sm:w-[384px]" style={cardStyle}>
           <div className="flex items-start gap-3">
             <Buddy character={ws.prefs.character} mood={last ? "cheer" : i === 0 ? "wave" : "happy"} size={64} />
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-amber">{buddy.name} · {i + 1} of {STEPS.length}</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-amber">{buddy.name} · {i + 1} of {S.length}</p>
               <p className="mt-1 font-display text-2xl uppercase leading-none">{step.title}</p>
               <p className="mt-2 text-sm leading-relaxed text-muted">{step.body}</p>
             </div>
             <button type="button" onClick={finish} aria-label="Skip tutorial" className="text-muted hover:text-fg"><X size={16} aria-hidden /></button>
           </div>
-          <div className="mt-4 h-1 overflow-hidden rounded-full bg-fg/10"><div className="h-full rounded-full bg-amber transition-all" style={{ width: `${((i + 1) / STEPS.length) * 100}%` }} /></div>
+          <div className="mt-4 h-1 overflow-hidden rounded-full bg-fg/10"><div className="h-full rounded-full bg-amber transition-all" style={{ width: `${((i + 1) / S.length) * 100}%` }} /></div>
           <div className="mt-4 flex items-center justify-between gap-2">
             <button type="button" onClick={finish} className="text-sm text-muted hover:text-fg">Skip tour</button>
             <div className="flex gap-2">

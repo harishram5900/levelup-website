@@ -29,7 +29,14 @@ App id: **`tech.levelupinnovations.app`**. It's permanent once you publish, so c
 
 1. **Run the SQL upgrade `supabase/007_reports_and_blocks.sql`** in Supabase → SQL Editor. It adds report and block to the leaderboard, which Apple requires for apps where people can see each other's names.
 2. **Add a support email.** In Vercel → Settings → Environment Variables, add `NEXT_PUBLIC_CONTACT_EMAIL` (e.g. `support@levelupinnovations.tech`) and redeploy. It appears on the Privacy and Delete-account pages, which both stores check.
-3. **Pro purchases in the app.** Both stores require their own in-app purchase (IAP) for digital subscriptions. The app already hides Stripe checkout, prices and promo codes inside the native app, and people who paid on the web keep Pro when they sign in. To sell Pro inside the app later, create the subscription in App Store Connect and Play Console and add RevenueCat (`@revenuecat/purchases-capacitor`). That can be a version 1.1.
+3. **Pro purchases in the app** are built in (RevenueCat). Inside the native app, Stripe checkout, prices and promo codes are hidden, and Pro is sold through the App Store / Google Play instead. People who paid on the web keep Pro when they sign in. To switch it on:
+   1. Run `supabase/008_store_purchases.sql`.
+   2. In App Store Connect and Play Console, create a monthly auto-renewing subscription called "LevelUp Pro".
+   3. In RevenueCat (free to start), add both apps, create the entitlement **`pro`** and attach both products. Make a "default" offering with a Monthly package.
+   4. Add `NEXT_PUBLIC_REVENUECAT_IOS_KEY`, `NEXT_PUBLIC_REVENUECAT_ANDROID_KEY` and `REVENUECAT_WEBHOOK_SECRET` in Vercel.
+   5. In RevenueCat → Integrations → Webhooks, set the URL to `https://www.levelupinnovations.tech/api/revenuecat` and the Authorization header to your secret.
+   6. Until the keys are set, the Go Pro screen in the app says "Pro in the app is coming soon".
+   7. Full timeline and every setting: `mobile/PLAN.md`.
 4. **Test on a real phone:**
    - **Android:** install `LevelUp-debug.apk` (sent separately, or build it below).
    - **iPhone:** run from Xcode or use TestFlight.
@@ -165,7 +172,7 @@ LevelUp is an AI co-founder for young entrepreneurs (13+). Sign up with email, o
 Native features: daily streak reminders (local notifications), haptic feedback, native share sheet, in-app browser for outside links, offline screen.
 Account deletion: More → Settings → Delete my account.
 Leaderboard moderation: tap ⋯ next to any founder to report or block. Reports are reviewed by our team.
-Pro subscriptions are not sold in this version of the app.
+Pro is an auto-renewing monthly subscription sold through in-app purchase (Go Pro tab under More), with Restore Purchases on the same screen.
 Demo account: [add a test email and password with Pro enabled]
 ```
 
@@ -175,7 +182,9 @@ Create a demo account and set it to Pro in Supabase (profiles → plan = "pro") 
 
 ## 6. Launch checklist
 
-- [ ] SQL 007 run in Supabase
+- [ ] SQL 007 and 008 run in Supabase
+- [ ] RevenueCat set up (keys + webhook), store subscriptions created
+- [ ] `APPLE_TEAM_ID` and `ANDROID_CERT_SHA256` set in Vercel (email links open the app)
 - [ ] `NEXT_PUBLIC_CONTACT_EMAIL` set in Vercel, redeployed
 - [ ] `ANTHROPIC_API_KEY` set in Vercel (AI plans and deep research for Pro)
 - [ ] Demo Pro account created for reviewers
