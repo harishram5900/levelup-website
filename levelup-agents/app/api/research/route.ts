@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { admin, userFrom } from "@/lib/server/billing";
 import { keywords, research, type ResearchKind } from "@/lib/server/research";
+import { isHardware, kindOf } from "@/lib/cofounder/context";
 
 /**
  * Live research for the agents and the Opportunities page.
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
     }
   }
 
-  const key = `${kind}|${query.toLowerCase()}|${deep ? "deep" : "free"}|${deep ? `${idea}|${customer}|${extra}` : ""}`;
+  const key = `${kind}|${query.toLowerCase()}|${deep ? "deep" : "free"}|${idea}|${customer}|${extra}`;
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < TTL) return NextResponse.json(hit.data);
 
@@ -58,8 +59,10 @@ export async function POST(req: Request) {
     clean(body.region, 40) && `Country/region: ${clean(body.region, 40)}`,
     extra && `More info: ${extra}`,
   ].filter(Boolean).join("\n");
-  const tech = /app|software|code|ai|web|platform|saas|tool|api|bot|developer|game/i.test(`${idea} ${query}`);
-  const data = await research(kind, query, context, { deep, tech });
+  const tech = /\b(apps?|software|code|ai|web|platform|saas|tools?|api|bots?|developer|games?)\b/i.test(`${idea} ${query}`);
+  const bizKind = kindOf({ idea, startup, customer } as never, { competitor: { niche, alternatives: extra } });
+  const named = extra.split(/[,;\n]| and | or /i).map((x) => x.trim()).filter((x) => x.length > 1 && x.length < 40 && /^[A-Z0-9]/.test(x));
+  const data = await research(kind, query, `${context}\nBusiness kind: ${bizKind}${bizKind === "app" ? "" : " (competitors are businesses, shops, brands or programs, not only apps; include local and offline alternatives)"}`, { deep, tech: tech || isHardware({ idea, startup } as never), appFirst: bizKind === "app", named });
   if (cache.size > 500) cache.clear();
   cache.set(key, { at: Date.now(), data });
   return NextResponse.json(data);

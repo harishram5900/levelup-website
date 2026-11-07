@@ -37,7 +37,18 @@ describe("guided plans (used whenever the AI is unavailable)", () => {
   });
   it("Money does correct break-even math", () => {
     const out = guided("money", P, { price: "$8", costs: "40" });
-    expect(out.find((s) => s.title === "Break-even math")!.items[0]).toContain("= 5 paying customers");
+    expect(out.find((s) => s.title === "Break-even math")!.items.join(" ")).toContain("= 5 sales a month");
+    const unit = guided("money", P, { price: "24", costs: "60", unitCost: "9" }).find((s) => s.title === "Break-even math")!.items.join(" ");
+    expect(unit).toContain("$15 profit");
+    expect(unit).toContain("= 4 sales a month");
+    const loss = guided("money", P, { price: "5", costs: "60", unitCost: "6" }).find((s) => s.title === "Break-even math")!.items[0];
+    expect(loss).toContain("lose money");
+  });
+  it("Adapts to the kind of business (no app advice for a bakery)", () => {
+    const bakery = { ...P, startup: "Sweet Spot", idea: "sells homemade cupcakes at school events" };
+    const text = ["build", "launch", "money"].flatMap((id) => guided(id as never, bakery, {}).flatMap((s) => s.items)).join(" ");
+    expect(text).not.toMatch(/Product Hunt|r\/SaaS|freemium|App Store/);
+    expect(guided("pitch", bakery, {}).flatMap((s) => s.items).join(" ")).toContain("Sweet Spot sells homemade cupcakes");
   });
   it("Traction includes launch sites and copyable drafts with the founder's link", () => {
     const out = guided("launch", P, { link: "voca.app", channels: "TikTok" });

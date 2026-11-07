@@ -126,6 +126,7 @@ export const AGENTS: Agent[] = [
       { id: "model", label: "How will you charge?", placeholder: "e.g. Monthly subscription / one-time / schools pay" },
       { id: "price", label: "Price you're thinking of ($)", placeholder: "e.g. 8" },
       { id: "costs", label: "Monthly costs ($)", placeholder: "e.g. 40" },
+      { id: "unitCost", label: "Cost to make or deliver one (optional, $)", placeholder: "e.g. 6" },
     ],
     sections: ["Pricing", "Break-even math", "Funding you can get", "Money basics"],
     brief: "Do simple, correct arithmetic. Recommend funding realistic for students: competitions, grants, small accelerators, pre-sales. Note that founders under 18 need a parent or guardian for bank accounts and contracts.",

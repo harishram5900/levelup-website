@@ -4,6 +4,7 @@ import { guided } from "./templates";
 import { getWorkspace, type AgentResult, type Profile } from "./profile";
 import { matchCommunities, matchDirectories } from "./channels";
 import { matchOpportunities, type OppType } from "./opportunities";
+import { kindOf } from "./context";
 import { tractionSummary } from "./traction";
 import { supabase } from "../supabase";
 
@@ -63,11 +64,13 @@ function teamContext(exclude: AgentId): string {
 function oppDigest(agentId: AgentId, p: Profile): string {
   const types = OPPS_FOR[agentId];
   const parts: string[] = [];
+  const k = kindOf(p, getWorkspace().answers);
+  parts.push(`Business kind: ${k}. Give advice that fits this kind of business; not every startup is an app.`);
   if (types) parts.push("Matched opportunities from LevelUp's verified database:", ...matchOpportunities({ text: `${p.idea} ${p.customer} ${p.startup}`, stage: p.stage, types, limit: 10 }).map((o) => `- ${o.name} (${o.type}, ${o.org}, ages: ${o.ages.join("/")}, ${o.region}): ${o.what} Perk: ${o.perk}. ${o.url}`));
   if (agentId === "launch" || agentId === "content" || agentId === "customer") {
     const text = `${p.idea} ${p.customer}`;
-    parts.push("Launch sites that fit:", ...matchDirectories(text, 8).map((d) => `- ${d.name}: ${d.how} ${d.url}`));
-    parts.push("Communities that fit (always follow their rules):", ...matchCommunities(text, 8).map((c) => `- ${c.name}: ${c.angle} ${c.url}`));
+    parts.push("Launch sites that fit:", ...matchDirectories(text, 8, k).map((d) => `- ${d.name}: ${d.how} ${d.url}`));
+    parts.push("Communities that fit (always follow their rules):", ...matchCommunities(text, 8, k).map((c) => `- ${c.name}: ${c.angle} ${c.url}`));
   }
   return parts.join("\n").slice(0, 6000);
 }
@@ -90,5 +93,5 @@ export async function runAgent(agentId: AgentId, profile: Profile, answers: Reco
     const out = await res.json();
     if (out?.source === "ai" && Array.isArray(out.sections) && out.sections.length) return { sections: out.sections, source: "ai", at: Date.now(), research };
   } catch { /* network error: fall through */ }
-  return { sections: guided(agentId, profile, answers, research), source: "guided", at: Date.now(), research };
+  return { sections: guided(agentId, profile, answers, research, { ...getWorkspace().answers, [agentId]: answers }), source: "guided", at: Date.now(), research };
 }

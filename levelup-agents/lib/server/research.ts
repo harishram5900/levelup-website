@@ -118,7 +118,12 @@ async function hn(q: string, tags: string, n: number): Promise<Found[]> {
 /* ---------------- GitHub ---------------- */
 async function github(q: string): Promise<Found[]> {
   const d = (await get(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&per_page=6`, { headers: { accept: "application/vnd.github+json" } })) as { items?: { full_name: string; html_url: string; description?: string; stargazers_count?: number }[] } | null;
-  return (d?.items ?? []).map((r) => ({ name: r.full_name, url: r.html_url, source: "GitHub", detail: clip(r.description, 160), meta: `${r.stargazers_count ?? 0} stars` }));
+  // GitHub's search is loose: keep repos that mention most of the query words.
+  const words = q.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+  const need = Math.min(words.length, Math.max(2, Math.ceil(words.length * 0.6)));
+  return (d?.items ?? [])
+    .filter((r) => (r.description ?? "").length < 400 && words.filter((w) => `${r.full_name} ${(r.description ?? "").slice(0, 200)}`.toLowerCase().includes(w)).length >= need)
+    .map((r) => ({ name: r.full_name, url: r.html_url, source: "GitHub", detail: clip(r.description, 160), meta: `${r.stargazers_count ?? 0} stars` }));
 }
 
 /* ---------------- Reddit ---------------- */
@@ -202,17 +207,38 @@ const settle = async <T,>(p: Promise<T>, fallback: T, name: string, ok: string[]
   try { const v = await p; if (Array.isArray(v) ? v.length : v && Object.values(v as object).some((x) => Array.isArray(x) && x.length)) ok.push(name); return v; } catch { return fallback; }
 };
 
-export async function research(kind: ResearchKind, query: string, context: string, opts: { deep: boolean; tech: boolean }): Promise<Research> {
+/** Look up the founder's own named alternatives (e.g. "Grailed, Crumbl") by name, keeping only real name matches. */
+async function namedApps(names: string[]): Promise<{ apps: Found[]; complaints: Complaint[] }> {
+  const out = await Promise.all(names.map((n) => appStore(n).catch(() => ({ apps: [], complaints: [] }))));
+  const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const apps: Found[] = [], complaints: Complaint[] = [];
+  out.forEach((r, i) => {
+    const want = norm(names[i]);
+    const hit = r.apps.find((a) => norm(a.name).startsWith(want));
+    if (!hit) return;
+    apps.push(hit);
+    complaints.push(...r.complaints.filter((c) => c.app === hit.name).slice(0, 4));
+  });
+  return { apps, complaints };
+}
+
+/**
+ * `appFirst` is false for food, physical products, services and social projects: their competitors are
+ * shops, brands and programs, not apps, so a generic App Store search would return cupcake games.
+ */
+export async function research(kind: ResearchKind, query: string, context: string, opts: { deep: boolean; tech: boolean; appFirst?: boolean; named?: string[] }): Promise<Research> {
   const q = clip(query, 80);
   const ok: string[] = [];
   const empty: Research = { kind, query: q, competitors: [], complaints: [], communities: [], discussions: [], hackathons: [], web: [], sources: ok, ai: false, at: Date.now() };
   if (!q) return empty;
 
   if (kind === "competitors") {
+    const appFirst = opts.appFirst !== false;
+    const named = (opts.named ?? []).slice(0, 4);
     const [as, gp, show, gh, rd, web] = await Promise.all([
-      settle(appStore(q), { apps: [], complaints: [] }, "App Store", ok),
-      settle(googlePlay(q), [], "Google Play", ok),
-      settle(hn(q, "show_hn", 8), [], "Hacker News", ok),
+      appFirst ? settle(appStore(q), { apps: [], complaints: [] }, "App Store", ok) : settle(namedApps(named), { apps: [], complaints: [] }, "App Store", ok),
+      appFirst ? settle(googlePlay(q), [], "Google Play", ok) : Promise.resolve([] as Found[]),
+      appFirst || opts.tech ? settle(hn(q, "show_hn", 8), [], "Hacker News", ok) : Promise.resolve([] as Found[]),
       opts.tech ? settle(github(q), [], "GitHub", ok) : Promise.resolve([] as Found[]),
       settle(reddit(q), { subs: [], posts: [] }, "Reddit", ok),
       opts.deep ? settle(claudeResearch(kind, context), [], "Web research", ok) : Promise.resolve([] as Found[]),

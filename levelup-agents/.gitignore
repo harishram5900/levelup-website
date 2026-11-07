@@ -8,3 +8,4 @@ data/waitlist.json
 .env
 .env.production
 mobile/builds
+eval-report.json
