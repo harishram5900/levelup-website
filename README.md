@@ -83,3 +83,7 @@ cases to the rule tables in `server/normalize.ts`.
 Hard filters: grade, status, state, GPA, minimum amount, required circumstances, heritage (only
 when the student shared theirs) and women-only awards (only when the student is male). Everything
 else affects ranking or shows up as a warning.
+
+## Agent company (Paperclip)
+
+`paperclip/` is an importable team of 11 AI agents (engineering, marketing, research, finance) that builds and grows LevelUp while you stay the board. Setup and activation steps are in [docs/PAPERCLIP.md](docs/PAPERCLIP.md).

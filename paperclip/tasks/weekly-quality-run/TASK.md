@@ -1,7 +1,7 @@
 ---
 name: Weekly quality run
 assignee: qa
-project: quality
+project: quality-and-trust
 recurring: true
 ---
 

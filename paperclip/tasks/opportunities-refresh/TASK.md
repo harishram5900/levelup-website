@@ -1,7 +1,7 @@
 ---
 name: Weekly opportunities refresh
 assignee: researcher
-project: opportunities-db
+project: opportunities-database
 recurring: true
 ---
 
