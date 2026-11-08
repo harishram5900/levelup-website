@@ -1,5 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
+import { Icon3D } from "@/components/ui/Icon3D";
+import { AGENT_STYLE } from "@/components/cofounder/AgentLayouts";
 import { ArrowLeft, ArrowRight, Award, Gift, Medal, BookOpen, Check, Crown, ExternalLink, Flame, Layers, Lock, Pencil, Plus, Sparkles, Star, Trash2, Trophy, Zap } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -118,7 +120,7 @@ function Welcome({ signedIn, onStart }: { signedIn: boolean; onStart: () => void
       <ul className="space-y-2.5">
         {points.map((x, i) => (
           <motion.li key={x.t} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 + i * 0.1 }} className="glass flex items-center gap-3.5 rounded-2xl p-3.5">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber/15 text-amber"><x.icon size={20} aria-hidden /></span>
+            <Icon3D icon={x.icon} color={["#6D4AFF", "#F5A524", "#F43F5E"][i % 3]} size={46} />
             <span><span className="block font-semibold">{x.t}</span><span className="text-sm text-muted">{x.d}</span></span>
           </motion.li>
         ))}
@@ -326,11 +328,10 @@ export default function HQ() {
                       <Link href={q.locked ? "/app/upgrade" : q.href} className="group flex items-center gap-4 py-1">
                         <span className="relative">
                           {isCur && <span className="absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-fg px-2.5 py-0.5 text-[11px] font-semibold text-bg">START<span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-amber" /></span>}
-                          <motion.span whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
-                            className={cn("grid place-items-center rounded-full transition-colors",
-                              q.boss ? "h-[64px] w-[64px]" : "h-[52px] w-[52px]",
-                              q.done ? "bg-fg text-bg" : isCur ? "pulse-ring border-2 border-fg bg-bg-2 text-fg" : "border border-fg/20 text-muted")}>
-                            {q.done ? <Check size={22} strokeWidth={2.5} aria-hidden /> : q.locked ? <Lock size={18} aria-hidden /> : q.boss ? <Crown size={24} aria-hidden /> : <Icon size={20} aria-hidden />}
+                          <motion.span whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }} className={cn("relative block rounded-full", isCur && "pulse-ring")}>
+                            <Icon3D round icon={q.done ? Check : q.locked ? Lock : q.boss ? Crown : Icon} size={q.boss ? 66 : 54}
+                              color={q.done ? "#22C55E" : q.boss ? "#F5A524" : (AGENT_STYLE as Record<string, { color: string }>)[q.id]?.color ?? "#6D4AFF"}
+                              state={q.locked ? "locked" : !q.done && !isCur ? "locked" : "idle"} />
                           </motion.span>
                           
                         </span>
@@ -373,9 +374,9 @@ export default function HQ() {
             const Icon = b.icon;
             return (
               <li key={b.id} className={cn("flex flex-col items-center rounded-2xl p-3 text-center transition", got ? "border border-fg/15" : "border border-dashed border-fg/15")}>
-                <motion.span whileHover={got ? { rotate: [0, -10, 10, 0] } : undefined} className={cn("relative grid h-14 w-14 place-items-center rounded-full", got ? "bg-fg text-bg" : "bg-fg/[0.07] text-muted")}>
-                  <Icon size={24} aria-hidden />
-                  {!got && <Lock size={14} className="absolute -bottom-0.5 -right-0.5 rounded-full bg-bg-2 p-0.5" aria-hidden />}
+                <motion.span whileHover={got ? { rotate: [0, -10, 10, 0] } : undefined} className="relative">
+                  <Icon3D round icon={Icon} size={58} color={["#F5A524", "#6D4AFF", "#F43F5E", "#14B8A6"][BADGES.indexOf(b) % 4]} state={got ? "idle" : "locked"} />
+                  {!got && <Lock size={14} className="absolute -bottom-0.5 -right-0.5 rounded-full bg-bg p-0.5" aria-hidden />}
                 </motion.span>
                 <p className={cn("mt-2 text-sm font-semibold leading-tight", !got && "text-muted")}>{b.name}</p>
                 <p className="text-[11px] leading-snug text-muted">{got ? "Unlocked" : b.how}</p>

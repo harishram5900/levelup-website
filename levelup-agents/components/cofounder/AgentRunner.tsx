@@ -14,6 +14,7 @@ import { Buddy, BuddySays, characterById } from "./Pip";
 import { PlaybookCard } from "./PlaybookCard";
 import { ProGate } from "./ProGate";
 import { AGENT_STYLE, AgentResultView } from "./AgentLayouts";
+import { Icon3D } from "@/components/ui/Icon3D";
 
 // These agents put their questions on top and use the full width for results.
 const TOP_FORM: AgentId[] = ["competitor", "customer", "brand", "pitch", "content", "launch", "sales"];
@@ -176,7 +177,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
     <div className="mx-auto max-w-[1240px] space-y-6" style={{ ["--ag" as string]: st.color } as React.CSSProperties}>
       {/* Agent header: calm surface; the agent's color lives only in its icon */}
       <header className="flex items-center gap-4">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white" style={{ background: st.color }}><Icon size={22} aria-hidden /></span>
+        <Icon3D icon={Icon} color={st.color} size={56} />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium text-muted">{WORLDS[agent.world].name} · {agent.role}{result ? " · completed" : ""}</p>
           <h2 className="text-2xl sm:text-3xl">{agent.name} agent</h2>

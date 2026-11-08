@@ -1,5 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
+import { Icon3D } from "@/components/ui/Icon3D";
+import { AGENT_STYLE } from "@/components/cofounder/AgentLayouts";
 import { Bot, ChevronDown, LineChart, ChevronsLeft, Crown, Flame, LayoutDashboard, Menu, Sparkles, Trophy, Zap, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -87,7 +89,7 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
                   <Link href={n.href} onClick={onNavigate} data-tour={n.tour} aria-current={active ? "page" : undefined} title={collapsed ? n.label : undefined}
                     className={cn("relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors", active ? "text-fg" : "text-muted hover:text-fg", inPro && "ml-2")}>
                     {active && <motion.span layoutId="nav-active" transition={spring} className="absolute inset-0 rounded-xl bg-fg/[0.07]" />}
-                    <Icon size={18} className="relative shrink-0" aria-hidden />
+                    {n.href.startsWith("/app/agents/") ? <Icon3D icon={Icon} size={26} className="relative" color={(AGENT_STYLE as Record<string, { color: string }>)[n.href.split("/").pop() ?? ""]?.color ?? "#6D4AFF"} /> : <Icon size={18} className="relative shrink-0" aria-hidden />}
                     {!collapsed && <span className="relative flex-1 truncate">{n.label}</span>}
                     {!collapsed && n.pro && !pro && <ProBadge className="relative" />}
                   </Link>
@@ -103,30 +105,30 @@ function NavList({ collapsed, onNavigate }: { collapsed?: boolean; onNavigate?: 
 
 /** Mobile bottom tab bar (the main navigation in the phone app). */
 const TABS = [
-  { href: "/app", label: "HQ", tour: "tab-hq", icon: LayoutDashboard, match: (p: string) => p === "/app" },
-  { href: "/app/agents", label: "Agents", tour: "tab-agents", icon: Sparkles, match: (p: string) => p.startsWith("/app/agents") },
-  { href: "/app/growth", label: "Growth", tour: "tab-growth", icon: LineChart, match: (p: string) => p.startsWith("/app/growth") },
-  { href: "/app/opportunities", label: "Opportunities", tour: "tab-opps", icon: Trophy, match: (p: string) => p.startsWith("/app/opportunities") },
+  { href: "/app", label: "HQ", tour: "tab-hq", icon: LayoutDashboard, color: "#6D4AFF", match: (p: string) => p === "/app" },
+  { href: "/app/agents", label: "Agents", tour: "tab-agents", icon: Sparkles, color: "#F5A524", match: (p: string) => p.startsWith("/app/agents") },
+  { href: "/app/growth", label: "Growth", tour: "tab-growth", icon: LineChart, color: "#22C55E", match: (p: string) => p.startsWith("/app/growth") },
+  { href: "/app/opportunities", label: "Opportunities", tour: "tab-opps", icon: Trophy, color: "#F43F5E", match: (p: string) => p.startsWith("/app/opportunities") },
 ];
 function TabBar({ path, onMore }: { path: string; onMore: () => void }) {
   const moreActive = !TABS.some((t) => t.match(path));
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-fg/[0.08] bg-bg/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
+    <nav aria-label="Main" className="neo-tabbar fixed inset-x-0 bottom-0 z-30 rounded-t-[26px] pb-[env(safe-area-inset-bottom)] md:hidden">
       <ul className="mx-auto grid max-w-md grid-cols-5">
         {TABS.map((t) => {
           const on = t.match(path);
           const Icon = t.icon;
           return (
             <li key={t.href}>
-              <Link href={t.href} data-tour={t.tour} aria-current={on ? "page" : undefined} className={cn("flex min-h-[56px] flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold transition active:scale-95", on ? "text-fg" : "text-muted")}>
-                <span className={cn("grid h-7 w-12 place-items-center rounded-full transition", on && "bg-fg text-bg")}><Icon size={19} aria-hidden /></span>{t.label}
+              <Link href={t.href} data-tour={t.tour} aria-current={on ? "page" : undefined} className={cn("flex min-h-[62px] flex-col items-center justify-center gap-1 text-[10.5px] font-extrabold transition active:scale-95", on ? "text-fg" : "text-muted")}>
+                {on ? <Icon3D icon={Icon} color={t.color} size={32} /> : <span className="grid h-8 w-8 place-items-center"><Icon size={21} strokeWidth={2.2} aria-hidden /></span>}{t.label}
               </Link>
             </li>
           );
         })}
         <li>
-          <button type="button" onClick={onMore} data-tour="open-menu" aria-label="More: open the full menu" className={cn("flex min-h-[56px] w-full flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold transition active:scale-95", moreActive ? "text-fg" : "text-muted")}>
-            <span className={cn("grid h-7 w-12 place-items-center rounded-full", moreActive && "bg-fg text-bg")}><Menu size={19} aria-hidden /></span>More
+          <button type="button" onClick={onMore} data-tour="open-menu" aria-label="More: open the full menu" className={cn("flex min-h-[62px] w-full flex-col items-center justify-center gap-1 text-[10.5px] font-extrabold transition active:scale-95", moreActive ? "text-fg" : "text-muted")}>
+            {moreActive ? <Icon3D icon={Menu} color="#0EA5E9" size={32} /> : <span className="grid h-8 w-8 place-items-center"><Menu size={21} strokeWidth={2.2} aria-hidden /></span>}More
           </button>
         </li>
       </ul>
