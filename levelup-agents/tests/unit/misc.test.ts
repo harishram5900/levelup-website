@@ -56,3 +56,14 @@ describe("growth tracker", () => {
     expect(tractionSummary({ traction: log })).toMatch(/13\.31 users|growing 10% per week/);
   });
 });
+
+import { lineText } from "@/lib/cofounder/lines";
+import { AGENTS as ALL_AGENTS } from "@/lib/agents";
+describe("character voice lines", () => {
+  it("every character has every line, and unknown lines are refused", () => {
+    for (const c of ["pip", "blaze", "sage", "nova", "rocco"] as const) {
+      for (const l of ["intro", "hello", "cheer", "levelup", "badge", "streak", ...ALL_AGENTS.map((a) => `agent-${a.id}`)]) expect(lineText(c, l)?.length ?? 0).toBeGreaterThan(10);
+      expect(lineText(c, "say anything")).toBeNull();
+    }
+  });
+});

@@ -2,6 +2,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { chirp, say, sfx } from "@/lib/sound";
 import { BADGES, gameStats } from "@/lib/cofounder/game";
 import { today, useWorkspace } from "@/lib/cofounder/profile";
 import { usePlan } from "@/lib/cofounder/plan";
@@ -54,9 +55,12 @@ export function Celebrator() {
   useEffect(() => {
     if (!moment) return;
     haptic("success");
+    sfx("levelup");
+    const who = ws.prefs.character;
+    const v = setTimeout(() => { chirp(who); setTimeout(() => void say(who, moment.kind === "level" ? "levelup" : "badge"), 380); }, 700);
     const t = setTimeout(() => setMoment(null), 4200);
-    return () => clearTimeout(t);
-  }, [moment]);
+    return () => { clearTimeout(t); clearTimeout(v); };
+  }, [moment]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <AnimatePresence>
@@ -64,7 +68,7 @@ export function Celebrator() {
         <>
           {!reduce && <Confetti key={moment.title} />}
           <motion.div role="status" initial={{ opacity: 0, y: 40, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 22 }}
-            className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] left-1/2 z-[90] flex md:bottom-5 w-[min(92vw,440px)] -translate-x-1/2 items-center gap-3 rounded-3xl bg-bg-2 p-4 pr-10 shadow-2xl ring-2 ring-amber/60">
+            className="fixed inset-x-0 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-[90] mx-auto flex md:bottom-5 w-[min(92vw,440px)] items-center gap-3 rounded-3xl bg-bg-2 p-4 pr-10 shadow-2xl ring-2 ring-amber/60">
             <Buddy character={ws.prefs.character} mood="cheer" size={64} />
             <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-widest text-amber">{moment.kind === "level" ? "Level up!" : "New badge"}</p>

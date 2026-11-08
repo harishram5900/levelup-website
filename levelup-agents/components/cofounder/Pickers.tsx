@@ -1,4 +1,5 @@
 "use client";
+import { chirp, say } from "@/lib/sound";
 import { Check, Crown } from "lucide-react";
 import Link from "next/link";
 import { usePlan } from "@/lib/cofounder/plan";
@@ -13,7 +14,7 @@ export function CharacterPicker({ value, onChange }: { value: Prefs["character"]
       {CHARACTERS.map((c) => {
         const on = value === c.id;
         return (
-          <button key={c.id} type="button" role="radio" aria-checked={on} onClick={() => onChange(c.id)}
+          <button key={c.id} type="button" role="radio" aria-checked={on} onClick={() => { onChange(c.id); chirp(c.id); setTimeout(() => void say(c.id, "intro"), 380); }}
             className={cn("group relative flex flex-col items-center rounded-2xl p-3 pt-4 text-center transition", on ? "bg-violet/10 ring-2 ring-violet" : "bg-fg/[0.03] ring-1 ring-fg/10 hover:ring-fg/30")}>
             {on && <span className="absolute right-2 top-2 grid h-5 w-5 place-items-center rounded-full bg-violet text-white"><Check size={12} strokeWidth={3} aria-hidden /></span>}
             <Buddy character={c.id} mood={on ? "cheer" : "happy"} size={76} />

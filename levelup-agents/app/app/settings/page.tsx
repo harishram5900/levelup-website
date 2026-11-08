@@ -72,6 +72,21 @@ export default function SettingsPage() {
         <CharacterPicker value={ws.prefs.character} onChange={(c) => update((w) => ({ ...w, prefs: { ...w.prefs, character: c } }))} />
       </Card>
 
+      <Card title="Sound and voice" sub="Your co-founder talks and the app plays small sounds. Turn either off anytime.">
+        <div className="grid gap-3 sm:grid-cols-2">
+          {([["sound", "Sound effects", "Taps, XP coins and level-up fanfares"], ["voice", "Character voices", "Your co-founder introduces agents and cheers you on"]] as const).map(([k, label, hint]) => {
+            const on = ws.prefs[k] !== false;
+            return (
+              <button key={k} type="button" role="switch" aria-checked={on} onClick={() => update((w) => ({ ...w, prefs: { ...w.prefs, [k]: !on } }))}
+                className="flex items-center justify-between gap-3 rounded-2xl p-4 text-left hairline">
+                <span><b className="block text-[15px]">{label}</b><span className="text-sm text-muted">{hint}</span></span>
+                <span className={cn("relative h-7 w-12 shrink-0 rounded-full transition", on ? "bg-good" : "bg-fg/20")}><span className={cn("absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all", on ? "left-6" : "left-1")} /></span>
+              </button>
+            );
+          })}
+        </div>
+      </Card>
+
       <Card title="Dashboard colors" sub="Changes buttons, highlights and your HQ banner.">
         <PalettePicker value={ws.prefs.palette} onChange={(p) => update((w) => ({ ...w, prefs: { ...w.prefs, palette: p } }))} />
       </Card>

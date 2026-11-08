@@ -388,3 +388,63 @@ html:not(.dark) .app-scope .text-emerald-700 { color: #065f46; }
 html:not(.dark) .app-scope .text-blue-700 { color: #1e40af; }
 /* Never let a transient animation widen the mobile layout viewport */
 html:has(.app-scope), body:has(.app-scope) { overflow-x: clip; }
+
+
+/* ================================================================
+   PREMIUM pass: notebook typography back (Instrument Serif + Inter
+   Tight), warm stone neumorphism with deeper, softer light, a glossy
+   ink key as the main action. Color lives in the 3D icons only.
+   ================================================================ */
+html:not(.dark) .app-scope, .app-scope {
+  --bg: 236 233 227;    /* warm stone #ECE9E3 */
+  --bg-2: 242 240 235;
+  --fg: 26 24 20;       /* ink */
+  --muted: 96 90 80;
+  --line: 26 24 20; --line-alpha: 0.1;
+  --good: 24 98 64;     /* deep green */
+  --amber: 130 66 4;
+  --violet: 24 98 64;
+  --ink: 26 24 20; --paper: 236 233 227;
+  --neo-hi: rgba(255, 255, 255, .88);
+  --neo-lo: rgba(168, 157, 140, .5);
+}
+html.dark .app-scope {
+  --bg: 26 25 23; --bg-2: 32 31 28; --fg: 240 236 228; --muted: 166 159 146;
+  --line: 240 236 228; --good: 110 200 150; --amber: 240 170 80; --violet: 110 200 150;
+  --ink: 240 236 228; --paper: 26 25 23;
+  --neo-hi: rgba(255, 255, 255, .04); --neo-lo: rgba(0, 0, 0, .55);
+}
+
+/* Typography: the notebook pairing */
+.app-scope :is(h1, h2, h3, .font-display, .serif) {
+  font-family: "Instrument Serif", Georgia, serif !important; font-weight: 400 !important;
+  letter-spacing: -0.012em; line-height: 1.02;
+}
+.app-scope h2.text-3xl, .app-scope h2.text-2xl { font-size: 2.45rem !important; }
+.app-scope h3.text-lg { font-size: 1.6rem !important; line-height: 1.08; }
+.app-scope .font-display.text-5xl, .app-scope h2.text-5xl { font-size: 2.85rem !important; }
+.app-scope .font-display.text-4xl, .app-scope h2.text-4xl { font-size: 2.45rem !important; }
+.app-scope b, .app-scope strong, .app-scope .font-semibold { font-weight: 600; }
+.app-scope .kicker { font-size: 12.5px; font-weight: 500; letter-spacing: 0.01em; text-transform: none; color: rgb(var(--muted)); }
+.app-scope h1.ui-title { font-family: "Inter Tight Variable", system-ui, sans-serif !important; font-weight: 600 !important; letter-spacing: -0.01em; font-size: 15px; }
+
+/* Softer, deeper light on every raised surface */
+.app-scope .glass {
+  border: 1px solid rgba(255, 255, 255, .5) !important;
+  box-shadow: 14px 14px 32px var(--neo-lo), -12px -12px 28px var(--neo-hi) !important;
+}
+.dark .app-scope .glass { border-color: rgba(255, 255, 255, .035) !important; }
+
+/* The main action: a glossy ink key that presses down */
+.app-scope .btn-play, .app-scope .bg-cta {
+  background: linear-gradient(180deg, #34302A 0%, #1A1814 55%, #12100D 100%) !important; color: #F6F3EC !important;
+  border-radius: 999px; font-weight: 600; letter-spacing: -0.005em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), inset 0 -2px 0 rgba(0, 0, 0, .5), 0 4px 0 #0A0907, 0 14px 26px -10px rgba(26, 24, 20, .55) !important;
+}
+.app-scope .btn-play:active, .app-scope .bg-cta:active { transform: translateY(3px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 1px 0 #0A0907, 0 6px 12px -8px rgba(26, 24, 20, .5) !important; }
+.app-scope .bg-cta { border-radius: 24px; }
+.dark .app-scope :is(.btn-play, .bg-cta) {
+  background: linear-gradient(180deg, #FFFFFF, #E9E4DA) !important; color: #1A1814 !important;
+  box-shadow: inset 0 1px 0 #fff, 0 4px 0 #A79F92, 0 14px 26px -10px rgba(0, 0, 0, .7) !important;
+}
+.app-scope .bg-accent { background: rgb(var(--good)) !important; }

@@ -19,7 +19,7 @@ export type DeckFont = "bebas" | "serif" | "sans" | "mono";
 export type DeckStyle = { template: DeckTemplate; font: DeckFont; bg: string; fg: string; accent: string; gradient: boolean };
 export type Deck = { theme?: DeckTheme; style: DeckStyle; logo?: string; slides: Slide[]; at: number };
 export type PaletteId = "royal" | "emerald" | "sunset" | "violet" | "crimson" | "ocean" | "gold" | "aurora";
-export type Prefs = { character: "pip" | "blaze" | "sage" | "nova" | "rocco"; palette: PaletteId; tourDone: boolean; picked: boolean };
+export type Prefs = { character: "pip" | "blaze" | "sage" | "nova" | "rocco"; palette: PaletteId; tourDone: boolean; picked: boolean; sound?: boolean; voice?: boolean };
 export type Workspace = {
   profile: Profile | null;
   results: Partial<Record<AgentId, AgentResult>>;

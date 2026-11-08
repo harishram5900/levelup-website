@@ -11,6 +11,7 @@ import { useWorkspace } from "@/lib/cofounder/profile";
 import { runAgent } from "@/lib/cofounder/runAgent";
 import { cn } from "@/lib/utils";
 import { Buddy, BuddySays, characterById } from "./Pip";
+import { TalkingBuddy } from "./TalkingBuddy";
 import { PlaybookCard } from "./PlaybookCard";
 import { ProGate } from "./ProGate";
 import { AGENT_STYLE, AgentResultView } from "./AgentLayouts";
@@ -182,7 +183,7 @@ export function AgentRunner({ agentId }: { agentId: AgentId }) {
           <p className="text-xs font-medium text-muted">{WORLDS[agent.world].name} · {agent.role}{result ? " · completed" : ""}</p>
           <h2 className="text-2xl sm:text-3xl">{agent.name} agent</h2>
         </div>
-        <Buddy character={ch} mood={loading ? "think" : result ? "cheer" : "happy"} size={48} className="shrink-0" />
+        <TalkingBuddy character={ch} mood={loading ? "think" : result ? "cheer" : "happy"} size={52} line={`agent-${agent.id}`} hint />
       </header>
       <p className="-mt-2 max-w-2xl text-[15px] text-muted">{loading ? (step || "Thinking about your startup…") : agent.line}</p>
 

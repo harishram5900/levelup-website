@@ -1,6 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { sfx } from "@/lib/sound";
 
 /** One action, one reaction: a small "+25 XP" chip that floats up after a meaningful action. */
 export function xpToast(amount: number, label = "XP") {
@@ -14,6 +15,7 @@ export function XpToast() {
       const { amount, label } = (e as CustomEvent<{ amount: number; label: string }>).detail;
       const id = Date.now() + Math.random();
       setItems((x) => [...x, { id, amount, label }].slice(-3));
+      sfx("coin");
       setTimeout(() => setItems((x) => x.filter((i) => i.id !== id)), 1400);
     };
     window.addEventListener("lu-xp", on);

@@ -9,6 +9,7 @@ import { PlaybookCard } from "@/components/cofounder/PlaybookCard";
 import { FounderCall } from "@/components/cofounder/FounderCall";
 import { ProBanner } from "@/components/cofounder/ProBanner";
 import { Buddy, BuddySays, CHARACTERS, characterById, type Mood } from "@/components/cofounder/Pip";
+import { TalkingBuddy } from "@/components/cofounder/TalkingBuddy";
 import { authEnabled, useAuth } from "@/lib/supabase";
 import { haptic } from "@/lib/native";
 import { xpToast } from "@/components/cofounder/XpToast";
@@ -206,7 +207,7 @@ export default function HQ() {
             <p className="text-sm text-muted">{hello}{p.founder ? `, ${p.founder}` : ""}</p>
             <h2 className="serif mt-1 truncate text-[56px] leading-[0.95]">{p.startup}</h2>
           </div>
-          <Buddy character={ch} mood={tip.mood} size={60} className="mb-1 shrink-0" />
+          <TalkingBuddy character={ch} mood={tip.mood} size={60} line="hello" hint className="mb-1" />
         </div>
         <button type="button" onClick={() => setEditing(true)} className="mt-2 inline-flex max-w-full items-start gap-1.5 text-left text-[15px] leading-snug text-muted hover:text-fg"><span className="line-clamp-2">{p.startup} {p.idea.replace(/\.$/, "")}.</span><Pencil size={12} className="mt-1 shrink-0" aria-hidden /></button>
         <div data-tour="level" className="mt-4 flex items-center gap-3 text-[13px] text-muted">

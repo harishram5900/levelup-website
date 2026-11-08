@@ -38,6 +38,8 @@ export function middleware(req: NextRequest) {
   if (limited(`all:${ip}`, 1200, 60_000)) return deny(429, "Too many requests. Slow down a little.");
 
   if (pathname.startsWith("/api/")) {
+    // Character voices are fixed, CDN-cached audio lines: read-only GET, rate-limited in the route.
+    if (pathname === "/api/voice" && req.method === "GET") return NextResponse.next();
     if (req.method !== "POST") return deny(405, "Method not allowed");
     const origin = req.headers.get("origin");
     if (origin) {
