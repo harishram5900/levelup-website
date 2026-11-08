@@ -1,0 +1,99 @@
+company:
+  name: LevelUp
+agents:
+  ceo:
+    role: ceo
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 1500
+  cto:
+    role: cto
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 1500
+  engineer:
+    role: engineer
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 2500
+  qa:
+    role: qa
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 1000
+  designer:
+    role: designer
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 800
+  cmo:
+    role: cmo
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 1000
+  content:
+    role: general
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 800
+  partnerships:
+    role: general
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 500
+  support:
+    role: general
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 500
+  researcher:
+    role: researcher
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 1200
+  cfo:
+    role: cfo
+    adapter:
+      type: claude_local
+    budgetMonthlyCents: 400
+routines:
+  weekly-priorities:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 9 * * 1"
+        timezone: America/Chicago
+  weekly-quality-run:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 8 * * 1"
+        timezone: America/Chicago
+  opportunities-refresh:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 10 * * 3"
+        timezone: America/Chicago
+  content-batch:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 10 * * 2"
+        timezone: America/Chicago
+  growth-experiment:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 11 * * 1"
+        timezone: America/Chicago
+  metrics-review:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 8 * * 1"
+        timezone: America/Chicago
+  feedback-digest:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 9 * * 5"
+        timezone: America/Chicago
+  competitor-watch:
+    triggers:
+      - kind: schedule
+        cronExpression: "0 10 1 * *"
+        timezone: America/Chicago
